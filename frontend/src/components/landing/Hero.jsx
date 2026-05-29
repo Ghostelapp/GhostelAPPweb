@@ -55,6 +55,7 @@ export default function Hero() {
             <Button
               data-testid="hero-cta-download"
               size="lg"
+              onClick={() => navigate("/register")}
               className="bg-gradient-to-r from-cyan-400 to-fuchsia-500 hover:opacity-90 text-zinc-950 font-semibold rounded-full px-7 h-12 neon-glow-cyan"
             >
               {t("hero.cta1")}
@@ -64,7 +65,7 @@ export default function Hero() {
               data-testid="hero-cta-register"
               size="lg"
               variant="outline"
-              onClick={() => navigate("/register")}
+              onClick={() => navigate("/login")}
               className="rounded-full h-12 px-7 border-white/20 bg-white/5 text-white hover:bg-white/10 hover:text-cyan-400 hover:border-cyan-400/50"
             >
               {t("hero.cta2")}
@@ -74,10 +75,10 @@ export default function Hero() {
           <div className="mt-10 flex items-center gap-6 text-xs text-zinc-500">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              99.9% uptime
+              TLS 1.3
             </div>
-            <div>End-to-end encrypted</div>
-            <div className="hidden sm:block">iOS · Android · Web</div>
+            <div>E2EE · Curve25519</div>
+            <div className="hidden sm:block">SOC 2 Ready</div>
           </div>
         </motion.div>
 

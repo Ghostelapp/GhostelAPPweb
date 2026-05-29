@@ -2,7 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLang } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { Menu, X, Globe } from "lucide-react";
+import { Menu, X, Globe, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -36,8 +36,8 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" data-testid="navbar-logo" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-400 to-fuchsia-500 neon-glow-cyan grid place-items-center text-zinc-950 font-display font-black">
-            G
+          <div className="w-9 h-9 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+            <ShieldCheck className="w-5 h-5" />
           </div>
           <span className="font-display font-bold text-xl tracking-tight text-white">
             Ghostel

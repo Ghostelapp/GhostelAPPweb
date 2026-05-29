@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
-import { Zap, MousePointer, Wifi, Lock, Smartphone, Radio } from "lucide-react";
+import { Lock, KeyRound, FileCheck2, Download, MonitorSmartphone, ShieldCheck } from "lucide-react";
 
 export default function WhyGhostel() {
   const { t } = useLang();
   const items = [
-    { icon: Zap, title: t("why.speed"), desc: t("why.speedDesc") },
-    { icon: MousePointer, title: t("why.intuitive"), desc: t("why.intuitiveDesc") },
-    { icon: Wifi, title: t("why.stable"), desc: t("why.stableDesc") },
-    { icon: Lock, title: t("why.secure"), desc: t("why.secureDesc") },
-    { icon: Smartphone, title: t("why.mobile"), desc: t("why.mobileDesc") },
-    { icon: Radio, title: t("why.realtime"), desc: t("why.realtimeDesc") },
+    { icon: Lock, title: t("why.speed"), desc: t("why.speedDesc") },
+    { icon: KeyRound, title: t("why.intuitive"), desc: t("why.intuitiveDesc") },
+    { icon: FileCheck2, title: t("why.stable"), desc: t("why.stableDesc") },
+    { icon: Download, title: t("why.secure"), desc: t("why.secureDesc") },
+    { icon: MonitorSmartphone, title: t("why.mobile"), desc: t("why.mobileDesc") },
+    { icon: ShieldCheck, title: t("why.realtime"), desc: t("why.realtimeDesc") },
   ];
 
   return (
@@ -19,7 +19,7 @@ export default function WhyGhostel() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
           <div className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-400 mb-4">
-            Why us
+            Security &amp; Compliance
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-white mb-4">
             {t("why.title")}

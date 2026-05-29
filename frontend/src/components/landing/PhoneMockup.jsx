@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { MessageCircle, Phone, Users, Bell } from "lucide-react";
+import { Lock, Timer, ShieldCheck, Phone } from "lucide-react";
 
 const fakeChats = [
-  { name: "Marek", text: "Hej, jesteś?", time: "12:34", unread: 2, color: "from-cyan-400 to-blue-500" },
-  { name: "Design Team", text: "Nowy mockup ready 🎨", time: "12:30", unread: 5, color: "from-fuchsia-500 to-purple-500" },
-  { name: "Anna", text: "Wysłałam pliki", time: "12:15", unread: 0, color: "from-emerald-400 to-teal-500" },
-  { name: "Crypto Talk", text: "BTC pump!", time: "11:58", unread: 12, color: "from-amber-400 to-orange-500" },
+  { name: "Legal Team", text: "🔒 NDA draft shared — 24h timer", time: "12:34", unread: 2, color: "from-cyan-400 to-blue-500", encrypted: true },
+  { name: "M&A Workspace", text: "Disappearing in 1h 12m", time: "12:30", unread: 5, color: "from-fuchsia-500 to-purple-500", encrypted: true },
+  { name: "CISO direct", text: "E2EE call ended · 14:02", time: "12:15", unread: 0, color: "from-emerald-400 to-teal-500", encrypted: true },
+  { name: "Board · Q1", text: "Audit log exported", time: "11:58", unread: 1, color: "from-amber-400 to-orange-500", encrypted: true },
 ];
 
 export default function PhoneMockup() {
@@ -27,7 +27,9 @@ export default function PhoneMockup() {
           {/* Status bar */}
           <div className="px-5 py-2 flex justify-between text-[10px] text-zinc-300 font-medium">
             <span>9:41</span>
-            <span>Ghostel</span>
+            <span className="flex items-center gap-1 text-cyan-400">
+              <Lock className="w-2.5 h-2.5" /> E2EE
+            </span>
             <span>100%</span>
           </div>
 
@@ -35,14 +37,14 @@ export default function PhoneMockup() {
           <div className="px-5 py-3 flex items-center justify-between border-b border-white/5">
             <div>
               <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-wider">
-                Czaty
+                Encrypted inbox
               </div>
               <div className="font-display text-lg font-bold text-white">
-                Wiadomości
+                Ghostel
               </div>
             </div>
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-fuchsia-500 grid place-items-center text-xs font-bold text-zinc-950">
-              GH
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-400 to-fuchsia-500 grid place-items-center">
+              <ShieldCheck className="w-4 h-4 text-zinc-950" />
             </div>
           </div>
 
@@ -61,7 +63,10 @@ export default function PhoneMockup() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline justify-between">
-                    <span className="text-sm text-white font-medium truncate">{c.name}</span>
+                    <span className="text-sm text-white font-medium truncate flex items-center gap-1">
+                      {c.name}
+                      {c.encrypted && <Lock className="w-2.5 h-2.5 text-cyan-400 shrink-0" />}
+                    </span>
                     <span className="text-[10px] text-zinc-500">{c.time}</span>
                   </div>
                   <div className="flex items-center justify-between">
@@ -77,21 +82,17 @@ export default function PhoneMockup() {
             ))}
           </div>
 
-          {/* Bottom nav */}
-          <div className="border-t border-white/5 px-2 py-3 flex justify-around">
-            {[MessageCircle, Phone, Users, Bell].map((Icon, i) => (
-              <div
-                key={i}
-                className={`w-9 h-9 grid place-items-center rounded-lg ${i === 0 ? "text-cyan-400 bg-cyan-400/10" : "text-zinc-500"}`}
-              >
-                <Icon className="w-4 h-4" />
-              </div>
-            ))}
+          {/* Bottom badge */}
+          <div className="border-t border-white/5 px-4 py-3 flex justify-center">
+            <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-cyan-400 flex items-center gap-1.5">
+              <ShieldCheck className="w-3 h-3" />
+              TLS 1.3 · CURVE25519
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Floating notification */}
+      {/* Floating elements */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -99,11 +100,11 @@ export default function PhoneMockup() {
         className="absolute -left-6 top-12 glass-strong rounded-2xl px-4 py-3 shadow-2xl hidden sm:flex items-center gap-3 max-w-[220px]"
       >
         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-fuchsia-500 to-purple-600 grid place-items-center">
-          <Bell className="w-4 h-4 text-white" />
+          <Timer className="w-4 h-4 text-white" />
         </div>
         <div>
-          <div className="text-xs font-bold text-white">Nowa wiadomość</div>
-          <div className="text-[10px] text-zinc-400">Push w czasie rzeczywistym</div>
+          <div className="text-xs font-bold text-white">Znika za 23h</div>
+          <div className="text-[10px] text-zinc-400">Disappearing message</div>
         </div>
       </motion.div>
 
@@ -117,8 +118,8 @@ export default function PhoneMockup() {
           <Phone className="w-3.5 h-3.5 text-emerald-400" />
         </div>
         <div>
-          <div className="text-xs font-bold text-white">Połączenie</div>
-          <div className="text-[10px] text-zinc-400">02:14</div>
+          <div className="text-xs font-bold text-white">E2EE call</div>
+          <div className="text-[10px] text-zinc-400">02:14 · secure</div>
         </div>
       </motion.div>
     </div>

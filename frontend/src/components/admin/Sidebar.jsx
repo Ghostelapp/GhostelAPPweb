@@ -9,6 +9,7 @@ import {
   Settings,
   FileBarChart2,
   Home,
+  ShieldCheck,
 } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
 
@@ -33,13 +34,13 @@ export default function Sidebar() {
       className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-64 border-r border-white/10 bg-zinc-950/95 backdrop-blur-xl z-40"
     >
       <div className="px-6 py-6 flex items-center gap-2 border-b border-white/5">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-fuchsia-500 neon-glow-cyan grid place-items-center text-zinc-950 font-display font-black">
-          G
+        <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+          <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
           <div className="font-display font-bold text-lg text-white leading-none">Ghostel</div>
-          <div className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em] mt-1">
-            Admin
+          <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1">
+            Admin · E2EE
           </div>
         </div>
       </div>

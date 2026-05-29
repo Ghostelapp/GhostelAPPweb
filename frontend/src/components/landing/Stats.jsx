@@ -30,9 +30,9 @@ function Counter({ to, suffix = "", duration = 2 }) {
 export default function Stats() {
   const { t } = useLang();
   const items = [
-    { value: 99, suffix: ".9%", label: t("stats.uptime") },
-    { value: 250000, suffix: "+", label: t("stats.messages") },
-    { value: 12000, suffix: "+", label: t("stats.conversations") },
+    { value: 99, suffix: ".99%", label: t("stats.uptime") },
+    { value: 12, suffix: "M+", label: t("stats.messages") },
+    { value: 320, suffix: "+", label: t("stats.conversations") },
     { value: 100, suffix: "%", label: t("stats.secure") },
   ];
 

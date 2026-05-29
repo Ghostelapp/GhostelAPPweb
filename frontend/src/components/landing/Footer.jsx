@@ -1,5 +1,5 @@
 import { useLang } from "@/context/LanguageContext";
-import { Github, Twitter, Linkedin } from "lucide-react";
+import { Github, Twitter, Linkedin, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   const { t } = useLang();
@@ -10,8 +10,8 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-cyan-400 to-fuchsia-500 neon-glow-cyan grid place-items-center text-zinc-950 font-display font-black">
-                G
+              <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+                <ShieldCheck className="w-5 h-5" />
               </div>
               <span className="font-display font-bold text-2xl text-white">Ghostel</span>
             </div>

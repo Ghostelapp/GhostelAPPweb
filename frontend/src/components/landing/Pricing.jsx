@@ -12,20 +12,31 @@ export default function Pricing() {
     {
       name: t("pricing.free"),
       price: "0",
-      currency: "zł",
+      currency: "$",
       cta: t("pricing.freeCta"),
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-free",
+      onClick: () => navigate("/register"),
     },
     {
       name: t("pricing.premium"),
-      price: "19",
-      currency: "zł",
+      price: "9",
+      currency: "$",
       cta: t("pricing.premiumCta"),
       features: [t("pricing.premF1"), t("pricing.premF2"), t("pricing.premF3"), t("pricing.premF4"), t("pricing.premF5")],
       popular: true,
       testid: "pricing-premium",
+      onClick: () => navigate("/register"),
+    },
+    {
+      name: t("pricing.enterprise"),
+      price: null,
+      cta: t("pricing.contactSales"),
+      features: [t("pricing.entF1"), t("pricing.entF2"), t("pricing.entF3"), t("pricing.entF4"), t("pricing.entF5")],
+      popular: false,
+      testid: "pricing-enterprise",
+      onClick: () => (window.location.href = "mailto:sales@ghostel.app"),
     },
   ];
 
@@ -42,7 +53,7 @@ export default function Pricing() {
           <p className="text-base text-zinc-400">{t("pricing.subtitle")}</p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-5 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
           {plans.map((p, i) => (
             <motion.div
               key={p.name}
@@ -63,11 +74,17 @@ export default function Pricing() {
                 </div>
               )}
               <div className="font-display text-2xl font-bold text-white mb-2">{p.name}</div>
-              <div className="flex items-baseline gap-2 mb-6">
-                <span className="font-display text-5xl font-black text-white">{p.price}</span>
-                <span className="text-base text-zinc-400">{p.currency}</span>
-                {p.price !== "0" && (
-                  <span className="text-xs text-zinc-500">{t("pricing.perMonth")}</span>
+              <div className="flex items-baseline gap-2 mb-6 min-h-[58px]">
+                {p.price !== null ? (
+                  <>
+                    <span className="text-base text-zinc-400">{p.currency}</span>
+                    <span className="font-display text-5xl font-black text-white">{p.price}</span>
+                    {p.price !== "0" && (
+                      <span className="text-xs text-zinc-500">{t("pricing.perMonth")}</span>
+                    )}
+                  </>
+                ) : (
+                  <span className="font-display text-3xl font-black text-white">Custom</span>
                 )}
               </div>
 
@@ -82,7 +99,7 @@ export default function Pricing() {
 
               <Button
                 data-testid={`${p.testid}-cta`}
-                onClick={() => navigate("/register")}
+                onClick={p.onClick}
                 className={
                   p.popular
                     ? "w-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-zinc-950 hover:opacity-90 h-11 rounded-full font-semibold"

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { ShieldCheck } from "lucide-react";
 
 export default function Login() {
   const { t } = useLang();
@@ -54,15 +55,16 @@ export default function Login() {
           {t("login.backHome")}
         </Link>
         <div className="flex items-center gap-2 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-fuchsia-500 grid place-items-center text-zinc-950 font-display font-black">
-            G
+          <div className="w-11 h-11 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+            <ShieldCheck className="w-6 h-6" />
           </div>
-          <span className="font-display font-bold text-2xl text-white">Ghostel</span>
+          <div>
+            <div className="font-display font-bold text-2xl text-white leading-none">Ghostel</div>
+            <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1">
+              Encrypted messaging
+            </div>
+          </div>
         </div>
-
-        <h1 className="font-display text-3xl font-black tracking-tighter text-white mb-2">
-          {t("login.title")}
-        </h1>
         <p className="text-sm text-zinc-400 mb-8">{t("login.subtitle")}</p>
 
         <form onSubmit={onSubmit} className="space-y-5">

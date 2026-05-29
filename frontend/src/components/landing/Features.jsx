@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
-import { MessageSquare, Users, Phone, Paperclip, Bell, ShieldCheck } from "lucide-react";
+import { Lock, Timer, PhoneCall, FileLock, BellOff, ShieldCheck } from "lucide-react";
 
 export default function Features() {
   const { t } = useLang();
   const items = [
-    { icon: MessageSquare, title: t("features.messagesTitle"), desc: t("features.messagesDesc"), span: "md:col-span-2", glow: "cyan" },
-    { icon: Users, title: t("features.groupsTitle"), desc: t("features.groupsDesc"), glow: "purple" },
-    { icon: Phone, title: t("features.voiceTitle"), desc: t("features.voiceDesc"), glow: "cyan" },
-    { icon: Paperclip, title: t("features.filesTitle"), desc: t("features.filesDesc"), glow: "purple" },
-    { icon: Bell, title: t("features.pushTitle"), desc: t("features.pushDesc"), glow: "cyan" },
+    { icon: Lock, title: t("features.messagesTitle"), desc: t("features.messagesDesc"), span: "md:col-span-2", glow: "cyan" },
+    { icon: Timer, title: t("features.groupsTitle"), desc: t("features.groupsDesc"), glow: "purple" },
+    { icon: PhoneCall, title: t("features.voiceTitle"), desc: t("features.voiceDesc"), glow: "cyan" },
+    { icon: FileLock, title: t("features.filesTitle"), desc: t("features.filesDesc"), glow: "purple" },
+    { icon: BellOff, title: t("features.pushTitle"), desc: t("features.pushDesc"), glow: "cyan" },
     { icon: ShieldCheck, title: t("features.securityTitle"), desc: t("features.securityDesc"), span: "md:col-span-2", glow: "purple" },
   ];
 
@@ -18,7 +18,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
           <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 mb-4">
-            Features
+            Security-first features
           </div>
           <h2 data-testid="features-title" className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-white mb-4">
             {t("features.title")}
