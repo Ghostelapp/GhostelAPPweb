@@ -96,6 +96,40 @@ export default function Dashboard() {
         ))}
       </div>
 
+      {data.source === "ghostel" && (
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div data-testid="stat-2fa" className="surface rounded-2xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+              2FA enabled
+            </div>
+            <div className="font-display text-2xl font-extrabold text-white">
+              {data.stats.two_factor_enabled}{" "}
+              <span className="text-xs text-zinc-500">/ {data.stats.total_users}</span>
+            </div>
+          </div>
+          <div data-testid="stat-push" className="surface rounded-2xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+              Push registered
+            </div>
+            <div className="font-display text-2xl font-extrabold text-white">
+              {data.stats.push_ready}{" "}
+              <span className="text-xs text-zinc-500">/ {data.stats.total_users}</span>
+            </div>
+          </div>
+          <div className="surface rounded-2xl p-5">
+            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-500 mb-2">
+              Online rate
+            </div>
+            <div className="font-display text-2xl font-extrabold text-cyan-400">
+              {data.stats.total_users
+                ? Math.round((data.stats.active_users / data.stats.total_users) * 100)
+                : 0}
+              %
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="grid lg:grid-cols-2 gap-4">
         <div data-testid="chart-activity" className="glass rounded-2xl p-6">
           <div className="flex items-center justify-between mb-6">

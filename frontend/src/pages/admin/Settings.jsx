@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
+import SourceBadge from "@/components/admin/SourceBadge";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -45,10 +46,13 @@ export default function Settings() {
     <div data-testid="admin-settings" className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
-            {t("admin.settings")}
-          </h1>
-          <p className="text-sm text-zinc-400">Konfiguracja Ghostel.</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="font-display text-4xl font-extrabold tracking-tight text-white">
+              {t("admin.settings")}
+            </h1>
+            <SourceBadge source="local" />
+          </div>
+          <p className="text-sm text-zinc-400">Lokalna konfiguracja landing page'a Ghostel.</p>
         </div>
         <Button
           data-testid="settings-save-btn"

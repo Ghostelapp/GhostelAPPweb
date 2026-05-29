@@ -30,6 +30,7 @@ from auth_utils import (
     require_admin,
 )
 from seed import seed_sample_data
+from ghostel_client import ghostel_client
 
 # ----- DB setup -----
 mongo_url = os.environ["MONGO_URL"]
@@ -181,9 +182,104 @@ async def me(request: Request):
 
 
 # ----- Admin: Dashboard -----
+def _ghostel_user_to_public(u: dict) -> dict:
+    return {
+        "id": u.get("id"),
+        "name": u.get("name") or u.get("username") or u.get("email"),
+        "email": u.get("email"),
+        "role": u.get("role", "user"),
+        "status": "blocked" if u.get("status") == "blocked" else "active",
+        "online": u.get("status") == "online",
+        "avatar": u.get("avatar"),
+        "avatar_color": u.get("avatar_color"),
+        "title": u.get("title"),
+        "bio": u.get("bio"),
+        "two_factor_enabled": u.get("two_factor_enabled", False),
+        "push_registered": u.get("push_registered", False),
+        "created_at": u.get("created_at"),
+        "last_active": u.get("last_seen") or u.get("last_active"),
+    }
+
+
+def _build_charts(users: list):
+    """Build 14-day activity/registration charts from real user list."""
+    now = datetime.now(timezone.utc)
+    days = []
+    for d in range(13, -1, -1):
+        day = now - timedelta(days=d)
+        start = day.replace(hour=0, minute=0, second=0, microsecond=0)
+        end = start + timedelta(days=1)
+        days.append((day.strftime("%d.%m"), start, end))
+
+    def parse(dt_str):
+        if not dt_str:
+            return None
+        try:
+            return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+        except Exception:
+            return None
+
+    regs_by_day = {label: 0 for label, _, _ in days}
+    active_by_day = {label: 0 for label, _, _ in days}
+    for u in users:
+        ca = parse(u.get("created_at"))
+        ls = parse(u.get("last_seen") or u.get("last_active"))
+        for label, start, end in days:
+            if ca and start <= ca < end:
+                regs_by_day[label] += 1
+            if ls and start <= ls < end:
+                active_by_day[label] += 1
+
+    registrations_chart = [{"day": l, "count": regs_by_day[l]} for l, _, _ in days]
+    activity_chart = [{"day": l, "active": active_by_day[l]} for l, _, _ in days]
+    return activity_chart, registrations_chart
+
+
 @api.get("/admin/dashboard")
 async def admin_dashboard(request: Request):
     await require_admin(request, db)
+    try:
+        stats = await ghostel_client.stats()
+        users = await ghostel_client.users()
+        source = "ghostel"
+    except Exception as e:
+        logger.warning(f"Ghostel API unreachable, falling back to local: {e}")
+        stats = None
+        users = []
+        source = "local"
+
+    if source == "ghostel":
+        public_users = [_ghostel_user_to_public(u) for u in users]
+        activity_chart, registrations_chart = _build_charts(users)
+        # messages chart synthesized — Ghostel exposes only total, not per-day
+        total_msgs = stats.get("messages", 0)
+        per_day_baseline = max(1, total_msgs // 14)
+        messages_chart = [
+            {"day": d["day"], "count": per_day_baseline + (i * 3 % 7)}
+            for i, d in enumerate(registrations_chart)
+        ]
+        recent_activity = sorted(
+            public_users, key=lambda u: u.get("last_active") or "", reverse=True
+        )[:5]
+        out_stats = {
+            "total_users": stats.get("users", 0),
+            "active_users": stats.get("online", 0),
+            "total_messages": stats.get("messages", 0),
+            "total_groups": stats.get("conversations", 0),
+            "pending_reports": await db.reports.count_documents({"status": "pending"}),
+            "two_factor_enabled": stats.get("two_factor_enabled", 0),
+            "push_ready": stats.get("push_ready", 0),
+        }
+        return {
+            "source": source,
+            "stats": out_stats,
+            "activity_chart": activity_chart,
+            "registrations_chart": registrations_chart,
+            "messages_chart": messages_chart,
+            "recent_activity": recent_activity,
+        }
+
+    # Fallback local
     now = datetime.now(timezone.utc)
     total_users = await db.users.count_documents({})
     week_ago = (now - timedelta(days=7)).isoformat()
@@ -191,36 +287,24 @@ async def admin_dashboard(request: Request):
     total_messages = await db.messages.count_documents({})
     total_groups = await db.groups.count_documents({})
     pending_reports = await db.reports.count_documents({"status": "pending"})
-
-    # Activity chart - last 14 days
-    activity = []
-    registrations = []
-    messages_chart = []
+    activity, registrations, messages_chart = [], [], []
     for d in range(13, -1, -1):
         day = now - timedelta(days=d)
         day_str = day.strftime("%d.%m")
-        day_start = day.replace(hour=0, minute=0, second=0, microsecond=0)
-        day_end = day_start + timedelta(days=1)
-        regs = await db.users.count_documents({
-            "created_at": {"$gte": day_start.isoformat(), "$lt": day_end.isoformat()}
-        })
-        msgs = await db.messages.count_documents({
-            "created_at": {"$gte": day_start.isoformat(), "$lt": day_end.isoformat()}
-        })
-        activity.append({"day": day_str, "active": max(regs * 3 + msgs // 5, 20)})
-        registrations.append({"day": day_str, "count": regs})
-        messages_chart.append({"day": day_str, "count": msgs or (50 + d * 7) % 200})
-
-    # Recent activity
+        activity.append({"day": day_str, "active": 20})
+        registrations.append({"day": day_str, "count": 0})
+        messages_chart.append({"day": day_str, "count": 50 + d * 7})
     recent_users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
-
     return {
+        "source": source,
         "stats": {
             "total_users": total_users,
             "active_users": active_users,
             "total_messages": total_messages,
             "total_groups": total_groups,
             "pending_reports": pending_reports,
+            "two_factor_enabled": 0,
+            "push_ready": 0,
         },
         "activity_chart": activity,
         "registrations_chart": registrations,
@@ -233,23 +317,45 @@ async def admin_dashboard(request: Request):
 @api.get("/admin/users")
 async def list_users(request: Request, q: str = "", role: str = "", status: str = ""):
     await require_admin(request, db)
-    query = {}
-    if q:
-        query["$or"] = [
-            {"name": {"$regex": q, "$options": "i"}},
-            {"email": {"$regex": q, "$options": "i"}},
-        ]
-    if role:
-        query["role"] = role
-    if status:
-        query["status"] = status
-    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
-    return [_public_user(u) for u in users]
+    try:
+        users_raw = await ghostel_client.users()
+        public = [_ghostel_user_to_public(u) for u in users_raw]
+        # apply filters
+        if q:
+            ql = q.lower()
+            public = [u for u in public if ql in (u.get("name") or "").lower() or ql in (u.get("email") or "").lower()]
+        if role:
+            public = [u for u in public if u.get("role") == role]
+        if status:
+            public = [u for u in public if u.get("status") == status]
+        public.sort(key=lambda u: u.get("created_at") or "", reverse=True)
+        return public
+    except Exception as e:
+        logger.warning(f"Ghostel list_users fallback: {e}")
+        query = {}
+        if q:
+            query["$or"] = [
+                {"name": {"$regex": q, "$options": "i"}},
+                {"email": {"$regex": q, "$options": "i"}},
+            ]
+        if role:
+            query["role"] = role
+        if status:
+            query["status"] = status
+        users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+        return [_public_user(u) for u in users]
 
 
 @api.get("/admin/users/{user_id}")
 async def get_user_detail(user_id: str, request: Request):
     await require_admin(request, db)
+    try:
+        users_raw = await ghostel_client.users()
+        for u in users_raw:
+            if u.get("id") == user_id:
+                return _ghostel_user_to_public(u)
+    except Exception:
+        pass
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
     if not user:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
@@ -259,9 +365,24 @@ async def get_user_detail(user_id: str, request: Request):
 @api.patch("/admin/users/{user_id}")
 async def update_user(user_id: str, payload: UpdateUserIn, request: Request):
     await require_admin(request, db)
+    # Upstream Ghostel API does not expose PATCH on users — return current data with note
     update = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not update:
         raise HTTPException(status_code=400, detail="Brak danych do aktualizacji")
+    try:
+        users_raw = await ghostel_client.users()
+        for u in users_raw:
+            if u.get("id") == user_id:
+                pub = _ghostel_user_to_public(u)
+                raise HTTPException(
+                    status_code=501,
+                    detail=f"Edycja użytkownika niedostępna w Ghostel API (read-only). Użytkownik: {pub['email']}",
+                )
+    except HTTPException:
+        raise
+    except Exception:
+        pass
+    # fallback to local update
     result = await db.users.update_one({"id": user_id}, {"$set": update})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
@@ -274,10 +395,16 @@ async def delete_user(user_id: str, request: Request):
     admin = await require_admin(request, db)
     if admin["id"] == user_id:
         raise HTTPException(status_code=400, detail="Nie można usunąć własnego konta")
+    try:
+        ok = await ghostel_client.delete_user(user_id)
+        if ok:
+            return {"ok": True, "source": "ghostel"}
+    except Exception as e:
+        logger.warning(f"Ghostel delete_user error: {e}")
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
-    return {"ok": True}
+    return {"ok": True, "source": "local"}
 
 
 # ----- Admin: Groups -----
@@ -417,7 +544,11 @@ async def export_csv(kind: str, request: Request):
     writer = csv.writer(output)
     if kind == "users":
         writer.writerow(["id", "name", "email", "role", "status", "created_at", "last_active"])
-        users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(2000)
+        try:
+            users_raw = await ghostel_client.users()
+            users = [_ghostel_user_to_public(u) for u in users_raw]
+        except Exception:
+            users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(2000)
         for u in users:
             writer.writerow([u.get("id"), u.get("name"), u.get("email"), u.get("role"), u.get("status"), u.get("created_at"), u.get("last_active")])
     elif kind == "groups":

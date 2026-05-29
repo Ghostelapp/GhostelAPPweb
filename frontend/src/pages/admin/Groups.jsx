@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { API, formatApiError, buildExportUrl } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
+import SourceBadge from "@/components/admin/SourceBadge";
 import {
   Table,
   TableBody,
@@ -94,10 +95,13 @@ export default function Groups() {
     <div data-testid="admin-groups" className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
-            {t("admin.groups")}
-          </h1>
-          <p className="text-sm text-zinc-400">{groups.length} grup</p>
+          <div className="flex items-center gap-3 mb-2">
+            <h1 className="font-display text-4xl font-extrabold tracking-tight text-white">
+              {t("admin.groups")}
+            </h1>
+            <SourceBadge source="local" />
+          </div>
+          <p className="text-sm text-zinc-400">{groups.length} grup · workspace management coming in v1.1</p>
         </div>
         <div className="flex gap-3">
           <a

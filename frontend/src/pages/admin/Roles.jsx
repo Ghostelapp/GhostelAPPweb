@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
+import SourceBadge from "@/components/admin/SourceBadge";
 import { Button } from "@/components/ui/button";
 import { Shield, KeyRound, User as UserIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -41,10 +42,13 @@ export default function Roles() {
   return (
     <div data-testid="admin-roles" className="space-y-6">
       <div>
-        <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
-          {t("admin.roles")}
-        </h1>
-        <p className="text-sm text-zinc-400">Nadawaj i odbieraj role użytkownikom.</p>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-white">
+            {t("admin.roles")}
+          </h1>
+          <SourceBadge source="ghostel" />
+        </div>
+        <p className="text-sm text-zinc-400">Role z Ghostel API · zmiany roli aktualnie read-only.</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">

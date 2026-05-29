@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, Globe, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { GHOSTEL_APP_URL } from "@/lib/constants";
 
 export default function Navbar() {
   const { t, lang, setLang } = useLang();
@@ -95,14 +96,14 @@ export default function Navbar() {
                 onClick={() => navigate("/login")}
                 className="hidden sm:inline-flex text-zinc-300 hover:text-white hover:bg-white/5 rounded-full h-9"
               >
-                {t("common.login")}
+                Admin
               </Button>
               <Button
                 data-testid="navbar-register-btn"
-                onClick={() => navigate("/register")}
+                onClick={() => (window.location.href = GHOSTEL_APP_URL)}
                 className="hidden sm:inline-flex btn-cyan rounded-full px-5 h-9 text-sm"
               >
-                {t("common.register")}
+                Open app
               </Button>
             </>
           )}
@@ -142,13 +143,13 @@ export default function Navbar() {
                   onClick={() => navigate("/login")}
                   className="flex-1 text-zinc-200"
                 >
-                  {t("common.login")}
+                  Admin
                 </Button>
                 <Button
-                  onClick={() => navigate("/register")}
+                  onClick={() => (window.location.href = GHOSTEL_APP_URL)}
                   className="flex-1 btn-cyan"
                 >
-                  {t("common.register")}
+                  Open app
                 </Button>
               </div>
             </div>

@@ -3,6 +3,7 @@ import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { GHOSTEL_APP_URL } from "@/lib/constants";
 import PhoneMockup from "./PhoneMockup";
 
 export default function Hero() {
@@ -52,7 +53,7 @@ export default function Hero() {
             <Button
               data-testid="hero-cta-download"
               size="lg"
-              onClick={() => navigate("/register")}
+              onClick={() => (window.location.href = GHOSTEL_APP_URL)}
               className="btn-cyan rounded-full px-8 h-12 text-sm"
             >
               {t("hero.cta1")}
@@ -65,7 +66,7 @@ export default function Hero() {
               onClick={() => navigate("/login")}
               className="rounded-full h-12 px-7 border-white/15 bg-transparent text-white hover:bg-white/5 hover:border-white/30"
             >
-              {t("hero.cta2")}
+              Admin panel
             </Button>
           </div>
 

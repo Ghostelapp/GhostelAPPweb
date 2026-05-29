@@ -3,6 +3,7 @@ import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { GHOSTEL_APP_URL } from "@/lib/constants";
 
 export default function Pricing() {
   const { t } = useLang();
@@ -17,7 +18,7 @@ export default function Pricing() {
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-free",
-      onClick: () => navigate("/register"),
+      onClick: () => (window.location.href = GHOSTEL_APP_URL),
     },
     {
       name: t("pricing.premium"),
@@ -27,7 +28,7 @@ export default function Pricing() {
       features: [t("pricing.premF1"), t("pricing.premF2"), t("pricing.premF3"), t("pricing.premF4"), t("pricing.premF5")],
       popular: true,
       testid: "pricing-premium",
-      onClick: () => navigate("/register"),
+      onClick: () => (window.location.href = GHOSTEL_APP_URL),
     },
     {
       name: t("pricing.enterprise"),

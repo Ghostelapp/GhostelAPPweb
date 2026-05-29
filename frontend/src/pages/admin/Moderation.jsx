@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import api, { formatApiError } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
+import SourceBadge from "@/components/admin/SourceBadge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Check, X, Ban, MessageSquare, User, UsersRound } from "lucide-react";
@@ -41,9 +42,12 @@ export default function Moderation() {
   return (
     <div data-testid="admin-moderation" className="space-y-6">
       <div>
-        <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
-          {t("admin.moderation")}
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-white">
+            {t("admin.moderation")}
+          </h1>
+          <SourceBadge source="local" />
+        </div>
         <p className="text-sm text-zinc-400">{reports.length} zgłoszeń · {reports.filter(r=>r.status==='pending').length} oczekujących</p>
       </div>
 
