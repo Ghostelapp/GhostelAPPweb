@@ -137,8 +137,8 @@ export default function Dashboard() {
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
               <XAxis dataKey="day" stroke="#52525b" fontSize={11} />
               <YAxis stroke="#52525b" fontSize={11} />
-              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(176,38,255,0.08)" }} />
-              <Bar dataKey="count" fill="#b026ff" radius={[6, 6, 0, 0]} />
+              <Tooltip content={<ChartTooltip />} cursor={{ fill: "rgba(34,211,238,0.08)" }} />
+              <Bar dataKey="count" fill="#22d3ee" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -165,7 +165,7 @@ export default function Dashboard() {
               stroke="#00e5ff"
               strokeWidth={2.5}
               dot={{ fill: "#00e5ff", r: 3 }}
-              activeDot={{ r: 6, fill: "#b026ff" }}
+              activeDot={{ r: 6, fill: "#22d3ee" }}
             />
           </LineChart>
         </ResponsiveContainer>

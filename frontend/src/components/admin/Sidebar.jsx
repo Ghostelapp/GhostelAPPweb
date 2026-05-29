@@ -31,21 +31,21 @@ export default function Sidebar() {
   return (
     <aside
       data-testid="admin-sidebar"
-      className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-64 border-r border-white/10 bg-zinc-950/95 backdrop-blur-xl z-40"
+      className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-64 border-r divider-soft bg-[#0a0e14] z-40"
     >
-      <div className="px-6 py-6 flex items-center gap-2 border-b border-white/5">
-        <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+      <div className="px-6 py-6 flex items-center gap-3 border-b divider-soft">
+        <div className="w-10 h-10 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
           <ShieldCheck className="w-5 h-5" />
         </div>
         <div>
-          <div className="font-display font-bold text-lg text-white leading-none">Ghostel</div>
-          <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1">
+          <div className="font-display font-bold text-base text-white leading-none">Ghostel</div>
+          <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1.5">
             Admin · E2EE
           </div>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         {items.map((it) => {
           const Icon = it.icon;
           return (
@@ -55,10 +55,10 @@ export default function Sidebar() {
               end={it.end}
               data-testid={it.testid}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-white/10 text-cyan-400 border-l-2 border-cyan-400 pl-[10px]"
-                    : "text-zinc-400 hover:bg-white/5 hover:text-white"
+                    ? "bg-cyan-400/10 text-cyan-400 border border-cyan-400/20"
+                    : "text-zinc-400 hover:bg-white/[0.03] hover:text-white border border-transparent"
                 }`
               }
             >
@@ -69,14 +69,14 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="px-3 py-4 border-t border-white/5">
+      <div className="px-3 py-4 border-t divider-soft">
         <button
           onClick={() => navigate("/")}
           data-testid="sidebar-back-home"
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-zinc-400 hover:bg-white/5 hover:text-white"
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-zinc-400 hover:bg-white/[0.03] hover:text-white"
         >
           <Home className="w-4 h-4" />
-          Strona główna
+          Home
         </button>
       </div>
     </aside>

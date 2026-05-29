@@ -30,7 +30,7 @@ export default function Login() {
     const res = await login(email, password);
     setLoading(false);
     if (res.ok) {
-      toast.success(t("common.login") + " OK");
+      toast.success("Signed in");
       navigate(res.user.role === "admin" ? "/admin" : "/");
     } else {
       setError(res.error);
@@ -39,37 +39,35 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen relative grid place-items-center bg-zinc-950 overflow-hidden p-6">
-      <div className="absolute inset-0 grid-bg opacity-30" />
-      <div className="absolute inset-0 radial-fade" />
-      <div className="absolute top-1/3 left-1/4 w-72 h-72 rounded-full bg-cyan-500/20 blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 rounded-full bg-fuchsia-500/20 blur-[120px]" />
+    <div className="min-h-screen relative grid place-items-center bg-[#0a0e14] overflow-hidden p-6">
+      <div className="absolute inset-0 subtle-grid opacity-30" />
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full bg-cyan-500/[0.06] blur-[120px]" />
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         data-testid="login-card"
-        className="relative w-full max-w-md glass-strong rounded-3xl p-8 shadow-2xl"
+        className="relative w-full max-w-md surface rounded-2xl p-8 shadow-2xl"
       >
         <Link to="/" data-testid="login-back-home" className="text-xs text-zinc-500 hover:text-cyan-400 mb-6 inline-block">
           {t("login.backHome")}
         </Link>
-        <div className="flex items-center gap-2 mb-6">
-          <div className="w-11 h-11 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
-            <ShieldCheck className="w-6 h-6" />
+        <div className="flex flex-col items-center text-center mb-8">
+          <div className="w-14 h-14 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400 mb-4">
+            <ShieldCheck className="w-7 h-7" />
           </div>
-          <div>
-            <div className="font-display font-bold text-2xl text-white leading-none">Ghostel</div>
-            <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1">
-              Encrypted messaging
-            </div>
+          <h1 className="font-display text-2xl font-extrabold text-white mb-1">
+            {t("login.title")}
+          </h1>
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">
+            Private. Encrypted. Untraceable.
           </div>
+          <p className="text-sm text-zinc-400 mt-3">{t("login.subtitle")}</p>
         </div>
-        <p className="text-sm text-zinc-400 mb-8">{t("login.subtitle")}</p>
 
         <form onSubmit={onSubmit} className="space-y-5">
           <div>
-            <Label className="text-xs font-bold uppercase tracking-[0.15em] text-zinc-400">
+            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
               {t("common.email")}
             </Label>
             <Input
@@ -78,12 +76,12 @@ export default function Login() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="mt-2 bg-white/5 border-white/10 text-white h-11 rounded-xl focus-visible:ring-cyan-400"
+              className="mt-2 bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
               placeholder="admin@ghostel.app"
             />
           </div>
           <div>
-            <Label className="text-xs font-bold uppercase tracking-[0.15em] text-zinc-400">
+            <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
               {t("common.password")}
             </Label>
             <Input
@@ -92,7 +90,7 @@ export default function Login() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 bg-white/5 border-white/10 text-white h-11 rounded-xl focus-visible:ring-cyan-400"
+              className="mt-2 bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
               placeholder="••••••••"
             />
           </div>
@@ -107,17 +105,17 @@ export default function Login() {
             data-testid="login-submit-btn"
             type="submit"
             disabled={loading}
-            className="w-full h-11 bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-zinc-950 font-semibold rounded-xl hover:opacity-90 disabled:opacity-50"
+            className="w-full h-11 btn-cyan rounded-full disabled:opacity-50"
           >
             {loading ? "..." : t("login.submit")}
           </Button>
         </form>
 
-        <div className="mt-6 text-xs text-zinc-500 text-center">
+        <div className="mt-6 pt-5 border-t divider-soft text-xs text-zinc-500 text-center">
           {t("login.adminHint")}
         </div>
 
-        <div className="mt-4 text-xs text-zinc-500 text-center">
+        <div className="mt-3 text-xs text-zinc-500 text-center">
           {t("login.noAccount")}{" "}
           <Link to="/register" data-testid="login-register-link" className="text-cyan-400 hover:underline">
             {t("common.register")}

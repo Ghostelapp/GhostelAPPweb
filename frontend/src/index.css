@@ -1,5 +1,5 @@
-/* Ghostel global styles - dark mode permanent */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+/* Ghostel global styles - aligned with actual app aesthetic */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -11,46 +11,46 @@
 
 html,
 body {
-    background: #09090b;
-    color: #fafafa;
+    background: #0a0e14;
+    color: #e6edf3;
     margin: 0;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
 ::selection {
-    background: rgba(0, 229, 255, 0.4);
+    background: rgba(34, 211, 238, 0.3);
     color: #fff;
 }
 
 @layer base {
     :root {
-        --background: 240 10% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 240 10% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 240 10% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 187 100% 50%;
-        --primary-foreground: 240 10% 3.9%;
-        --secondary: 240 3.7% 15.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 240 3.7% 15.9%;
-        --muted-foreground: 240 5% 64.9%;
-        --accent: 240 3.7% 15.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 240 3.7% 15.9%;
-        --input: 240 3.7% 15.9%;
-        --ring: 187 100% 50%;
+        --background: 217 33% 6%;       /* #0a0e14 */
+        --foreground: 210 20% 95%;
+        --card: 217 28% 9%;             /* #141a26 surface */
+        --card-foreground: 210 20% 95%;
+        --popover: 217 28% 9%;
+        --popover-foreground: 210 20% 95%;
+        --primary: 188 95% 53%;         /* cyan #22d3ee */
+        --primary-foreground: 217 33% 6%;
+        --secondary: 217 19% 16%;
+        --secondary-foreground: 210 20% 95%;
+        --muted: 217 19% 16%;
+        --muted-foreground: 215 14% 60%;
+        --accent: 217 19% 16%;
+        --accent-foreground: 210 20% 95%;
+        --destructive: 0 72% 51%;
+        --destructive-foreground: 210 20% 95%;
+        --border: 217 19% 18%;
+        --input: 217 19% 16%;
+        --ring: 188 95% 53%;
         --radius: 0.75rem;
-        --chart-1: 187 100% 50%;
-        --chart-2: 280 90% 60%;
-        --chart-3: 200 90% 60%;
-        --chart-4: 320 85% 65%;
-        --chart-5: 160 80% 50%;
+        --chart-1: 188 95% 53%;
+        --chart-2: 200 90% 60%;
+        --chart-3: 175 70% 50%;
+        --chart-4: 160 70% 45%;
+        --chart-5: 220 80% 65%;
     }
 }
 
@@ -67,126 +67,125 @@ body {
     h3,
     h4,
     h5 {
-        font-family: 'Outfit', sans-serif;
+        font-family: 'Inter', sans-serif;
         letter-spacing: -0.02em;
+        font-weight: 700;
     }
 }
 
-/* Custom utilities */
+/* Utilities matching the app */
 .font-display {
-    font-family: 'Outfit', sans-serif;
+    font-family: 'Inter', sans-serif;
 }
 
-.glass {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+.surface {
+    background: #141a26;
+    border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.glass-strong {
-    background: rgba(9, 9, 11, 0.72);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+.surface-hover {
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+.surface-hover:hover {
+    background: #1a2030;
+    border-color: rgba(34, 211, 238, 0.25);
 }
 
-.neon-text {
-    background: linear-gradient(135deg, #00e5ff 0%, #b026ff 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+.cyan-glow-soft {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.25),
+        0 8px 24px -8px rgba(34, 211, 238, 0.25);
 }
 
-.neon-glow-cyan {
-    box-shadow:
-        0 0 30px rgba(0, 229, 255, 0.35),
-        0 0 60px rgba(0, 229, 255, 0.15);
+.cyan-ring {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2),
+        inset 0 0 0 1px rgba(34, 211, 238, 0.08);
 }
 
-.neon-glow-purple {
-    box-shadow:
-        0 0 30px rgba(176, 38, 255, 0.35),
-        0 0 60px rgba(176, 38, 255, 0.15);
+.btn-cyan {
+    background: #22d3ee;
+    color: #0a0e14;
+    font-weight: 600;
+    transition: background 0.15s ease, transform 0.15s ease;
+}
+.btn-cyan:hover {
+    background: #06b6d4;
+}
+.btn-cyan:active {
+    transform: translateY(1px);
 }
 
-.neon-border {
-    position: relative;
-}
-.neon-border::before {
-    content: '';
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(135deg, #00e5ff, #b026ff);
-    -webkit-mask:
-        linear-gradient(#fff 0 0) content-box,
-        linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    pointer-events: none;
+.divider-soft {
+    border-color: rgba(255, 255, 255, 0.06);
 }
 
-.grid-bg {
+.subtle-grid {
     background-image:
-        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
     background-size: 60px 60px;
 }
 
-.radial-fade {
-    background: radial-gradient(
-        ellipse at top,
-        rgba(0, 229, 255, 0.15) 0%,
-        rgba(176, 38, 255, 0.08) 35%,
-        transparent 70%
-    );
-}
-
 @keyframes floaty {
-    0%,
-    100% {
-        transform: translateY(0px);
-    }
-    50% {
-        transform: translateY(-12px);
-    }
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
 }
 .animate-floaty {
     animation: floaty 6s ease-in-out infinite;
 }
 
-@keyframes pulse-glow {
-    0%,
-    100% {
-        opacity: 0.35;
-    }
-    50% {
-        opacity: 0.65;
-    }
+@keyframes pulse-soft {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
 }
-.animate-pulse-glow {
-    animation: pulse-glow 4s ease-in-out infinite;
+.animate-pulse-soft {
+    animation: pulse-soft 2.4s ease-in-out infinite;
 }
 
-@keyframes shimmer {
-    0% {
-        background-position: -200% 0;
-    }
-    100% {
-        background-position: 200% 0;
-    }
+/* Legacy class aliases - keep admin pages working with the new aesthetic */
+.glass {
+    background: #141a26;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    backdrop-filter: none;
 }
-.shimmer {
-    background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.08) 50%,
-        rgba(255, 255, 255, 0) 100%
-    );
-    background-size: 200% 100%;
-    animation: shimmer 3s linear infinite;
+
+.glass-strong {
+    background: #141a26;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: none;
+}
+
+.neon-text {
+    color: #22d3ee;
+    background: none;
+    -webkit-text-fill-color: #22d3ee;
+}
+
+.neon-glow-cyan {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2);
+}
+
+.neon-glow-purple {
+    box-shadow: 0 0 0 1px rgba(34, 211, 238, 0.2);
+}
+
+.neon-border {
+    border: 1px solid rgba(34, 211, 238, 0.3);
+}
+
+/* Override gradient utility used in admin buttons */
+.bg-gradient-to-r.from-cyan-400.to-fuchsia-500,
+.bg-gradient-to-r.from-cyan-500.to-fuchsia-500 {
+    background: #22d3ee !important;
+    color: #0a0e14 !important;
+}
+.bg-gradient-to-br.from-cyan-400.to-fuchsia-500,
+.bg-gradient-to-br.from-fuchsia-500.to-cyan-400 {
+    background: rgba(34, 211, 238, 0.15) !important;
+    color: #22d3ee !important;
+    border: 1px solid rgba(34, 211, 238, 0.3);
 }
 
 /* Scrollbar */
@@ -195,12 +194,12 @@ body {
     height: 10px;
 }
 ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: #0a0e14;
 }
 ::-webkit-scrollbar-thumb {
     background: rgba(255, 255, 255, 0.08);
     border-radius: 10px;
 }
 ::-webkit-scrollbar-thumb:hover {
-    background: rgba(0, 229, 255, 0.3);
+    background: rgba(34, 211, 238, 0.4);
 }

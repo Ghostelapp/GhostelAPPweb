@@ -44,10 +44,10 @@ export default function Pricing() {
     <section id="pricing" data-testid="pricing-section" className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 mb-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
             Pricing
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-white mb-4">
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("pricing.title")}
           </h2>
           <p className="text-base text-zinc-400">{t("pricing.subtitle")}</p>
@@ -57,41 +57,41 @@ export default function Pricing() {
           {plans.map((p, i) => (
             <motion.div
               key={p.name}
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08 }}
               data-testid={p.testid}
-              className={`relative rounded-3xl p-8 transition-all duration-300 ${
+              className={`relative rounded-2xl p-8 transition-all duration-300 ${
                 p.popular
-                  ? "glass-strong border-2 border-transparent neon-border neon-glow-cyan"
-                  : "glass hover:bg-white/[0.05]"
+                  ? "surface border-cyan-400/40 cyan-glow-soft"
+                  : "surface surface-hover"
               }`}
             >
               {p.popular && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-zinc-950">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-400 text-[#0a0e14]">
                   {t("pricing.popular")}
                 </div>
               )}
-              <div className="font-display text-2xl font-bold text-white mb-2">{p.name}</div>
-              <div className="flex items-baseline gap-2 mb-6 min-h-[58px]">
+              <div className="font-display text-xl font-bold text-white mb-2">{p.name}</div>
+              <div className="flex items-baseline gap-1.5 mb-7 min-h-[58px]">
                 {p.price !== null ? (
                   <>
                     <span className="text-base text-zinc-400">{p.currency}</span>
-                    <span className="font-display text-5xl font-black text-white">{p.price}</span>
+                    <span className="font-display text-5xl font-extrabold text-white">{p.price}</span>
                     {p.price !== "0" && (
-                      <span className="text-xs text-zinc-500">{t("pricing.perMonth")}</span>
+                      <span className="text-xs text-zinc-500 ml-1">{t("pricing.perMonth")}</span>
                     )}
                   </>
                 ) : (
-                  <span className="font-display text-3xl font-black text-white">Custom</span>
+                  <span className="font-display text-3xl font-extrabold text-white">Custom</span>
                 )}
               </div>
 
               <ul className="space-y-3 mb-8">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-3 text-sm text-zinc-300">
-                    <Check className={`w-4 h-4 mt-0.5 shrink-0 ${p.popular ? "text-cyan-400" : "text-emerald-400"}`} />
+                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-cyan-400" />
                     {f}
                   </li>
                 ))}
@@ -102,8 +102,8 @@ export default function Pricing() {
                 onClick={p.onClick}
                 className={
                   p.popular
-                    ? "w-full bg-gradient-to-r from-cyan-400 to-fuchsia-500 text-zinc-950 hover:opacity-90 h-11 rounded-full font-semibold"
-                    : "w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 h-11 rounded-full"
+                    ? "w-full btn-cyan h-11 rounded-full"
+                    : "w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
                 }
               >
                 {p.cta}

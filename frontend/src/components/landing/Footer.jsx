@@ -5,26 +5,26 @@ export default function Footer() {
   const { t } = useLang();
 
   return (
-    <footer data-testid="footer-section" className="relative border-t border-white/5 pt-16 pb-10">
+    <footer data-testid="footer-section" className="relative border-t divider-soft pt-16 pb-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-10 h-10 rounded-xl bg-cyan-400/10 border border-cyan-400/30 neon-glow-cyan grid place-items-center text-cyan-400">
+            <div className="flex items-center gap-2.5 mb-4">
+              <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="font-display font-bold text-2xl text-white">Ghostel</span>
+              <span className="font-display font-bold text-xl text-white">Ghostel</span>
             </div>
-            <p className="text-base text-zinc-400 mb-6 max-w-sm">
+            <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
               {t("footer.tagline")}
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-2">
               {[Github, Twitter, Linkedin].map((Icon, i) => (
                 <a
                   key={i}
                   href="#"
                   data-testid={`footer-social-${i}`}
-                  className="w-9 h-9 rounded-lg glass grid place-items-center text-zinc-400 hover:text-cyan-400 hover:border-cyan-400/40 transition-colors"
+                  className="w-9 h-9 rounded-lg surface surface-hover grid place-items-center text-zinc-400 hover:text-cyan-400 transition-colors"
                 >
                   <Icon className="w-4 h-4" />
                 </a>
@@ -33,7 +33,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+            <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 mb-4">
               Ghostel
             </div>
             <ul className="space-y-3 text-sm">
@@ -44,7 +44,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <div className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500 mb-4">
+            <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 mb-4">
               Legal
             </div>
             <ul className="space-y-3 text-sm">
@@ -54,9 +54,12 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="pt-8 border-t border-white/5 text-xs text-zinc-500 flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div className="pt-8 border-t divider-soft text-xs text-zinc-500 flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>© 2026 Ghostel. {t("footer.rights")}</div>
-          <div>Made with neon ✦</div>
+          <div className="flex items-center gap-1.5">
+            <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+            TLS 1.3 · E2EE
+          </div>
         </div>
       </div>
     </footer>

@@ -14,10 +14,10 @@ export default function HowItWorks() {
     <section id="how" data-testid="how-section" className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 mb-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
             Process
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-white mb-4">
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("how.title")}
           </h2>
           <p className="text-base text-zinc-400">{t("how.subtitle")}</p>
@@ -27,23 +27,20 @@ export default function HowItWorks() {
           {steps.map((s, i) => (
             <motion.div
               key={s.n}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
+              transition={{ delay: i * 0.08 }}
               data-testid={`how-step-${i}`}
-              className="relative glass rounded-2xl p-6 hover:bg-white/[0.05] transition-all duration-300"
+              className="surface surface-hover rounded-2xl p-6"
             >
-              <div className="font-display text-5xl font-black neon-text mb-4">
+              <div className="font-display text-sm font-bold text-cyan-400 mb-3 tracking-widest">
                 {s.n}
               </div>
-              <h3 className="font-display text-lg font-bold text-white mb-2">
+              <h3 className="font-display text-base font-bold text-white mb-2">
                 {s.title}
               </h3>
-              <p className="text-sm text-zinc-400">{s.desc}</p>
-              {i < steps.length - 1 && (
-                <div className="hidden lg:block absolute top-1/2 -right-2 w-4 h-px bg-gradient-to-r from-cyan-400/50 to-transparent" />
-              )}
+              <p className="text-sm text-zinc-400 leading-relaxed">{s.desc}</p>
             </motion.div>
           ))}
         </div>

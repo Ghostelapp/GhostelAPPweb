@@ -17,29 +17,29 @@ export default function Faq() {
   ];
 
   return (
-    <section id="faq" data-testid="faq-section" className="relative py-24 sm:py-32">
-      <div className="max-w-4xl mx-auto px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="text-xs font-bold uppercase tracking-[0.2em] text-fuchsia-400 mb-4">
+    <section id="faq" data-testid="faq-section" className="relative py-24 sm:py-32 border-t divider-soft">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8">
+        <div className="mb-12">
+          <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
             FAQ
           </div>
-          <h2 className="font-display text-4xl sm:text-5xl font-black tracking-tighter text-white">
+          <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
             {t("faq.title")}
           </h2>
         </div>
 
-        <Accordion type="single" collapsible className="space-y-3">
+        <Accordion type="single" collapsible className="space-y-2">
           {items.map((item, i) => (
             <AccordionItem
               key={i}
               value={`item-${i}`}
               data-testid={`faq-item-${i}`}
-              className="glass rounded-2xl border border-white/10 px-6 overflow-hidden"
+              className="surface rounded-xl px-5 border-white/5"
             >
               <AccordionTrigger className="text-left font-display font-semibold text-base text-white hover:text-cyan-400 hover:no-underline py-5">
                 {item.q}
               </AccordionTrigger>
-              <AccordionContent className="text-sm text-zinc-400 pb-5">
+              <AccordionContent className="text-sm text-zinc-400 pb-5 leading-relaxed">
                 {item.a}
               </AccordionContent>
             </AccordionItem>
