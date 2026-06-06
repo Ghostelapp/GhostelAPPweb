@@ -10,6 +10,7 @@ import uuid
 import logging
 import io
 import csv
+import httpx
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
 
@@ -49,6 +50,8 @@ class RegisterIn(BaseModel):
     name: str
     email: EmailStr
     password: str = Field(min_length=6)
+    title: Optional[str] = ""
+    username: Optional[str] = None
 
 
 class LoginIn(BaseModel):
@@ -118,6 +121,42 @@ def _public_user(u: dict) -> dict:
     }
 
 
+def _upstream_detail(exc: httpx.HTTPStatusError) -> str:
+    try:
+        detail = exc.response.json().get("detail")
+    except Exception:
+        detail = None
+    if isinstance(detail, str):
+        return detail
+    if isinstance(detail, list):
+        return " ".join(str(item.get("msg", item)) for item in detail if item)
+    return exc.response.text or "Błąd API aplikacji"
+
+
+async def _mirror_app_user(app_user: dict, password: str) -> dict:
+    now = datetime.now(timezone.utc).isoformat()
+    email = (app_user.get("email") or "").lower()
+    existing = await db.users.find_one({"email": email}) if email else None
+    existing_role = existing.get("role") if existing else None
+    role = "admin" if existing_role == "admin" else app_user.get("role", "user")
+    doc = {
+        "id": app_user.get("id") or (existing or {}).get("id") or str(uuid.uuid4()),
+        "name": app_user.get("name") or email,
+        "email": email,
+        "password_hash": hash_password(password),
+        "role": role,
+        "status": "blocked" if app_user.get("status") == "blocked" else "active",
+        "avatar": app_user.get("avatar") or "",
+        "created_at": app_user.get("created_at") or (existing or {}).get("created_at") or now,
+        "last_active": app_user.get("last_active") or app_user.get("last_seen") or now,
+        "app_user_id": app_user.get("id"),
+        "username": app_user.get("username", ""),
+        "title": app_user.get("title", ""),
+    }
+    await db.users.update_one({"email": email}, {"$set": doc}, upsert=True)
+    return doc
+
+
 # ----- Health -----
 @api.get("/")
 async def root():
@@ -127,24 +166,47 @@ async def root():
 # ----- Auth -----
 @api.post("/auth/register")
 async def register(payload: RegisterIn, response: Response):
-    email = payload.email.lower()
+    email = payload.email.lower().strip()
     if await db.users.find_one({"email": email}):
         raise HTTPException(status_code=400, detail="Email już zarejestrowany")
-    user_id = str(uuid.uuid4())
-    doc = {
-        "id": user_id,
-        "name": payload.name,
-        "email": email,
-        "password_hash": hash_password(payload.password),
-        "role": "user",
-        "status": "active",
-        "avatar": "",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-        "last_active": datetime.now(timezone.utc).isoformat(),
-    }
-    await db.users.insert_one(doc)
-    access = create_access_token(user_id, email, "user")
-    refresh = create_refresh_token(user_id)
+
+    if ghostel_client.has_public_api:
+        try:
+            app_data = await ghostel_client.public_register(
+                email=email,
+                password=payload.password,
+                name=payload.name,
+                title=payload.title or "",
+                username=payload.username,
+            )
+        except httpx.HTTPStatusError as e:
+            detail = _upstream_detail(e)
+            if e.response.status_code == 400 and "registered" in detail.lower():
+                detail = "Email jest już zarejestrowany w aplikacji. Zaloguj się zamiast zakładać konto."
+            raise HTTPException(status_code=e.response.status_code, detail=detail)
+        except httpx.RequestError:
+            raise HTTPException(status_code=503, detail="Nie można połączyć się z API aplikacji. Spróbuj ponownie za chwilę.")
+        app_user = app_data.get("user")
+        if not app_user:
+            raise HTTPException(status_code=502, detail="API aplikacji nie zwróciło danych użytkownika")
+        doc = await _mirror_app_user(app_user, payload.password)
+    else:
+        user_id = str(uuid.uuid4())
+        doc = {
+            "id": user_id,
+            "name": payload.name,
+            "email": email,
+            "password_hash": hash_password(payload.password),
+            "role": "user",
+            "status": "active",
+            "avatar": "",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+            "last_active": datetime.now(timezone.utc).isoformat(),
+        }
+        await db.users.insert_one(doc)
+
+    access = create_access_token(doc["id"], email, doc.get("role", "user"))
+    refresh = create_refresh_token(doc["id"])
     _set_cookies(response, access, refresh)
     out = _public_user(doc)
     out["access_token"] = access
@@ -153,10 +215,26 @@ async def register(payload: RegisterIn, response: Response):
 
 @api.post("/auth/login")
 async def login(payload: LoginIn, response: Response):
-    email = payload.email.lower()
+    email = payload.email.lower().strip()
     user = await db.users.find_one({"email": email})
     if not user or not verify_password(payload.password, user["password_hash"]):
-        raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
+        if ghostel_client.has_public_api:
+            try:
+                app_data = await ghostel_client.public_login(email, payload.password)
+            except httpx.HTTPStatusError as e:
+                raise HTTPException(status_code=401, detail=_upstream_detail(e))
+            except httpx.RequestError:
+                if user:
+                    raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
+                raise HTTPException(status_code=503, detail="Nie można połączyć się z API aplikacji. Spróbuj ponownie za chwilę.")
+            if app_data.get("requires_2fa"):
+                raise HTTPException(status_code=401, detail="To konto ma włączone 2FA. Zaloguj się w aplikacji.")
+            app_user = app_data.get("user")
+            if not app_user:
+                raise HTTPException(status_code=502, detail="API aplikacji nie zwróciło danych użytkownika")
+            user = await _mirror_app_user(app_user, payload.password)
+        else:
+            raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
     if user.get("status") == "blocked":
         raise HTTPException(status_code=403, detail="Konto zablokowane")
     access = create_access_token(user["id"], email, user.get("role", "user"))
@@ -238,15 +316,16 @@ def _build_charts(users: list):
 @api.get("/admin/dashboard")
 async def admin_dashboard(request: Request):
     await require_admin(request, db)
-    try:
-        stats = await ghostel_client.stats()
-        users = await ghostel_client.users()
-        source = "ghostel"
-    except Exception as e:
-        logger.warning(f"Ghostel API unreachable, falling back to local: {e}")
-        stats = None
-        users = []
-        source = "local"
+    stats = None
+    users = []
+    source = "local"
+    if ghostel_client.is_configured:
+        try:
+            stats = await ghostel_client.stats()
+            users = await ghostel_client.users()
+            source = "ghostel"
+        except Exception as e:
+            logger.warning(f"Ghostel API unreachable, falling back to local: {e}")
 
     if source == "ghostel":
         public_users = [_ghostel_user_to_public(u) for u in users]
@@ -317,45 +396,47 @@ async def admin_dashboard(request: Request):
 @api.get("/admin/users")
 async def list_users(request: Request, q: str = "", role: str = "", status: str = ""):
     await require_admin(request, db)
-    try:
-        users_raw = await ghostel_client.users()
-        public = [_ghostel_user_to_public(u) for u in users_raw]
-        # apply filters
-        if q:
-            ql = q.lower()
-            public = [u for u in public if ql in (u.get("name") or "").lower() or ql in (u.get("email") or "").lower()]
-        if role:
-            public = [u for u in public if u.get("role") == role]
-        if status:
-            public = [u for u in public if u.get("status") == status]
-        public.sort(key=lambda u: u.get("created_at") or "", reverse=True)
-        return public
-    except Exception as e:
-        logger.warning(f"Ghostel list_users fallback: {e}")
-        query = {}
-        if q:
-            query["$or"] = [
-                {"name": {"$regex": q, "$options": "i"}},
-                {"email": {"$regex": q, "$options": "i"}},
-            ]
-        if role:
-            query["role"] = role
-        if status:
-            query["status"] = status
-        users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
-        return [_public_user(u) for u in users]
+    if ghostel_client.is_configured:
+        try:
+            users_raw = await ghostel_client.users()
+            public = [_ghostel_user_to_public(u) for u in users_raw]
+            # apply filters
+            if q:
+                ql = q.lower()
+                public = [u for u in public if ql in (u.get("name") or "").lower() or ql in (u.get("email") or "").lower()]
+            if role:
+                public = [u for u in public if u.get("role") == role]
+            if status:
+                public = [u for u in public if u.get("status") == status]
+            public.sort(key=lambda u: u.get("created_at") or "", reverse=True)
+            return public
+        except Exception as e:
+            logger.warning(f"Ghostel list_users fallback: {e}")
+    query = {}
+    if q:
+        query["$or"] = [
+            {"name": {"$regex": q, "$options": "i"}},
+            {"email": {"$regex": q, "$options": "i"}},
+        ]
+    if role:
+        query["role"] = role
+    if status:
+        query["status"] = status
+    users = await db.users.find(query, {"_id": 0, "password_hash": 0}).sort("created_at", -1).to_list(500)
+    return [_public_user(u) for u in users]
 
 
 @api.get("/admin/users/{user_id}")
 async def get_user_detail(user_id: str, request: Request):
     await require_admin(request, db)
-    try:
-        users_raw = await ghostel_client.users()
-        for u in users_raw:
-            if u.get("id") == user_id:
-                return _ghostel_user_to_public(u)
-    except Exception:
-        pass
+    if ghostel_client.is_configured:
+        try:
+            users_raw = await ghostel_client.users()
+            for u in users_raw:
+                if u.get("id") == user_id:
+                    return _ghostel_user_to_public(u)
+        except Exception:
+            pass
     user = await db.users.find_one({"id": user_id}, {"_id": 0, "password_hash": 0})
     if not user:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
@@ -369,19 +450,20 @@ async def update_user(user_id: str, payload: UpdateUserIn, request: Request):
     update = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not update:
         raise HTTPException(status_code=400, detail="Brak danych do aktualizacji")
-    try:
-        users_raw = await ghostel_client.users()
-        for u in users_raw:
-            if u.get("id") == user_id:
-                pub = _ghostel_user_to_public(u)
-                raise HTTPException(
-                    status_code=501,
-                    detail=f"Edycja użytkownika niedostępna w Ghostel API (read-only). Użytkownik: {pub['email']}",
-                )
-    except HTTPException:
-        raise
-    except Exception:
-        pass
+    if ghostel_client.is_configured:
+        try:
+            users_raw = await ghostel_client.users()
+            for u in users_raw:
+                if u.get("id") == user_id:
+                    pub = _ghostel_user_to_public(u)
+                    raise HTTPException(
+                        status_code=501,
+                        detail=f"Edycja użytkownika niedostępna w Ghostel API (read-only). Użytkownik: {pub['email']}",
+                    )
+        except HTTPException:
+            raise
+        except Exception:
+            pass
     # fallback to local update
     result = await db.users.update_one({"id": user_id}, {"$set": update})
     if result.matched_count == 0:
@@ -395,12 +477,13 @@ async def delete_user(user_id: str, request: Request):
     admin = await require_admin(request, db)
     if admin["id"] == user_id:
         raise HTTPException(status_code=400, detail="Nie można usunąć własnego konta")
-    try:
-        ok = await ghostel_client.delete_user(user_id)
-        if ok:
-            return {"ok": True, "source": "ghostel"}
-    except Exception as e:
-        logger.warning(f"Ghostel delete_user error: {e}")
+    if ghostel_client.is_configured:
+        try:
+            ok = await ghostel_client.delete_user(user_id)
+            if ok:
+                return {"ok": True, "source": "ghostel"}
+        except Exception as e:
+            logger.warning(f"Ghostel delete_user error: {e}")
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
@@ -544,10 +627,14 @@ async def export_csv(kind: str, request: Request):
     writer = csv.writer(output)
     if kind == "users":
         writer.writerow(["id", "name", "email", "role", "status", "created_at", "last_active"])
-        try:
-            users_raw = await ghostel_client.users()
-            users = [_ghostel_user_to_public(u) for u in users_raw]
-        except Exception:
+        users = None
+        if ghostel_client.is_configured:
+            try:
+                users_raw = await ghostel_client.users()
+                users = [_ghostel_user_to_public(u) for u in users_raw]
+            except Exception:
+                users = None
+        if users is None:
             users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(2000)
         for u in users:
             writer.writerow([u.get("id"), u.get("name"), u.get("email"), u.get("role"), u.get("status"), u.get("created_at"), u.get("last_active")])
@@ -581,12 +668,12 @@ async def export_csv(kind: str, request: Request):
 app.include_router(api)
 
 _frontend = os.environ.get("FRONTEND_URL", "http://localhost:3000")
-_origins = list({
-    _frontend,
-    "http://localhost:3000",
-    "https://ghostel-staging.preview.emergentagent.com",
-    "https://50e08b50-37c9-4ea5-9edf-8c4fe5f38944.preview.emergentagent.com",
-})
+_extra_origins = [
+    origin.strip()
+    for origin in os.environ.get("ADDITIONAL_CORS_ORIGINS", "").split(",")
+    if origin.strip()
+]
+_origins = list({_frontend, "http://localhost:3000", *_extra_origins})
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -605,7 +692,9 @@ async def on_startup():
     await db.messages.create_index("created_at")
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
-    admin_password = os.environ.get("ADMIN_PASSWORD", "Admin123!")
+    admin_password = os.environ.get("ADMIN_PASSWORD")
+    if not admin_password:
+        raise RuntimeError("ADMIN_PASSWORD environment variable is required")
     existing = await db.users.find_one({"email": admin_email})
     if existing is None:
         await db.users.insert_one({
@@ -623,7 +712,8 @@ async def on_startup():
     elif not verify_password(admin_password, existing["password_hash"]):
         await db.users.update_one({"email": admin_email}, {"$set": {"password_hash": hash_password(admin_password)}})
 
-    await seed_sample_data(db)
+    if os.environ.get("SEED_SAMPLE_DATA", "").lower() in {"1", "true", "yes"}:
+        await seed_sample_data(db)
     logger.info("Ghostel startup complete")
 
 

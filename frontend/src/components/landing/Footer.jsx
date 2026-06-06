@@ -1,5 +1,7 @@
 import { useLang } from "@/context/LanguageContext";
-import { Github, Twitter, Linkedin, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Github, Twitter, Linkedin } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Footer() {
   const { t } = useLang();
@@ -10,9 +12,7 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
+              <BrandLogo />
               <span className="font-display font-bold text-xl text-white">Ghostel</span>
             </div>
             <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
@@ -37,9 +37,9 @@ export default function Footer() {
               Ghostel
             </div>
             <ul className="space-y-3 text-sm">
-              <li><a href="#" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
-              <li><a href="#" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</a></li>
-              <li><a href="#" data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")}</a></li>
+              <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
+              <li><a href="mailto:support@ghostel.app" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</a></li>
+              <li><a href="#download" data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")}</a></li>
             </ul>
           </div>
 
@@ -48,8 +48,9 @@ export default function Footer() {
               Legal
             </div>
             <ul className="space-y-3 text-sm">
-              <li><a href="#" data-testid="footer-link-terms" className="text-zinc-400 hover:text-cyan-400">{t("footer.terms")}</a></li>
-              <li><a href="#" data-testid="footer-link-privacy" className="text-zinc-400 hover:text-cyan-400">{t("footer.privacy")}</a></li>
+              <li><Link to="/terms" data-testid="footer-link-terms" className="text-zinc-400 hover:text-cyan-400">{t("footer.terms")}</Link></li>
+              <li><Link to="/privacy" data-testid="footer-link-privacy" className="text-zinc-400 hover:text-cyan-400">{t("footer.privacy")}</Link></li>
+              <li><Link to="/delete-account" data-testid="footer-link-delete-account" className="text-zinc-400 hover:text-cyan-400">{t("nav.deleteAccount")}</Link></li>
             </ul>
           </div>
         </div>
@@ -58,7 +59,7 @@ export default function Footer() {
           <div>© 2026 Ghostel. {t("footer.rights")}</div>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-            TLS 1.3 · E2EE
+            Android · Push · Voice calls
           </div>
         </div>
       </div>

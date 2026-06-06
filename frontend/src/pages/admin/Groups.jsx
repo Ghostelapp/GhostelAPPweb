@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api, { API, formatApiError, buildExportUrl } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
 import SourceBadge from "@/components/admin/SourceBadge";
@@ -43,19 +43,19 @@ export default function Groups() {
   const [creating, setCreating] = useState(false);
   const [form, setForm] = useState({ name: "", description: "", visibility: "public" });
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const r = await api.get(`/admin/groups?q=${encodeURIComponent(q)}`);
       setGroups(r.data);
     } catch (e) {
       toast.error(formatApiError(e));
     }
-  };
+  }, [q]);
 
   useEffect(() => {
     const id = setTimeout(load, 300);
     return () => clearTimeout(id);
-  }, [q]);
+  }, [load]);
 
   const createGroup = async () => {
     if (!form.name.trim()) return;

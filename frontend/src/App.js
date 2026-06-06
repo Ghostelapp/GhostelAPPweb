@@ -6,6 +6,10 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Account from "@/pages/Account";
+import Privacy from "@/pages/Privacy";
+import DeleteAccount from "@/pages/DeleteAccount";
+import Terms from "@/pages/Terms";
 import AdminLayout from "@/pages/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import Users from "@/pages/admin/Users";
@@ -51,8 +55,12 @@ function App() {
             />
             <Routes>
               <Route path="/" element={<Landing />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/delete-account" element={<DeleteAccount />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/account" element={<Account />} />
               <Route
                 path="/admin"
                 element={

@@ -1,4 +1,4 @@
-"""Client for upstream Ghostel API (collab-platform-41)."""
+"""Client for upstream Ghostel API."""
 import os
 import time
 import httpx
@@ -13,6 +13,14 @@ class GhostelClient:
         self._token: Optional[str] = None
         self._token_expires_at: float = 0
         self._client = httpx.AsyncClient(timeout=15.0)
+
+    @property
+    def is_configured(self) -> bool:
+        return bool(self.base and self.email and self.password)
+
+    @property
+    def has_public_api(self) -> bool:
+        return bool(self.base)
 
     async def close(self):
         await self._client.aclose()
@@ -46,6 +54,30 @@ class GhostelClient:
             headers["Authorization"] = f"Bearer {self._token}"
             r = await self._client.request(method, url, headers=headers, **kw)
         return r
+
+    async def public_login(self, email: str, password: str, totp_code: str | None = None) -> dict:
+        payload = {"email": email, "password": password}
+        if totp_code:
+            payload["totp_code"] = totp_code
+        r = await self._client.post(f"{self.base}/auth/login", json=payload)
+        r.raise_for_status()
+        return r.json()
+
+    async def public_register(
+        self,
+        *,
+        email: str,
+        password: str,
+        name: str,
+        title: str = "",
+        username: str | None = None,
+    ) -> dict:
+        payload = {"email": email, "password": password, "name": name, "title": title}
+        if username:
+            payload["username"] = username
+        r = await self._client.post(f"{self.base}/auth/register", json=payload)
+        r.raise_for_status()
+        return r.json()
 
     async def stats(self) -> dict:
         r = await self._request("GET", "/admin/stats")

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
-import { ShieldCheck } from "lucide-react";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Login() {
   const { t } = useLang();
@@ -20,7 +20,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user && user.role === "admin") navigate("/admin");
-    else if (user) navigate("/");
+    else if (user) navigate("/account");
   }, [user, navigate]);
 
   const onSubmit = async (e) => {
@@ -31,7 +31,7 @@ export default function Login() {
     setLoading(false);
     if (res.ok) {
       toast.success("Signed in");
-      navigate(res.user.role === "admin" ? "/admin" : "/");
+      navigate(res.user.role === "admin" ? "/admin" : "/account");
     } else {
       setError(res.error);
       toast.error(res.error);
@@ -53,14 +53,12 @@ export default function Login() {
           {t("login.backHome")}
         </Link>
         <div className="flex flex-col items-center text-center mb-8">
-          <div className="w-14 h-14 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400 mb-4">
-            <ShieldCheck className="w-7 h-7" />
-          </div>
+          <BrandLogo className="h-16 w-16 mb-4" />
           <h1 className="font-display text-2xl font-extrabold text-white mb-1">
             {t("login.title")}
           </h1>
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">
-            Private. Encrypted. Untraceable.
+            Ghostel account
           </div>
           <p className="text-sm text-zinc-400 mt-3">{t("login.subtitle")}</p>
         </div>
@@ -77,7 +75,7 @@ export default function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="mt-2 bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
-              placeholder="admin@ghostel.app"
+              placeholder="twoj@email.pl"
             />
           </div>
           <div>

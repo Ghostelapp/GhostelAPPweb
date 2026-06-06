@@ -1,11 +1,11 @@
 import { motion } from "framer-motion";
-import { Lock, Timer, ShieldCheck, Phone } from "lucide-react";
+import { Bell, MessageCircle, ShieldCheck, Phone } from "lucide-react";
 
 const fakeChats = [
-  { name: "Legal Team", text: "NDA draft · 24h timer", time: "12:34", unread: 2 },
-  { name: "M&A Workspace", text: "Disappearing in 1h 12m", time: "12:30", unread: 5 },
-  { name: "CISO direct", text: "E2EE call ended · 14:02", time: "12:15", unread: 0 },
-  { name: "Board · Q1", text: "Audit log exported", time: "11:58", unread: 1 },
+  { name: "Marta Kowal", text: "Dzwonie za chwile", time: "12:34", unread: 2 },
+  { name: "Zespol", text: "Nowa wiadomosc w grupie", time: "12:30", unread: 5 },
+  { name: "Kamil", text: "Polaczenie zakonczone · 02:14", time: "12:15", unread: 0 },
+  { name: "Support", text: "Eksport danych gotowy", time: "11:58", unread: 1 },
 ];
 
 export default function PhoneMockup() {
@@ -26,7 +26,7 @@ export default function PhoneMockup() {
           <div className="px-5 pt-2 pb-3 flex justify-between text-[10px] text-zinc-400 font-medium">
             <span>9:41</span>
             <span className="flex items-center gap-1 text-cyan-400">
-              <Lock className="w-2.5 h-2.5" /> E2EE
+              <Bell className="w-2.5 h-2.5" /> Push ready
             </span>
             <span>100%</span>
           </div>
@@ -39,7 +39,7 @@ export default function PhoneMockup() {
             <div>
               <div className="font-display text-base font-bold text-white leading-none">Ghostel</div>
               <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.15em] mt-1">
-                Private. Encrypted.
+                Chats. Calls. Push.
               </div>
             </div>
           </div>
@@ -55,7 +55,7 @@ export default function PhoneMockup() {
                 className="flex items-center gap-3 px-2 py-2.5 rounded-xl hover:bg-white/[0.03]"
               >
                 <div className="w-9 h-9 rounded-full bg-[#1a2030] border border-white/5 grid place-items-center text-cyan-400">
-                  <Lock className="w-3.5 h-3.5" />
+                  <MessageCircle className="w-3.5 h-3.5" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-baseline justify-between">
@@ -92,11 +92,11 @@ export default function PhoneMockup() {
         className="absolute -left-6 top-20 surface rounded-2xl px-3.5 py-2.5 shadow-2xl hidden sm:flex items-center gap-2.5 max-w-[200px]"
       >
         <div className="w-8 h-8 rounded-lg bg-cyan-400/10 border border-cyan-400/20 grid place-items-center text-cyan-400">
-          <Timer className="w-4 h-4" />
+          <Bell className="w-4 h-4" />
         </div>
         <div>
-          <div className="text-xs font-bold text-white leading-tight">Znika za 23h</div>
-          <div className="text-[10px] text-zinc-500">Disappearing</div>
+          <div className="text-xs font-bold text-white leading-tight">Dzwoni Marta</div>
+          <div className="text-[10px] text-zinc-500">Full-screen push</div>
         </div>
       </motion.div>
 
@@ -110,7 +110,7 @@ export default function PhoneMockup() {
           <Phone className="w-3.5 h-3.5 text-cyan-400" />
         </div>
         <div>
-          <div className="text-xs font-bold text-white leading-tight">E2EE call</div>
+          <div className="text-xs font-bold text-white leading-tight">Voice call</div>
           <div className="text-[10px] text-zinc-500">02:14</div>
         </div>
       </motion.div>

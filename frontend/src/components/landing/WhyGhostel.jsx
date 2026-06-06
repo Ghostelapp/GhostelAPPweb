@@ -18,7 +18,7 @@ export default function WhyGhostel() {
       <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            Security &amp; Compliance
+            Product fit
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("why.title")}

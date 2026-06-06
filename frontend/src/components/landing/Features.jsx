@@ -1,15 +1,15 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
-import { Lock, Timer, PhoneCall, FileLock, BellOff, ShieldCheck } from "lucide-react";
+import { BellRing, Download, PhoneCall, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 
 export default function Features() {
   const { t } = useLang();
   const items = [
-    { icon: Lock, title: t("features.messagesTitle"), desc: t("features.messagesDesc") },
-    { icon: Timer, title: t("features.groupsTitle"), desc: t("features.groupsDesc") },
+    { icon: UserRoundPlus, title: t("features.messagesTitle"), desc: t("features.messagesDesc") },
+    { icon: UsersRound, title: t("features.groupsTitle"), desc: t("features.groupsDesc") },
     { icon: PhoneCall, title: t("features.voiceTitle"), desc: t("features.voiceDesc") },
-    { icon: FileLock, title: t("features.filesTitle"), desc: t("features.filesDesc") },
-    { icon: BellOff, title: t("features.pushTitle"), desc: t("features.pushDesc") },
+    { icon: BellRing, title: t("features.filesTitle"), desc: t("features.filesDesc") },
+    { icon: Download, title: t("features.pushTitle"), desc: t("features.pushDesc") },
     { icon: ShieldCheck, title: t("features.securityTitle"), desc: t("features.securityDesc") },
   ];
 
@@ -18,7 +18,7 @@ export default function Features() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            Security-first features
+            Core features
           </div>
           <h2 data-testid="features-title" className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("features.title")}

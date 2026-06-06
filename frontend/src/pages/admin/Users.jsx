@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api, { API, formatApiError, buildExportUrl } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
 import SourceBadge from "@/components/admin/SourceBadge";
@@ -46,19 +46,19 @@ export default function Users() {
   const [q, setQ] = useState("");
   const [detail, setDetail] = useState(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     try {
       const r = await api.get(`/admin/users?q=${encodeURIComponent(q)}`);
       setUsers(r.data);
     } catch (e) {
       toast.error(formatApiError(e));
     }
-  };
+  }, [q]);
 
   useEffect(() => {
     const id = setTimeout(load, 300);
     return () => clearTimeout(id);
-  }, [q]);
+  }, [load]);
 
   const updateUser = async (id, patch) => {
     try {
@@ -91,7 +91,7 @@ export default function Users() {
             </h1>
             <SourceBadge source="ghostel" />
           </div>
-          <p className="text-sm text-zinc-400">{users.length} użytkowników · źródło: collab-platform-41</p>
+          <p className="text-sm text-zinc-400">{users.length} użytkowników · źródło: Ghostel API</p>
         </div>
         <a
           data-testid="export-users-csv"

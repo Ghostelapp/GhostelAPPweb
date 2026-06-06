@@ -29,7 +29,7 @@
     "/app/backend/tests/test_ghostel_api.py (new)"
   ],
   "success_rate": {"backend": "100% (33/33)", "frontend": "N/A (backend-only)"},
-  "test_credentials": "admin@ghostel.app / Admin123! ; alice.carter@ghostel.app / Password123! (both verified working)",
+  "test_credentials": "Credentials are loaded from local environment variables and are intentionally not stored in the repository.",
   "seed_data_creation": "Tests create transient TEST_ prefixed users/groups via register + admin POST and clean them up via DELETE in same test. Notifications/settings updates persist (acceptable for mock data).",
   "retest_needed": false,
   "main_agent_can_self_test": true,

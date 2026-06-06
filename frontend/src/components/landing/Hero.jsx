@@ -73,12 +73,12 @@ export default function Hero() {
           <div className="mt-12 flex items-center gap-6 text-xs text-zinc-500">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse-soft" />
-              TLS 1.3
+              Push notifications
             </div>
             <div className="text-zinc-700">·</div>
-            <div>E2EE · Curve25519</div>
+            <div>Voice calls</div>
             <div className="text-zinc-700">·</div>
-            <div className="hidden sm:block">SOC 2 Ready</div>
+            <div className="hidden sm:block">Account controls</div>
           </div>
         </motion.div>
 

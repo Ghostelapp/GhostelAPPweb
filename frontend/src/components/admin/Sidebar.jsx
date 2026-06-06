@@ -9,9 +9,9 @@ import {
   Settings,
   FileBarChart2,
   Home,
-  ShieldCheck,
 } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Sidebar() {
   const { t } = useLang();
@@ -34,13 +34,11 @@ export default function Sidebar() {
       className="hidden lg:flex flex-col fixed top-0 left-0 h-full w-64 border-r divider-soft bg-[#0a0e14] z-40"
     >
       <div className="px-6 py-6 flex items-center gap-3 border-b divider-soft">
-        <div className="w-10 h-10 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
-          <ShieldCheck className="w-5 h-5" />
-        </div>
+        <BrandLogo className="h-10 w-10" />
         <div>
           <div className="font-display font-bold text-base text-white leading-none">Ghostel</div>
           <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1.5">
-            Admin · E2EE
+            Admin panel
           </div>
         </div>
       </div>

@@ -4,18 +4,20 @@ import uuid
 import pytest
 import requests
 
-BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "https://ghostel-staging.preview.emergentagent.com").rstrip("/")
+BASE_URL = os.environ.get("REACT_APP_BACKEND_URL", "http://localhost:8001").rstrip("/")
 API = f"{BASE_URL}/api"
 
-ADMIN_EMAIL = "admin@ghostel.app"
-ADMIN_PASSWORD = "Admin123!"
-USER_EMAIL = "alice.carter@ghostel.app"
-USER_PASSWORD = "Password123!"
+ADMIN_EMAIL = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app")
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD")
+USER_EMAIL = os.environ.get("TEST_USER_EMAIL")
+USER_PASSWORD = os.environ.get("TEST_USER_PASSWORD")
 
 
 # ---- Fixtures ----
 @pytest.fixture(scope="session")
 def admin_token():
+    if not ADMIN_PASSWORD:
+        pytest.skip("ADMIN_PASSWORD env var is required for admin API tests")
     r = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
     assert r.status_code == 200, f"Admin login failed: {r.status_code} {r.text}"
     data = r.json()
@@ -33,6 +35,8 @@ def admin_id(admin_token):
 
 @pytest.fixture(scope="session")
 def user_token():
+    if not USER_EMAIL or not USER_PASSWORD:
+        pytest.skip("TEST_USER_EMAIL and TEST_USER_PASSWORD env vars are required for user login tests")
     r = requests.post(f"{API}/auth/login", json={"email": USER_EMAIL, "password": USER_PASSWORD})
     if r.status_code != 200:
         pytest.skip(f"User login failed: {r.status_code} {r.text}")
@@ -51,6 +55,8 @@ class TestAuth:
         assert "message" in r.json()
 
     def test_login_admin_success(self):
+        if not ADMIN_PASSWORD:
+            pytest.skip("ADMIN_PASSWORD env var is required for admin API tests")
         r = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
         assert r.status_code == 200
         d = r.json()

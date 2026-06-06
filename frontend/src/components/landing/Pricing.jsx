@@ -2,18 +2,15 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { GHOSTEL_APP_URL } from "@/lib/constants";
 
 export default function Pricing() {
   const { t } = useLang();
-  const navigate = useNavigate();
 
   const plans = [
     {
       name: t("pricing.free"),
-      price: "0",
-      currency: "$",
+      label: "Google Play",
       cta: t("pricing.freeCta"),
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
@@ -22,8 +19,7 @@ export default function Pricing() {
     },
     {
       name: t("pricing.premium"),
-      price: "9",
-      currency: "$",
+      label: "Beta",
       cta: t("pricing.premiumCta"),
       features: [t("pricing.premF1"), t("pricing.premF2"), t("pricing.premF3"), t("pricing.premF4"), t("pricing.premF5")],
       popular: true,
@@ -32,7 +28,7 @@ export default function Pricing() {
     },
     {
       name: t("pricing.enterprise"),
-      price: null,
+      label: "Support",
       cta: t("pricing.contactSales"),
       features: [t("pricing.entF1"), t("pricing.entF2"), t("pricing.entF3"), t("pricing.entF4"), t("pricing.entF5")],
       popular: false,
@@ -42,11 +38,11 @@ export default function Pricing() {
   ];
 
   return (
-    <section id="pricing" data-testid="pricing-section" className="relative py-24 sm:py-32">
+    <section id="download" data-testid="download-section" className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            Pricing
+            Download
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("pricing.title")}
@@ -75,18 +71,8 @@ export default function Pricing() {
                 </div>
               )}
               <div className="font-display text-xl font-bold text-white mb-2">{p.name}</div>
-              <div className="flex items-baseline gap-1.5 mb-7 min-h-[58px]">
-                {p.price !== null ? (
-                  <>
-                    <span className="text-base text-zinc-400">{p.currency}</span>
-                    <span className="font-display text-5xl font-extrabold text-white">{p.price}</span>
-                    {p.price !== "0" && (
-                      <span className="text-xs text-zinc-500 ml-1">{t("pricing.perMonth")}</span>
-                    )}
-                  </>
-                ) : (
-                  <span className="font-display text-3xl font-extrabold text-white">Custom</span>
-                )}
+              <div className="mb-7 min-h-[58px] flex items-center">
+                <span className="font-display text-3xl font-extrabold text-white">{p.label}</span>
               </div>
 
               <ul className="space-y-3 mb-8">

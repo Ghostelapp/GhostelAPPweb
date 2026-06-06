@@ -1,11 +1,11 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useLang } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
-import { Menu, X, Globe, ShieldCheck } from "lucide-react";
+import { Menu, X, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
-import { GHOSTEL_APP_URL } from "@/lib/constants";
+import BrandLogo from "@/components/BrandLogo";
 
 export default function Navbar() {
   const { t, lang, setLang } = useLang();
@@ -13,6 +13,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -21,12 +22,37 @@ export default function Navbar() {
   }, []);
 
   const links = [
-    { href: "#features", label: t("nav.features") },
-    { href: "#why", label: t("nav.why") },
-    { href: "#how", label: t("nav.how") },
-    { href: "#pricing", label: t("nav.pricing") },
-    { href: "#faq", label: t("nav.faq") },
+    { section: "features", label: t("nav.features") },
+    { section: "why", label: t("nav.why") },
+    { section: "how", label: t("nav.how") },
+    { section: "download", label: t("common.download") },
+    { section: "faq", label: t("nav.faq") },
+    { href: "/privacy", label: t("nav.privacy") },
+    { href: "/delete-account", label: t("nav.deleteAccount") },
   ];
+
+  const goToLink = (link) => {
+    setOpen(false);
+    if (link.href) {
+      navigate(link.href);
+      return;
+    }
+
+    const scrollToSection = () => {
+      document.getElementById(link.section)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    };
+
+    if (location.pathname !== "/") {
+      navigate(`/#${link.section}`);
+      window.setTimeout(scrollToSection, 80);
+    } else {
+      window.history.replaceState(null, "", `#${link.section}`);
+      scrollToSection();
+    }
+  };
 
   return (
     <header
@@ -37,9 +63,7 @@ export default function Navbar() {
     >
       <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
         <Link to="/" data-testid="navbar-logo" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
-            <ShieldCheck className="w-5 h-5" />
-          </div>
+          <BrandLogo />
           <span className="font-display font-bold text-lg tracking-tight text-white">
             Ghostel
           </span>
@@ -47,14 +71,15 @@ export default function Navbar() {
 
         <nav className="hidden lg:flex items-center gap-8">
           {links.map((l) => (
-            <a
-              key={l.href}
-              href={l.href}
-              data-testid={`nav-link-${l.href.replace("#", "")}`}
+            <button
+              key={l.href || l.section}
+              type="button"
+              onClick={() => goToLink(l)}
+              data-testid={`nav-link-${l.href ? l.href.replace("/", "") : l.section}`}
               className="text-sm text-zinc-400 hover:text-white transition-colors duration-200"
             >
               {l.label}
-            </a>
+            </button>
           ))}
         </nav>
 
@@ -70,6 +95,15 @@ export default function Navbar() {
 
           {user ? (
             <>
+              {user.role !== "admin" && (
+                <Button
+                  data-testid="navbar-account-btn"
+                  onClick={() => navigate("/account")}
+                  className="hidden sm:inline-flex btn-cyan rounded-full px-5 h-9 text-sm"
+                >
+                  {t("common.account")}
+                </Button>
+              )}
               {user.role === "admin" && (
                 <Button
                   data-testid="navbar-admin-btn"
@@ -96,14 +130,14 @@ export default function Navbar() {
                 onClick={() => navigate("/login")}
                 className="hidden sm:inline-flex text-zinc-300 hover:text-white hover:bg-white/5 rounded-full h-9"
               >
-                Admin
+                {t("common.login")}
               </Button>
               <Button
                 data-testid="navbar-register-btn"
-                onClick={() => (window.location.href = GHOSTEL_APP_URL)}
+                onClick={() => navigate("/register")}
                 className="hidden sm:inline-flex btn-cyan rounded-full px-5 h-9 text-sm"
               >
-                Open app
+                {t("common.register")}
               </Button>
             </>
           )}
@@ -128,29 +162,49 @@ export default function Navbar() {
           >
             <div className="px-6 py-4 flex flex-col gap-3">
               {links.map((l) => (
-                <a
-                  key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="text-sm text-zinc-300 hover:text-cyan-400 py-2"
+                <button
+                  key={l.href || l.section}
+                  type="button"
+                  onClick={() => goToLink(l)}
+                  className="text-left text-sm text-zinc-300 hover:text-cyan-400 py-2"
                 >
                   {l.label}
-                </a>
+                </button>
               ))}
               <div className="flex gap-3 pt-3 border-t border-white/5">
-                <Button
-                  variant="ghost"
-                  onClick={() => navigate("/login")}
-                  className="flex-1 text-zinc-200"
-                >
-                  Admin
-                </Button>
-                <Button
-                  onClick={() => (window.location.href = GHOSTEL_APP_URL)}
-                  className="flex-1 btn-cyan"
-                >
-                  Open app
-                </Button>
+                {user ? (
+                  <>
+                    <Button
+                      onClick={() => navigate(user.role === "admin" ? "/admin" : "/account")}
+                      className="flex-1 btn-cyan"
+                    >
+                      {user.role === "admin" ? t("common.adminPanel") : t("common.account")}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={logout}
+                      className="flex-1 text-zinc-200"
+                    >
+                      {t("common.logout")}
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button
+                      variant="ghost"
+                      onClick={() => navigate("/login")}
+                      className="flex-1 text-zinc-200"
+                    >
+                      {t("common.login")}
+                    </Button>
+                    <Button
+                      onClick={() => navigate("/register")}
+                      className="flex-1 btn-cyan"
+                    >
+                      {t("common.register")}
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </motion.div>
