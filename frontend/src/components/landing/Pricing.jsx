@@ -1,31 +1,36 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { Check, Download } from "lucide-react";
-import { GHOSTEL_APK_URL } from "@/lib/constants";
+import { Check, Download, Globe2 } from "lucide-react";
+import { GHOSTEL_APK_URL, GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 
 export default function Pricing() {
   const { t, lang } = useLang();
   const directDownload = () => (window.location.href = GHOSTEL_APK_URL);
+  const openWebApp = () => (window.location.href = GHOSTEL_WEB_APP_URL);
 
   const plans = [
+    {
+      name: lang === "pl" ? "Wersja webowa" : "Web app",
+      label: "app.ghostel.app",
+      cta: lang === "pl" ? "Otwórz w przeglądarce" : "Open in browser",
+      features: lang === "pl"
+        ? ["Bez instalowania programu", "To samo konto i kontakty", "Czat, połączenia i ustawienia", "Możliwość instalacji jako PWA"]
+        : ["No software installation", "The same account and contacts", "Chat, calls and settings", "Installable as a PWA"],
+      popular: true,
+      testid: "pricing-web",
+      onClick: openWebApp,
+      icon: Globe2,
+    },
     {
       name: t("pricing.free"),
       label: "APK 1.4.0",
       cta: lang === "pl" ? "Pobierz APK na Androida" : "Download Android APK",
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
-      popular: true,
-      testid: "pricing-free",
-      onClick: directDownload,
-    },
-    {
-      name: t("pricing.premium"),
-      label: lang === "pl" ? "Instalacja" : "Installation",
-      cta: lang === "pl" ? "Pobierz wersję testową" : "Download test build",
-      features: [t("pricing.premF1"), t("pricing.premF2"), t("pricing.premF3"), t("pricing.premF4"), t("pricing.premF5")],
       popular: false,
-      testid: "pricing-premium",
+      testid: "pricing-android",
       onClick: directDownload,
+      icon: Download,
     },
     {
       name: t("pricing.enterprise"),
@@ -46,9 +51,13 @@ export default function Pricing() {
             {lang === "pl" ? "Pobieranie" : "Download"}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            {t("pricing.title")}
+            {lang === "pl" ? "Korzystaj tak, jak Ci wygodnie" : "Use Ghostel your way"}
           </h2>
-          <p className="text-base text-zinc-400">{t("pricing.subtitle")}</p>
+          <p className="text-base text-zinc-400">
+            {lang === "pl"
+              ? "Otwórz Ghostel od razu w przeglądarce albo pobierz aplikację na Androida."
+              : "Open Ghostel instantly in your browser or download the Android app."}
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
@@ -94,7 +103,7 @@ export default function Pricing() {
                     : "w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
                 }
               >
-                {i < 2 && <Download className="w-4 h-4 mr-2" />}
+                {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
                 {p.cta}
               </Button>
             </motion.div>

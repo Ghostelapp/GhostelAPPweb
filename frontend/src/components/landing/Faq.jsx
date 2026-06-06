@@ -7,8 +7,14 @@ import {
 } from "@/components/ui/accordion";
 
 export default function Faq() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
   const items = [
+    {
+      q: lang === "pl" ? "Czy Ghostel działa w przeglądarce?" : "Does Ghostel work in a browser?",
+      a: lang === "pl"
+        ? "Tak. Pod adresem app.ghostel.app możesz zalogować się na to samo konto i korzystać z rozmów, kontaktów, połączeń oraz ustawień bez instalowania programu."
+        : "Yes. At app.ghostel.app you can sign in to the same account and use chats, contacts, calls and settings without installing software.",
+    },
     { q: t("faq.q1"), a: t("faq.a1") },
     { q: t("faq.q2"), a: t("faq.a2") },
     { q: t("faq.q3"), a: t("faq.a3") },

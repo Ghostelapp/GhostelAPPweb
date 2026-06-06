@@ -1,5 +1,6 @@
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
+import BrowserApp from "@/components/landing/BrowserApp";
 import Features from "@/components/landing/Features";
 import WhyGhostel from "@/components/landing/WhyGhostel";
 import HowItWorks from "@/components/landing/HowItWorks";
@@ -14,6 +15,7 @@ export default function Landing() {
       <Navbar />
       <main>
         <Hero />
+        <BrowserApp />
         <Features />
         <WhyGhostel />
         <HowItWorks />

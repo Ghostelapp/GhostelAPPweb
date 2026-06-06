@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Menu, X, Globe, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
+import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 
 export default function Navbar() {
   const { t, lang, setLang } = useLang();
@@ -135,10 +136,10 @@ export default function Navbar() {
               </Button>
               <Button
                 data-testid="navbar-register-btn"
-                onClick={() => navigate("/register")}
+                onClick={() => (window.location.href = GHOSTEL_WEB_APP_URL)}
                 className="hidden sm:inline-flex btn-cyan rounded-full px-5 h-9 text-sm"
               >
-                {t("common.register")}
+                Ghostel Web
               </Button>
             </>
           )}
@@ -199,10 +200,10 @@ export default function Navbar() {
                       {t("common.login")}
                     </Button>
                     <Button
-                      onClick={() => navigate("/register")}
+                      onClick={() => (window.location.href = GHOSTEL_WEB_APP_URL)}
                       className="flex-1 btn-cyan"
                     >
-                      {t("common.register")}
+                      Ghostel Web
                     </Button>
                   </>
                 )}
