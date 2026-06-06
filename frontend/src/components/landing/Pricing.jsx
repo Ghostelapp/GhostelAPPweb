@@ -1,15 +1,14 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Check, Download, Globe2, MonitorDown } from "lucide-react";
-import {
-  GHOSTEL_APK_URL,
-  GHOSTEL_DESKTOP_URL,
-  GHOSTEL_WEB_APP_URL,
-} from "@/lib/constants";
+import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
+import { useLatestRelease } from "@/hooks/useLatestRelease";
+import { cn } from "@/lib/utils";
 
 export default function Pricing() {
   const { t, lang } = useLang();
+  const { version, apkUrl, desktopUrl } = useLatestRelease();
   const openWebApp = () => (window.location.href = GHOSTEL_WEB_APP_URL);
 
   const plans = [
@@ -27,26 +26,24 @@ export default function Pricing() {
     },
     {
       name: t("pricing.free"),
-      label: "APK 1.4.1",
+      label: version ? `APK ${version}` : "APK latest",
       cta: lang === "pl" ? "Pobierz APK na Androida" : "Download Android APK",
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-android",
-      href: GHOSTEL_APK_URL,
-      download: true,
+      href: apkUrl,
       icon: Download,
     },
     {
       name: lang === "pl" ? "Wersja desktopowa" : "Desktop app",
-      label: "Windows 10/11",
+      label: version ? `Windows ${version}` : "Windows latest",
       cta: lang === "pl" ? "Pobierz na Windows" : "Download for Windows",
       features: lang === "pl"
         ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z Ghostel"]
         : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
       popular: false,
       testid: "pricing-desktop",
-      href: GHOSTEL_DESKTOP_URL,
-      download: true,
+      href: desktopUrl,
       icon: MonitorDown,
     },
   ];
@@ -103,16 +100,17 @@ export default function Pricing() {
               </ul>
 
               {p.href ? (
-                <Button
-                  asChild
+                <a
+                  href={p.href}
                   data-testid={`${p.testid}-cta`}
-                  className="w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
+                  className={cn(
+                    buttonVariants(),
+                    "w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full",
+                  )}
                 >
-                  <a href={p.href} download={p.download || undefined}>
-                    {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
-                    {p.cta}
-                  </a>
-                </Button>
+                  {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
+                  {p.cta}
+                </a>
               ) : (
                 <Button
                   data-testid={`${p.testid}-cta`}

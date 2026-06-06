@@ -2,11 +2,13 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
-import { GHOSTEL_APK_URL, GHOSTEL_WEB_APP_URL } from "@/lib/constants";
+import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
+import { useLatestRelease } from "@/hooks/useLatestRelease";
 import PhoneMockup from "./PhoneMockup";
 
 export default function Hero() {
   const { lang } = useLang();
+  const { version, apkUrl } = useLatestRelease();
   const copy = lang === "pl"
     ? {
         tag: "Prywatna komunikacja na co dzień",
@@ -76,13 +78,15 @@ export default function Hero() {
               <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
             <Button
+              asChild
               data-testid="hero-cta-register"
               size="lg"
               variant="outline"
-              onClick={() => (window.location.href = GHOSTEL_APK_URL)}
               className="rounded-md h-12 px-7 border-white/15 bg-transparent text-white hover:bg-white/5 hover:border-white/30"
             >
-              {copy.secondary}
+              <a href={apkUrl}>
+                {copy.secondary}{version ? ` v${version}` : ""}
+              </a>
             </Button>
           </div>
 
