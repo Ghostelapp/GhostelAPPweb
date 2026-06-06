@@ -6,6 +6,10 @@ export const GHOSTEL_APK_URL =
 export const GHOSTEL_WEB_APP_URL =
   process.env.REACT_APP_GHOSTEL_WEB_APP_URL || "https://app.ghostel.app";
 
+export const GHOSTEL_DESKTOP_URL =
+  process.env.REACT_APP_GHOSTEL_DESKTOP_URL ||
+  "/downloads/ghostel-desktop-latest.exe";
+
 // Generic "open app" actions lead to the browser client. Android downloads
 // continue to use the stable direct APK URL above.
 export const GHOSTEL_APP_URL =

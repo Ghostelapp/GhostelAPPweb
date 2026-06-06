@@ -1,12 +1,17 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { Check, Download, Globe2 } from "lucide-react";
-import { GHOSTEL_APK_URL, GHOSTEL_WEB_APP_URL } from "@/lib/constants";
+import { Check, Download, Globe2, MonitorDown } from "lucide-react";
+import {
+  GHOSTEL_APK_URL,
+  GHOSTEL_DESKTOP_URL,
+  GHOSTEL_WEB_APP_URL,
+} from "@/lib/constants";
 
 export default function Pricing() {
   const { t, lang } = useLang();
   const directDownload = () => (window.location.href = GHOSTEL_APK_URL);
+  const desktopDownload = () => (window.location.href = GHOSTEL_DESKTOP_URL);
   const openWebApp = () => (window.location.href = GHOSTEL_WEB_APP_URL);
 
   const plans = [
@@ -33,13 +38,16 @@ export default function Pricing() {
       icon: Download,
     },
     {
-      name: t("pricing.enterprise"),
-      label: "Support",
-      cta: t("pricing.contactSales"),
-      features: [t("pricing.entF1"), t("pricing.entF2"), t("pricing.entF3"), t("pricing.entF4"), t("pricing.entF5")],
+      name: lang === "pl" ? "Wersja desktopowa" : "Desktop app",
+      label: "Windows 10/11",
+      cta: lang === "pl" ? "Pobierz na Windows" : "Download for Windows",
+      features: lang === "pl"
+        ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z Ghostel"]
+        : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
       popular: false,
-      testid: "pricing-enterprise",
-      onClick: () => (window.location.href = "mailto:sales@ghostel.app"),
+      testid: "pricing-desktop",
+      onClick: desktopDownload,
+      icon: MonitorDown,
     },
   ];
 
@@ -55,8 +63,8 @@ export default function Pricing() {
           </h2>
           <p className="text-base text-zinc-400">
             {lang === "pl"
-              ? "Otwórz Ghostel od razu w przeglądarce albo pobierz aplikację na Androida."
-              : "Open Ghostel instantly in your browser or download the Android app."}
+              ? "Otwórz Ghostel w przeglądarce albo pobierz aplikację na Androida lub Windows."
+              : "Open Ghostel in your browser or download the Android or Windows app."}
           </p>
         </div>
 
