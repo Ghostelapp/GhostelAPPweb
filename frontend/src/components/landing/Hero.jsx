@@ -2,13 +2,11 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import { GHOSTEL_APK_URL } from "@/lib/constants";
+import { GHOSTEL_APK_URL, GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 import PhoneMockup from "./PhoneMockup";
 
 export default function Hero() {
   const { lang } = useLang();
-  const navigate = useNavigate();
   const copy = lang === "pl"
     ? {
         tag: "Prywatna komunikacja na co dzień",
@@ -16,8 +14,8 @@ export default function Hero() {
         title: "rozmowy pod Twoją kontrolą",
         subtitle:
           "Pisz, wysyłaj załączniki i prowadź rozmowy głosowe w aplikacji projektowanej z myślą o prywatności. Ghostel łączy szyfrowanie end-to-end, ochronę konta i wygodne powiadomienia na Androidzie.",
-        primary: "Pobierz aplikację",
-        secondary: "Panel użytkownika",
+        primary: "Otwórz w przeglądarce",
+        secondary: "Pobierz na Androida",
         signals: ["E2EE wiadomości", "2FA i blokada PIN", "Szyfrowane połączenia"],
       }
     : {
@@ -26,8 +24,8 @@ export default function Hero() {
         title: "conversations under your control",
         subtitle:
           "Message, share attachments and make voice calls in an app designed around privacy. Ghostel combines end-to-end encryption, account protection and reliable Android notifications.",
-        primary: "Download the app",
-        secondary: "User panel",
+        primary: "Open in browser",
+        secondary: "Download for Android",
         signals: ["Message E2EE", "2FA and PIN lock", "Encrypted calls"],
       };
 
@@ -71,7 +69,7 @@ export default function Hero() {
             <Button
               data-testid="hero-cta-download"
               size="lg"
-              onClick={() => (window.location.href = GHOSTEL_APK_URL)}
+              onClick={() => (window.location.href = GHOSTEL_WEB_APP_URL)}
               className="btn-cyan rounded-md px-8 h-12 text-sm"
             >
               {copy.primary}
@@ -81,7 +79,7 @@ export default function Hero() {
               data-testid="hero-cta-register"
               size="lg"
               variant="outline"
-              onClick={() => navigate("/login")}
+              onClick={() => (window.location.href = GHOSTEL_APK_URL)}
               className="rounded-md h-12 px-7 border-white/15 bg-transparent text-white hover:bg-white/5 hover:border-white/30"
             >
               {copy.secondary}
