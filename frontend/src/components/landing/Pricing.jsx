@@ -10,8 +10,6 @@ import {
 
 export default function Pricing() {
   const { t, lang } = useLang();
-  const directDownload = () => (window.location.href = GHOSTEL_APK_URL);
-  const desktopDownload = () => (window.location.href = GHOSTEL_DESKTOP_URL);
   const openWebApp = () => (window.location.href = GHOSTEL_WEB_APP_URL);
 
   const plans = [
@@ -29,12 +27,13 @@ export default function Pricing() {
     },
     {
       name: t("pricing.free"),
-      label: "APK 1.4.0",
+      label: "APK 1.4.1",
       cta: lang === "pl" ? "Pobierz APK na Androida" : "Download Android APK",
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-android",
-      onClick: directDownload,
+      href: GHOSTEL_APK_URL,
+      download: true,
       icon: Download,
     },
     {
@@ -46,7 +45,8 @@ export default function Pricing() {
         : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
       popular: false,
       testid: "pricing-desktop",
-      onClick: desktopDownload,
+      href: GHOSTEL_DESKTOP_URL,
+      download: true,
       icon: MonitorDown,
     },
   ];
@@ -102,18 +102,27 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              <Button
-                data-testid={`${p.testid}-cta`}
-                onClick={p.onClick}
-                className={
-                  p.popular
-                    ? "w-full btn-cyan h-11 rounded-full"
-                    : "w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
-                }
-              >
-                {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
-                {p.cta}
-              </Button>
+              {p.href ? (
+                <Button
+                  asChild
+                  data-testid={`${p.testid}-cta`}
+                  className="w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
+                >
+                  <a href={p.href} download={p.download || undefined}>
+                    {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
+                    {p.cta}
+                  </a>
+                </Button>
+              ) : (
+                <Button
+                  data-testid={`${p.testid}-cta`}
+                  onClick={p.onClick}
+                  className="w-full btn-cyan h-11 rounded-full"
+                >
+                  {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
+                  {p.cta}
+                </Button>
+              )}
             </motion.div>
           ))}
         </div>
