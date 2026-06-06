@@ -3,33 +3,52 @@ import { useLang } from "@/context/LanguageContext";
 import { BellRing, Download, PhoneCall, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 
 export default function Features() {
-  const { t } = useLang();
-  const items = [
-    { icon: UserRoundPlus, title: t("features.messagesTitle"), desc: t("features.messagesDesc") },
-    { icon: UsersRound, title: t("features.groupsTitle"), desc: t("features.groupsDesc") },
-    { icon: PhoneCall, title: t("features.voiceTitle"), desc: t("features.voiceDesc") },
-    { icon: BellRing, title: t("features.filesTitle"), desc: t("features.filesDesc") },
-    { icon: Download, title: t("features.pushTitle"), desc: t("features.pushDesc") },
-    { icon: ShieldCheck, title: t("features.securityTitle"), desc: t("features.securityDesc") },
-  ];
+  const { lang } = useLang();
+  const copy = lang === "pl"
+    ? {
+        eyebrow: "Najważniejsze możliwości",
+        title: "Komunikacja bez zbędnego chaosu",
+        subtitle:
+          "Ghostel skupia wiadomości, kontakty, połączenia i kontrolę prywatności w jednej aplikacji, bez ukrywania ważnych ustawień.",
+        items: [
+          { icon: UserRoundPlus, title: "Wiadomości i kontakty", desc: "Prywatne rozmowy, kontakty po nazwie użytkownika, reakcje i czytelna historia konwersacji." },
+          { icon: UsersRound, title: "Rozmowy grupowe", desc: "Twórz grupy, zarządzaj członkami i korzystaj z szyfrowania, gdy urządzenia uczestników mają aktywne klucze." },
+          { icon: PhoneCall, title: "Połączenia głosowe", desc: "Rozmawiaj przez WebRTC z szyfrowanymi mediami oraz szyfrowaną sygnalizacją między urządzeniami." },
+          { icon: BellRing, title: "Powiadomienia połączeń", desc: "Dedykowane alerty połączeń z dźwiękiem, wibracją i ekranem odbierania na Androidzie." },
+          { icon: Download, title: "Kontrola własnych danych", desc: "Eksportuj dane konta albo trwale usuń konto bez konieczności kontaktowania się z administratorem." },
+          { icon: ShieldCheck, title: "Ochrona konta i aplikacji", desc: "Włącz kod 2FA, blokadę aplikacji PIN-em i zarządzaj listą zablokowanych użytkowników." },
+        ],
+      }
+    : {
+        eyebrow: "Core capabilities",
+        title: "Communication without unnecessary noise",
+        subtitle:
+          "Ghostel brings messages, contacts, calls and privacy controls into one app without hiding important settings.",
+        items: [
+          { icon: UserRoundPlus, title: "Messages and contacts", desc: "Private conversations, username-based contacts, reactions and a clear conversation history." },
+          { icon: UsersRound, title: "Group conversations", desc: "Create groups, manage members and use encryption when participant devices have active keys." },
+          { icon: PhoneCall, title: "Voice calls", desc: "Talk over WebRTC with encrypted media and end-to-end encrypted signaling between devices." },
+          { icon: BellRing, title: "Incoming call alerts", desc: "Dedicated Android call alerts with sound, vibration and an answer screen." },
+          { icon: Download, title: "Control your data", desc: "Export account data or permanently delete your account without contacting an administrator." },
+          { icon: ShieldCheck, title: "Account and app protection", desc: "Enable 2FA, protect the app with a PIN and manage blocked users." },
+        ],
+      };
 
   return (
     <section id="features" data-testid="features-section" className="relative py-24 sm:py-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            Core features
+            {copy.eyebrow}
           </div>
           <h2 data-testid="features-title" className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            {t("features.title")}
+            {copy.title}
           </h2>
-          <p className="text-base text-zinc-400 leading-relaxed">
-            {t("features.subtitle")}
-          </p>
+          <p className="text-base text-zinc-400 leading-relaxed">{copy.subtitle}</p>
         </div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {items.map((item, i) => {
+          {copy.items.map((item, i) => {
             const Icon = item.icon;
             return (
               <motion.div
@@ -39,14 +58,12 @@ export default function Features() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.05 }}
                 data-testid={`feature-card-${i}`}
-                className="surface surface-hover rounded-2xl p-7 group"
+                className="surface surface-hover rounded-lg p-7 group"
               >
-                <div className="w-11 h-11 rounded-xl bg-cyan-400/10 border border-cyan-400/20 grid place-items-center text-cyan-400 mb-5 group-hover:bg-cyan-400/15 transition-colors">
+                <div className="w-11 h-11 rounded-md bg-cyan-400/10 border border-cyan-400/20 grid place-items-center text-cyan-400 mb-5 group-hover:bg-cyan-400/15 transition-colors">
                   <Icon className="w-5 h-5" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-white mb-2">
-                  {item.title}
-                </h3>
+                <h3 className="font-display text-lg font-bold text-white mb-2">{item.title}</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">{item.desc}</p>
               </motion.div>
             );

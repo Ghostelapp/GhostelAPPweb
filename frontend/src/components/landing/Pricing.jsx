@@ -1,30 +1,31 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
-import { GHOSTEL_APP_URL } from "@/lib/constants";
+import { Check, Download } from "lucide-react";
+import { GHOSTEL_APK_URL } from "@/lib/constants";
 
 export default function Pricing() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const directDownload = () => (window.location.href = GHOSTEL_APK_URL);
 
   const plans = [
     {
       name: t("pricing.free"),
-      label: "Google Play",
-      cta: t("pricing.freeCta"),
+      label: "APK 1.4.0",
+      cta: lang === "pl" ? "Pobierz APK na Androida" : "Download Android APK",
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
-      popular: false,
+      popular: true,
       testid: "pricing-free",
-      onClick: () => (window.location.href = GHOSTEL_APP_URL),
+      onClick: directDownload,
     },
     {
       name: t("pricing.premium"),
-      label: "Beta",
-      cta: t("pricing.premiumCta"),
+      label: lang === "pl" ? "Instalacja" : "Installation",
+      cta: lang === "pl" ? "Pobierz wersję testową" : "Download test build",
       features: [t("pricing.premF1"), t("pricing.premF2"), t("pricing.premF3"), t("pricing.premF4"), t("pricing.premF5")],
-      popular: true,
+      popular: false,
       testid: "pricing-premium",
-      onClick: () => (window.location.href = GHOSTEL_APP_URL),
+      onClick: directDownload,
     },
     {
       name: t("pricing.enterprise"),
@@ -42,7 +43,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            Download
+            {lang === "pl" ? "Pobieranie" : "Download"}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
             {t("pricing.title")}
@@ -93,6 +94,7 @@ export default function Pricing() {
                     : "w-full bg-white/[0.03] hover:bg-white/[0.08] text-white border border-white/10 h-11 rounded-full"
                 }
               >
+                {i < 2 && <Download className="w-4 h-4 mr-2" />}
                 {p.cta}
               </Button>
             </motion.div>
