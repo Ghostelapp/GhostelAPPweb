@@ -1,7 +1,6 @@
 import { useLang } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
-import { Github, Twitter, Linkedin } from "lucide-react";
-import BrandLogo from "@/components/BrandLogo";
+import { Github, Twitter, Linkedin, ShieldCheck } from "lucide-react";
 
 export default function Footer() {
   const { t } = useLang();
@@ -12,7 +11,9 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
             <div className="flex items-center gap-2.5 mb-4">
-              <BrandLogo />
+              <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
+                <ShieldCheck className="w-5 h-5" />
+              </div>
               <span className="font-display font-bold text-xl text-white">Ghostel</span>
             </div>
             <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
