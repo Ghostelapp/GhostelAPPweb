@@ -2,26 +2,24 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Check, Download, Globe2, MonitorDown } from "lucide-react";
-import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
 import { cn } from "@/lib/utils";
 
 export default function Pricing() {
   const { t, lang } = useLang();
-  const { version, apkUrl, desktopUrl } = useLatestRelease();
-  const openWebApp = () => (window.location.href = GHOSTEL_WEB_APP_URL);
+  const { version, apkUrl } = useLatestRelease();
 
   const plans = [
     {
       name: lang === "pl" ? "Wersja webowa" : "Web app",
-      label: "app.ghostel.app",
-      cta: lang === "pl" ? "Otwórz w przeglądarce" : "Open in browser",
+      label: lang === "pl" ? "W budowie" : "In development",
+      cta: lang === "pl" ? "Wersja webowa w budowie" : "Web app in development",
       features: lang === "pl"
         ? ["Bez instalowania programu", "To samo konto i kontakty", "Czat, połączenia i ustawienia", "Możliwość instalacji jako PWA"]
         : ["No software installation", "The same account and contacts", "Chat, calls and settings", "Installable as a PWA"],
-      popular: true,
+      popular: false,
       testid: "pricing-web",
-      onClick: openWebApp,
+      disabled: true,
       icon: Globe2,
     },
     {
@@ -36,14 +34,14 @@ export default function Pricing() {
     },
     {
       name: lang === "pl" ? "Wersja desktopowa" : "Desktop app",
-      label: version ? `Windows ${version}` : "Windows latest",
-      cta: lang === "pl" ? "Pobierz na Windows" : "Download for Windows",
+      label: lang === "pl" ? "W budowie" : "In development",
+      cta: lang === "pl" ? "Wersja Windows w budowie" : "Windows app in development",
       features: lang === "pl"
         ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z Ghostel"]
         : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
       popular: false,
       testid: "pricing-desktop",
-      href: desktopUrl,
+      disabled: true,
       icon: MonitorDown,
     },
   ];
@@ -60,8 +58,8 @@ export default function Pricing() {
           </h2>
           <p className="text-base text-zinc-400">
             {lang === "pl"
-              ? "Otwórz Ghostel w przeglądarce albo pobierz aplikację na Androida lub Windows."
-              : "Open Ghostel in your browser or download the Android or Windows app."}
+              ? "Pobierz aplikację na Androida. Wersje Web i Windows są obecnie w budowie."
+              : "Download the Android app. Web and Windows versions are currently in development."}
           </p>
         </div>
 
@@ -99,7 +97,16 @@ export default function Pricing() {
                 ))}
               </ul>
 
-              {p.href ? (
+              {p.disabled ? (
+                <Button
+                  data-testid={`${p.testid}-cta`}
+                  disabled
+                  className="w-full h-11 rounded-full bg-white/[0.03] text-zinc-500 border border-white/10"
+                >
+                  {p.icon ? <p.icon className="w-4 h-4 mr-2" /> : null}
+                  {p.cta}
+                </Button>
+              ) : p.href ? (
                 <a
                   href={p.href}
                   data-testid={`${p.testid}-cta`}

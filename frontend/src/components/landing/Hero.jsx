@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
-import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
 import PhoneMockup from "./PhoneMockup";
 
@@ -16,7 +15,7 @@ export default function Hero() {
         title: "rozmowy pod Twoją kontrolą",
         subtitle:
           "Pisz, wysyłaj załączniki i prowadź rozmowy głosowe w aplikacji projektowanej z myślą o prywatności. Ghostel łączy szyfrowanie end-to-end, ochronę konta i wygodne powiadomienia na Androidzie.",
-        primary: "Otwórz w przeglądarce",
+        primary: "Web w budowie",
         secondary: "Pobierz na Androida",
         signals: ["E2EE wiadomości", "2FA i blokada PIN", "Szyfrowane połączenia"],
       }
@@ -26,7 +25,7 @@ export default function Hero() {
         title: "conversations under your control",
         subtitle:
           "Message, share attachments and make voice calls in an app designed around privacy. Ghostel combines end-to-end encryption, account protection and reliable Android notifications.",
-        primary: "Open in browser",
+        primary: "Web in development",
         secondary: "Download for Android",
         signals: ["Message E2EE", "2FA and PIN lock", "Encrypted calls"],
       };
@@ -71,8 +70,8 @@ export default function Hero() {
             <Button
               data-testid="hero-cta-download"
               size="lg"
-              onClick={() => (window.location.href = GHOSTEL_WEB_APP_URL)}
-              className="btn-cyan rounded-md px-8 h-12 text-sm"
+              disabled
+              className="rounded-md px-8 h-12 text-sm bg-white/[0.04] text-zinc-500 border border-white/10"
             >
               {copy.primary}
               <ArrowRight className="w-4 h-4 ml-2" />

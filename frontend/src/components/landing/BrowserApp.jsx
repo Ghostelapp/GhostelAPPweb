@@ -2,7 +2,6 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Check, Globe2, LockKeyhole, MessageCircle, Monitor, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/context/LanguageContext";
-import { GHOSTEL_WEB_APP_URL } from "@/lib/constants";
 
 export default function BrowserApp() {
   const { lang } = useLang();
@@ -12,14 +11,14 @@ export default function BrowserApp() {
         title: "Twoje rozmowy są dostępne również w przeglądarce",
         subtitle:
           "Zaloguj się na komputerze lub telefonie bez instalowania programu. Wersja webowa korzysta z tego samego konta, kontaktów i rozmów co aplikacja mobilna.",
-        cta: "Otwórz Ghostel Web",
+        cta: "Wersja webowa w budowie",
         points: [
           "Prywatne i grupowe rozmowy w czasie rzeczywistym",
           "Kontakty, połączenia i ustawienia konta",
           "Instalacja jako PWA bez sklepu z aplikacjami",
         ],
-        status: "Połączono z Ghostel",
-        message: "Wersja webowa jest gotowa.",
+        status: "W budowie",
+        message: "Wersja webowa jest obecnie przygotowywana.",
         navigation: ["Rozmowy", "Kontakty", "Połączenia", "Profil"],
       }
     : {
@@ -27,14 +26,14 @@ export default function BrowserApp() {
         title: "Your conversations are also available in the browser",
         subtitle:
           "Sign in on a computer or phone without installing software. The web version uses the same account, contacts and conversations as the mobile app.",
-        cta: "Open Ghostel Web",
+        cta: "Web app in development",
         points: [
           "Private and group conversations in real time",
           "Contacts, calls and account settings",
           "Installable as a PWA without an app store",
         ],
-        status: "Connected to Ghostel",
-        message: "The web version is ready.",
+        status: "In development",
+        message: "The web version is currently being prepared.",
         navigation: ["Chats", "Contacts", "Calls", "Profile"],
       };
 
@@ -69,8 +68,8 @@ export default function BrowserApp() {
           <Button
             data-testid="web-app-cta"
             size="lg"
-            onClick={() => (window.location.href = GHOSTEL_WEB_APP_URL)}
-            className="btn-cyan rounded-md px-8 h-12 text-sm"
+            disabled
+            className="rounded-md px-8 h-12 text-sm bg-white/[0.04] text-zinc-500 border border-white/10"
           >
             {copy.cta}
             <ArrowUpRight className="w-4 h-4 ml-2" />

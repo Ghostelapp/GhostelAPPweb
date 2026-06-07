@@ -12,8 +12,8 @@ export default function Faq() {
     {
       q: lang === "pl" ? "Czy Ghostel działa w przeglądarce?" : "Does Ghostel work in a browser?",
       a: lang === "pl"
-        ? "Tak. Pod adresem app.ghostel.app możesz zalogować się na to samo konto i korzystać z rozmów, kontaktów, połączeń oraz ustawień bez instalowania programu."
-        : "Yes. At app.ghostel.app you can sign in to the same account and use chats, contacts, calls and settings without installing software.",
+        ? "Wersja przeglądarkowa jest obecnie w budowie. Na ten moment korzystaj z aplikacji Android."
+        : "The browser version is currently in development. For now, use the Android app.",
     },
     { q: t("faq.q1"), a: t("faq.a1") },
     { q: t("faq.q2"), a: t("faq.a2") },
