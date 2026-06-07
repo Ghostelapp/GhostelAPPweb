@@ -1,6 +1,14 @@
 import axios from "axios";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8001";
+const configuredBackendUrl = process.env.REACT_APP_BACKEND_URL;
+const isProductionWebsite =
+  window.location.hostname === "ghostel.app" ||
+  window.location.hostname === "www.ghostel.app";
+const BACKEND_URL =
+  isProductionWebsite &&
+  (!configuredBackendUrl || configuredBackendUrl === "https://ghostel.app")
+    ? "https://panel-api.ghostel.app"
+    : configuredBackendUrl || "http://localhost:8001";
 export const API = `${BACKEND_URL}/api`;
 
 const api = axios.create({
