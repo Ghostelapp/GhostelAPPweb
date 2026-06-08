@@ -1,6 +1,7 @@
 import { useAuth } from "@/context/AuthContext";
-import { nextLanguage, useLang } from "@/context/LanguageContext";
-import { Globe, LogOut, Search } from "lucide-react";
+import { useLang } from "@/context/LanguageContext";
+import { LogOut, Search } from "lucide-react";
+import LanguageMenu from "@/components/LanguageMenu";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +13,7 @@ import { Input } from "@/components/ui/input";
 
 export default function Topbar() {
   const { user, logout } = useAuth();
-  const { t, lang, setLang } = useLang();
+  const { t } = useLang();
 
   return (
     <header
@@ -29,14 +30,9 @@ export default function Topbar() {
       </div>
 
       <div className="ml-auto flex items-center gap-3">
-        <button
-          onClick={() => setLang(nextLanguage(lang))}
-          data-testid="topbar-lang-toggle"
-          className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full glass text-xs font-semibold text-zinc-300 hover:text-cyan-400"
-        >
-          <Globe className="w-3.5 h-3.5" />
-          {lang.toUpperCase()}
-        </button>
+        <div className="hidden sm:block">
+          <LanguageMenu compact />
+        </div>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

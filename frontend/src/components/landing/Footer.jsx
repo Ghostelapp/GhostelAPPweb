@@ -1,9 +1,11 @@
 import { useLang } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
 import { Github, Twitter, Linkedin, ShieldCheck } from "lucide-react";
+import { useLatestRelease } from "@/hooks/useLatestRelease";
 
 export default function Footer() {
   const { t } = useLang();
+  const { version, apkUrl } = useLatestRelease();
 
   return (
     <footer data-testid="footer-section" className="relative border-t divider-soft pt-16 pb-10">
@@ -40,7 +42,7 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
               <li><a href="mailto:support@ghostel.app" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</a></li>
-              <li><a href="#download" data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")}</a></li>
+              <li><a href={apkUrl} data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")} Android{version ? ` v${version}` : ""}</a></li>
             </ul>
           </div>
 

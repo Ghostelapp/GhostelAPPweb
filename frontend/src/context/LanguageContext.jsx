@@ -4,11 +4,6 @@ import { translations } from "../i18n/translations";
 const LanguageContext = createContext(null);
 const supportedLanguages = ["pl", "en", "de"];
 
-export function nextLanguage(lang) {
-  const index = supportedLanguages.indexOf(lang);
-  return supportedLanguages[(index + 1) % supportedLanguages.length];
-}
-
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
     const saved = localStorage.getItem("ghostel_lang");
