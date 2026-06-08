@@ -5,7 +5,6 @@ import Features from "@/components/landing/Features";
 import WhyGhostel from "@/components/landing/WhyGhostel";
 import Comparison from "@/components/landing/Comparison";
 import HowItWorks from "@/components/landing/HowItWorks";
-import Stats from "@/components/landing/Stats";
 import Pricing from "@/components/landing/Pricing";
 import Faq from "@/components/landing/Faq";
 import Footer from "@/components/landing/Footer";
@@ -21,7 +20,6 @@ export default function Landing() {
         <WhyGhostel />
         <Comparison />
         <HowItWorks />
-        <Stats />
         <Pricing />
         <Faq />
       </main>
