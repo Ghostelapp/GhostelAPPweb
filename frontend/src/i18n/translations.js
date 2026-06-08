@@ -30,6 +30,7 @@ export const translations = {
     nav: {
       features: "Funkcje",
       why: "Bezpieczeństwo",
+      comparison: "Porównanie",
       how: "Jak działa",
       download: "Pobierz",
       privacy: "Prywatność",
@@ -266,6 +267,7 @@ export const translations = {
     nav: {
       features: "Features",
       why: "Security",
+      comparison: "Comparison",
       how: "How it works",
       download: "Download",
       privacy: "Privacy",
@@ -506,6 +508,7 @@ translations.de = {
   nav: {
     features: "Funktionen",
     why: "Sicherheit",
+    comparison: "Vergleich",
     how: "So funktioniert es",
     download: "Download",
     privacy: "Datenschutz",

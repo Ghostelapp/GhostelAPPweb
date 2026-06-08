@@ -26,6 +26,7 @@ export default function Navbar() {
   const primaryLinks = [
     { section: "features", label: t("nav.features") },
     { section: "why", label: t("nav.why") },
+    { section: "comparison", label: t("nav.comparison") },
     { section: "download", label: t("nav.download") },
     { section: "faq", label: t("nav.faq") },
   ];

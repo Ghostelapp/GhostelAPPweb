@@ -3,6 +3,7 @@ import Hero from "@/components/landing/Hero";
 import BrowserApp from "@/components/landing/BrowserApp";
 import Features from "@/components/landing/Features";
 import WhyGhostel from "@/components/landing/WhyGhostel";
+import Comparison from "@/components/landing/Comparison";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Stats from "@/components/landing/Stats";
 import Pricing from "@/components/landing/Pricing";
@@ -18,6 +19,7 @@ export default function Landing() {
         <BrowserApp />
         <Features />
         <WhyGhostel />
+        <Comparison />
         <HowItWorks />
         <Stats />
         <Pricing />
