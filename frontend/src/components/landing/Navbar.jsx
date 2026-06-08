@@ -26,7 +26,7 @@ export default function Navbar() {
   const primaryLinks = [
     { section: "features", label: t("nav.features") },
     { section: "why", label: t("nav.why") },
-    { section: "download", label: t("common.download") },
+    { section: "download", label: t("nav.download") },
     { section: "faq", label: t("nav.faq") },
   ];
   const mobileLinks = [
@@ -75,7 +75,7 @@ export default function Navbar() {
           </span>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.025] p-1">
+        <nav className="hidden xl:flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.025] p-1">
           {primaryLinks.map((l) => (
             <button
               key={l.href || l.section}
@@ -148,7 +148,7 @@ export default function Navbar() {
           <button
             data-testid="navbar-mobile-toggle"
             onClick={() => setOpen(!open)}
-            className="lg:hidden p-2 text-zinc-300"
+            className="xl:hidden rounded-lg p-2 text-zinc-300 transition-colors hover:bg-white/[0.05] hover:text-white"
           >
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
@@ -161,14 +161,14 @@ export default function Navbar() {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="lg:hidden border-t border-white/10 bg-[#080c12]/98 shadow-2xl backdrop-blur-xl overflow-hidden"
+            className="xl:hidden border-t border-white/10 bg-[#080c12]/98 shadow-2xl backdrop-blur-xl overflow-hidden"
           >
             <div className="px-4 py-5 sm:px-6">
-              <div className="mb-4 flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-white/[0.025] p-2">
-                <LanguageMenu />
+              <div className="mb-4 grid grid-cols-2 gap-2 rounded-xl border border-white/10 bg-white/[0.025] p-2">
+                <LanguageMenu compact />
                 <a
                   href={apkUrl}
-                  className="inline-flex h-10 items-center gap-2 rounded-lg bg-cyan-400 px-3 text-xs font-bold text-[#071018]"
+                  className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-cyan-400 px-3 text-xs font-bold text-[#071018] transition-colors hover:bg-cyan-300"
                 >
                   <Download className="h-4 w-4" />
                   Android {version ? `v${version}` : "APK"}
