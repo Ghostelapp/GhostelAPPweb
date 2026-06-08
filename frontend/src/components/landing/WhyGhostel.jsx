@@ -39,6 +39,32 @@ export default function WhyGhostel() {
         transparency:
           "Ważne: serwer nadal przetwarza dane konta, tokeny push, członkostwo rozmów, statusy oraz metadane potrzebne do dostarczenia wiadomości i połączeń.",
       }
+    : lang === "de"
+    ? {
+        eyebrow: "Sicherheit ohne vage Versprechen",
+        title: "Was Unterhaltungen heute schützt",
+        subtitle:
+          "Ghostel trennt Gesprächsinhalte von den Betriebsdaten, die für den Dienst erforderlich sind. Hier siehst du die aktuellen Schutzmaßnahmen und die weitere Entwicklungsrichtung.",
+        currentLabel: "Heute verfügbar",
+        current: [
+          { icon: LockKeyhole, title: "E2EE für Nachrichten und Anhänge", desc: "Inhalte werden auf dem Gerät verschlüsselt. Der Server speichert verschlüsselte Daten, wenn alle Mitglieder Geräteschlüssel besitzen." },
+          { icon: KeyRound, title: "Prüfung von Geräteschlüsseln", desc: "Nach einer Änderung des Geräteschlüssels wird das Senden pausiert, bis der neue Fingerabdruck bestätigt wurde." },
+          { icon: ShieldCheck, title: "Verschlüsselte Anrufe", desc: "Die Anrufsignalisierung ist Ende-zu-Ende-verschlüsselt; Sprachmedien werden durch WebRTC DTLS-SRTP geschützt." },
+          { icon: Fingerprint, title: "2FA und lokale PIN-Sperre", desc: "Konten können einen 2FA-Code verlangen und die App kann mit einer sicher gespeicherten PIN geschützt werden." },
+          { icon: Smartphone, title: "Geschützte Gerätedaten", desc: "Anmeldetokens und private Schlüssel werden im SecureStore des Systems gespeichert." },
+          { icon: UserX, title: "Datenschutz und Kontokontrolle", desc: "Blockieren, Datenschutzoptionen, Datenexport und dauerhafte Kontolöschung stehen direkt zur Verfügung." },
+        ],
+        roadmapLabel: "Entwicklungsrichtung",
+        roadmapTitle: "Die nächsten Schutzebenen",
+        roadmapNote: "Die Roadmap beschreibt die geplante Richtung und kann sich durch Tests und Prüfungen ändern.",
+        roadmap: [
+          { icon: Radar, title: "Unabhängige Sicherheitsprüfung", desc: "Externe Prüfung von Architektur, Anwendungen und Infrastruktur vor einer breiteren Veröffentlichung." },
+          { icon: KeyRound, title: "Erweiterte Mehrgeräteverwaltung", desc: "Übersichtlichere Verwaltung vertrauenswürdiger Geräte, Sitzungen und Schlüsseländerungen." },
+          { icon: BellRing, title: "Sicherheitswarnungen für Konten", desc: "Bessere Hinweise zu neuen Anmeldungen, Sicherheitsänderungen und verdächtigen Aktivitäten." },
+        ],
+        transparency:
+          "Wichtig: Der Server verarbeitet weiterhin Kontodaten, Push-Tokens, Gesprächsmitgliedschaften, Status und Metadaten, die für Nachrichten und Anrufe erforderlich sind.",
+      }
     : {
         eyebrow: "Security without vague claims",
         title: "What protects conversations today",
