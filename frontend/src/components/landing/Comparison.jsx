@@ -169,31 +169,31 @@ export default function Comparison() {
         </div>
 
         <div className="mt-12 overflow-hidden rounded-[1.75rem] border border-white/10 bg-zinc-950/70 shadow-2xl shadow-cyan-950/20 backdrop-blur">
-          <div className="grid border-b border-white/10 bg-white/[0.025] p-4 md:grid-cols-4">
-            {brands.map(({ key, name, Logo }, index) => (
-              <div
-                key={key}
-                className={`flex items-center gap-3 rounded-2xl p-3 ${key === "ghostel" ? "border border-cyan-300/25 bg-cyan-300/10" : ""}`}
-              >
-                <Logo />
-                <div>
-                  <div className={`text-sm font-black ${key === "ghostel" ? "text-cyan-100" : "text-white"}`}>{name}</div>
-                  <div className="text-xs text-zinc-500">{copy.columns[index + 1]}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-
           <div className="overflow-x-auto">
-            <table className="min-w-[900px] w-full text-left">
+            <table className="min-w-[980px] w-full table-fixed text-left">
+              <colgroup>
+                <col className="w-[44%]" />
+                <col className="w-[14%]" />
+                <col className="w-[14%]" />
+                <col className="w-[14%]" />
+                <col className="w-[14%]" />
+              </colgroup>
               <thead>
-                <tr className="border-b border-white/10">
-                  {copy.columns.map((column, index) => (
+                <tr className="border-b border-white/10 bg-white/[0.025]">
+                  <th className="px-5 py-5 text-xs font-bold uppercase tracking-[0.16em] text-zinc-500">
+                    {copy.columns[0]}
+                  </th>
+                  {brands.map(({ key, name, Logo }) => (
                     <th
-                      key={column}
-                      className={`px-5 py-4 text-xs font-bold uppercase tracking-[0.16em] ${index === 1 ? "bg-cyan-300/[0.07] text-cyan-200" : "text-zinc-500"}`}
+                      key={key}
+                      className={`px-3 py-4 ${key === "ghostel" ? "bg-cyan-300/[0.07]" : ""}`}
                     >
-                      {column}
+                      <div className="flex flex-col items-center gap-2 text-center">
+                        <Logo />
+                        <span className={`text-xs font-black uppercase tracking-[0.12em] ${key === "ghostel" ? "text-cyan-200" : "text-zinc-300"}`}>
+                          {name}
+                        </span>
+                      </div>
                     </th>
                   ))}
                 </tr>
