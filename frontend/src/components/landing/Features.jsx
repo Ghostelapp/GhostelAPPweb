@@ -19,6 +19,21 @@ export default function Features() {
           { icon: ShieldCheck, title: "Ochrona konta i aplikacji", desc: "Włącz kod 2FA, blokadę aplikacji PIN-em i zarządzaj listą zablokowanych użytkowników." },
         ],
       }
+    : lang === "de"
+    ? {
+        eyebrow: "Wichtigste Funktionen",
+        title: "Kommunikation ohne unnötiges Chaos",
+        subtitle:
+          "Ghostel vereint Nachrichten, Kontakte, Anrufe und Datenschutzkontrollen in einer App, ohne wichtige Einstellungen zu verstecken.",
+        items: [
+          { icon: UserRoundPlus, title: "Nachrichten und Kontakte", desc: "Private Unterhaltungen, Kontakte per Benutzername, Reaktionen und ein übersichtlicher Verlauf." },
+          { icon: UsersRound, title: "Gruppenunterhaltungen", desc: "Erstelle Gruppen, verwalte Mitglieder und nutze Verschlüsselung, wenn die Geräte aktive Schlüssel besitzen." },
+          { icon: PhoneCall, title: "Sprachanrufe", desc: "Telefoniere über WebRTC mit verschlüsselten Medien und Ende-zu-Ende-verschlüsselter Signalisierung." },
+          { icon: BellRing, title: "Anrufbenachrichtigungen", desc: "Eigene Android-Anrufhinweise mit Ton, Vibration und Anrufbildschirm." },
+          { icon: Download, title: "Kontrolle über deine Daten", desc: "Exportiere Kontodaten oder lösche dein Konto dauerhaft ohne Kontakt zum Administrator." },
+          { icon: ShieldCheck, title: "Konto- und App-Schutz", desc: "Aktiviere 2FA, schütze die App mit einer PIN und verwalte blockierte Benutzer." },
+        ],
+      }
     : {
         eyebrow: "Core capabilities",
         title: "Communication without unnecessary noise",

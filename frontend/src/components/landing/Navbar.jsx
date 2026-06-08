@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { useLang } from "@/context/LanguageContext";
+import { nextLanguage, useLang } from "@/context/LanguageContext";
 import { useAuth } from "@/context/AuthContext";
 import { Menu, X, Globe, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -87,7 +87,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <button
             data-testid="lang-toggle"
-            onClick={() => setLang(lang === "pl" ? "en" : "pl")}
+            onClick={() => setLang(nextLanguage(lang))}
             className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-full surface text-[11px] font-semibold text-zinc-300 hover:text-cyan-400 transition-colors"
           >
             <Globe className="w-3 h-3" />
@@ -138,7 +138,7 @@ export default function Navbar() {
                 disabled
                 className="hidden sm:inline-flex rounded-full px-5 h-9 text-sm bg-white/[0.04] text-zinc-500"
               >
-                Ghostel Web · {lang === "pl" ? "w budowie" : "in development"}
+                Ghostel Web · {lang === "pl" ? "w budowie" : lang === "de" ? "in Entwicklung" : "in development"}
               </Button>
             </>
           )}
@@ -202,7 +202,7 @@ export default function Navbar() {
                       disabled
                       className="flex-1 bg-white/[0.04] text-zinc-500"
                     >
-                      Ghostel Web · {lang === "pl" ? "w budowie" : "in development"}
+                      Ghostel Web · {lang === "pl" ? "w budowie" : lang === "de" ? "in Entwicklung" : "in development"}
                     </Button>
                   </>
                 )}

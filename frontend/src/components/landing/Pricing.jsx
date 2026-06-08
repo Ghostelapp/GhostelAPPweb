@@ -11,11 +11,13 @@ export default function Pricing() {
 
   const plans = [
     {
-      name: lang === "pl" ? "Wersja webowa" : "Web app",
-      label: lang === "pl" ? "W budowie" : "In development",
-      cta: lang === "pl" ? "Wersja webowa w budowie" : "Web app in development",
+      name: lang === "pl" ? "Wersja webowa" : lang === "de" ? "Web-App" : "Web app",
+      label: lang === "pl" ? "W budowie" : lang === "de" ? "In Entwicklung" : "In development",
+      cta: lang === "pl" ? "Wersja webowa w budowie" : lang === "de" ? "Web-App in Entwicklung" : "Web app in development",
       features: lang === "pl"
         ? ["Bez instalowania programu", "To samo konto i kontakty", "Czat, połączenia i ustawienia", "Możliwość instalacji jako PWA"]
+        : lang === "de"
+        ? ["Keine Softwareinstallation", "Dasselbe Konto und dieselben Kontakte", "Chats, Anrufe und Einstellungen", "Als PWA installierbar"]
         : ["No software installation", "The same account and contacts", "Chat, calls and settings", "Installable as a PWA"],
       popular: false,
       testid: "pricing-web",
@@ -25,7 +27,7 @@ export default function Pricing() {
     {
       name: t("pricing.free"),
       label: version ? `APK ${version}` : "APK latest",
-      cta: lang === "pl" ? "Pobierz APK na Androida" : "Download Android APK",
+      cta: lang === "pl" ? "Pobierz APK na Androida" : lang === "de" ? "Android-APK herunterladen" : "Download Android APK",
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-android",
@@ -33,11 +35,13 @@ export default function Pricing() {
       icon: Download,
     },
     {
-      name: lang === "pl" ? "Wersja desktopowa" : "Desktop app",
-      label: lang === "pl" ? "W budowie" : "In development",
-      cta: lang === "pl" ? "Wersja Windows w budowie" : "Windows app in development",
+      name: lang === "pl" ? "Wersja desktopowa" : lang === "de" ? "Desktop-App" : "Desktop app",
+      label: lang === "pl" ? "W budowie" : lang === "de" ? "In Entwicklung" : "In development",
+      cta: lang === "pl" ? "Wersja Windows w budowie" : lang === "de" ? "Windows-App in Entwicklung" : "Windows app in development",
       features: lang === "pl"
         ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z Ghostel"]
+        : lang === "de"
+        ? ["Eigenständige Desktop-App", "Dasselbe Konto und dieselben Unterhaltungen", "Verknüpfungen auf Desktop und im Startmenü", "Automatische Verbindung mit Ghostel"]
         : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
       popular: false,
       testid: "pricing-desktop",
@@ -51,14 +55,16 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="max-w-2xl mx-auto text-center mb-16">
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-            {lang === "pl" ? "Pobieranie" : "Download"}
+            {lang === "pl" ? "Pobieranie" : lang === "de" ? "Herunterladen" : "Download"}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            {lang === "pl" ? "Korzystaj tak, jak Ci wygodnie" : "Use Ghostel your way"}
+            {lang === "pl" ? "Korzystaj tak, jak Ci wygodnie" : lang === "de" ? "Nutze Ghostel auf deine Art" : "Use Ghostel your way"}
           </h2>
           <p className="text-base text-zinc-400">
             {lang === "pl"
               ? "Pobierz aplikację na Androida. Wersje Web i Windows są obecnie w budowie."
+              : lang === "de"
+              ? "Lade die Android-App herunter. Die Web- und Windows-Versionen befinden sich derzeit in Entwicklung."
               : "Download the Android app. Web and Windows versions are currently in development."}
           </p>
         </div>

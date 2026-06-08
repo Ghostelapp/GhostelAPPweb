@@ -21,6 +21,22 @@ export default function BrowserApp() {
         message: "Wersja webowa jest obecnie przygotowywana.",
         navigation: ["Rozmowy", "Kontakty", "Połączenia", "Profil"],
       }
+    : lang === "de"
+    ? {
+        eyebrow: "Ghostel Web",
+        title: "Deine Unterhaltungen sind auch im Browser verfügbar",
+        subtitle:
+          "Melde dich am Computer oder Telefon an, ohne Software zu installieren. Die Webversion verwendet dasselbe Konto, dieselben Kontakte und Unterhaltungen wie die mobile App.",
+        cta: "Web-App in Entwicklung",
+        points: [
+          "Private und Gruppenunterhaltungen in Echtzeit",
+          "Kontakte, Anrufe und Kontoeinstellungen",
+          "Als PWA ohne App-Store installierbar",
+        ],
+        status: "In Entwicklung",
+        message: "Die Webversion wird derzeit vorbereitet.",
+        navigation: ["Chats", "Kontakte", "Anrufe", "Profil"],
+      }
     : {
         eyebrow: "Ghostel Web",
         title: "Your conversations are also available in the browser",

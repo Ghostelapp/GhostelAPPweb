@@ -19,6 +19,17 @@ export default function Hero() {
         secondary: "Pobierz na Androida",
         signals: ["E2EE wiadomości", "2FA i blokada PIN", "Szyfrowane połączenia"],
       }
+    : lang === "de"
+    ? {
+        tag: "Private Kommunikation für jeden Tag",
+        titleLead: "Ghostel",
+        title: "Gespräche unter deiner Kontrolle",
+        subtitle:
+          "Schreibe Nachrichten, teile Anhänge und führe Sprachanrufe in einer App, die auf Datenschutz ausgelegt ist. Ghostel verbindet Ende-zu-Ende-Verschlüsselung, Kontoschutz und zuverlässige Android-Benachrichtigungen.",
+        primary: "Webversion in Entwicklung",
+        secondary: "Für Android herunterladen",
+        signals: ["E2EE-Nachrichten", "2FA und PIN-Sperre", "Verschlüsselte Anrufe"],
+      }
     : {
         tag: "Private communication for everyday use",
         titleLead: "Ghostel",
