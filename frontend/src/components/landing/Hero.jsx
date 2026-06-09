@@ -11,10 +11,10 @@ export default function Hero() {
   const copy = lang === "pl"
     ? {
         tag: "Prywatna komunikacja na co dzień",
-        titleLead: "Ghostel",
+        titleLead: "ghostel.app",
         title: "rozmowy pod Twoją kontrolą",
         subtitle:
-          "Pisz, wysyłaj załączniki i prowadź rozmowy głosowe w aplikacji projektowanej z myślą o prywatności. Ghostel łączy szyfrowanie end-to-end, ochronę konta i wygodne powiadomienia na Androidzie.",
+          "Pisz, wysyłaj załączniki i prowadź rozmowy głosowe w aplikacji projektowanej z myślą o prywatności. ghostel.app łączy szyfrowanie end-to-end, ochronę konta i wygodne powiadomienia na Androidzie.",
         primary: "Web w budowie",
         secondary: "Pobierz na Androida",
         signals: ["E2EE wiadomości", "2FA i blokada PIN", "Szyfrowane połączenia"],
@@ -22,20 +22,20 @@ export default function Hero() {
     : lang === "de"
     ? {
         tag: "Private Kommunikation für jeden Tag",
-        titleLead: "Ghostel",
+        titleLead: "ghostel.app",
         title: "Gespräche unter deiner Kontrolle",
         subtitle:
-          "Schreibe Nachrichten, teile Anhänge und führe Sprachanrufe in einer App, die auf Datenschutz ausgelegt ist. Ghostel verbindet Ende-zu-Ende-Verschlüsselung, Kontoschutz und zuverlässige Android-Benachrichtigungen.",
+          "Schreibe Nachrichten, teile Anhänge und führe Sprachanrufe in einer App, die auf Datenschutz ausgelegt ist. ghostel.app verbindet Ende-zu-Ende-Verschlüsselung, Kontoschutz und zuverlässige Android-Benachrichtigungen.",
         primary: "Webversion in Entwicklung",
         secondary: "Für Android herunterladen",
         signals: ["E2EE-Nachrichten", "2FA und PIN-Sperre", "Verschlüsselte Anrufe"],
       }
     : {
         tag: "Private communication for everyday use",
-        titleLead: "Ghostel",
+        titleLead: "ghostel.app",
         title: "conversations under your control",
         subtitle:
-          "Message, share attachments and make voice calls in an app designed around privacy. Ghostel combines end-to-end encryption, account protection and reliable Android notifications.",
+          "Message, share attachments and make voice calls in an app designed around privacy. ghostel.app combines end-to-end encryption, account protection and reliable Android notifications.",
         primary: "Web in development",
         secondary: "Download for Android",
         signals: ["Message E2EE", "2FA and PIN lock", "Encrypted calls"],

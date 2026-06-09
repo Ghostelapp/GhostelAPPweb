@@ -39,10 +39,10 @@ export default function Pricing() {
       label: lang === "pl" ? "W budowie" : lang === "de" ? "In Entwicklung" : "In development",
       cta: lang === "pl" ? "Wersja Windows w budowie" : lang === "de" ? "Windows-App in Entwicklung" : "Windows app in development",
       features: lang === "pl"
-        ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z Ghostel"]
+        ? ["Osobna aplikacja na komputer", "To samo konto i rozmowy", "Skrót na pulpicie i w menu Start", "Automatyczne połączenie z ghostel.app"]
         : lang === "de"
-        ? ["Eigenständige Desktop-App", "Dasselbe Konto und dieselben Unterhaltungen", "Verknüpfungen auf Desktop und im Startmenü", "Automatische Verbindung mit Ghostel"]
-        : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to Ghostel"],
+        ? ["Eigenständige Desktop-App", "Dasselbe Konto und dieselben Unterhaltungen", "Verknüpfungen auf Desktop und im Startmenü", "Automatische Verbindung mit ghostel.app"]
+        : ["Standalone desktop application", "The same account and conversations", "Desktop and Start menu shortcuts", "Automatic connection to ghostel.app"],
       popular: false,
       testid: "pricing-desktop",
       disabled: true,
@@ -58,7 +58,7 @@ export default function Pricing() {
             {lang === "pl" ? "Pobieranie" : lang === "de" ? "Herunterladen" : "Download"}
           </div>
           <h2 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight text-white mb-4">
-            {lang === "pl" ? "Korzystaj tak, jak Ci wygodnie" : lang === "de" ? "Nutze Ghostel auf deine Art" : "Use Ghostel your way"}
+            {lang === "pl" ? "Korzystaj tak, jak Ci wygodnie" : lang === "de" ? "Nutze ghostel.app auf deine Art" : "Use ghostel.app your way"}
           </h2>
           <p className="text-base text-zinc-400">
             {lang === "pl"

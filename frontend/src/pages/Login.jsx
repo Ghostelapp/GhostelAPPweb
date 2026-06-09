@@ -58,7 +58,7 @@ export default function Login() {
             {t("login.title")}
           </h1>
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">
-            Ghostel account
+            ghostel.app account
           </div>
           <p className="text-sm text-zinc-400 mt-3">{t("login.subtitle")}</p>
         </div>

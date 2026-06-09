@@ -5,7 +5,7 @@ import { Check, Minus, ShieldCheck, Smartphone, X } from "lucide-react";
 const brands = [
   {
     key: "ghostel",
-    name: "Ghostel",
+    name: "ghostel.app",
     Logo: () => (
       <div className="relative grid h-12 w-12 place-items-center overflow-hidden rounded-2xl border border-cyan-300/40 bg-cyan-300/15 p-1.5 shadow-lg shadow-cyan-950/40">
         <img src="/ghostel-logo.png" alt="" className="h-full w-full object-contain" />
@@ -77,9 +77,9 @@ export default function Comparison() {
   const copy = lang === "pl"
     ? {
         eyebrow: "Porównanie",
-        title: "Ghostel kontra wielkie komunikatory",
-        subtitle: "Ghostel stawia na prywatną rozmowę, realne połączenia na Androidzie i kontrolę konta bez społecznościowego hałasu. Duże aplikacje są mocne skalą, ale często dokładamy do nich reklamy, kanały, algorytmy i kompromisy.",
-        columns: ["Funkcja", "Ghostel", "Telegram", "Messenger", "WhatsApp"],
+        title: "ghostel.app kontra wielkie komunikatory",
+        subtitle: "ghostel.app stawia na prywatną rozmowę, realne połączenia na Androidzie i kontrolę konta bez społecznościowego hałasu. Duże aplikacje są mocne skalą, ale często dokładamy do nich reklamy, kanały, algorytmy i kompromisy.",
+        columns: ["Funkcja", "ghostel.app", "Telegram", "Messenger", "WhatsApp"],
         rows: [
           ["Szyfrowanie treści wiadomości end-to-end w rozmowach", "yes", "partial", "partial", "yes"],
           ["Szyfrowane załączniki i zdjęcia jednorazowe 5 s", "yes", "partial", "partial", "partial"],
@@ -89,18 +89,18 @@ export default function Comparison() {
           ["Szybkie wdrażanie własnych funkcji pod użytkowników", "yes", "no", "no", "no"],
         ],
         highlights: [
-          ["Prywatność jako domyślne założenie", "Ghostel nie jest siecią społecznościową. Skupia się na rozmowie, kontakcie i kontroli danych użytkownika.", ShieldCheck],
+          ["Prywatność jako domyślne założenie", "ghostel.app nie jest siecią społecznościową. Skupia się na rozmowie, kontakcie i kontroli danych użytkownika.", ShieldCheck],
           ["Android first", "Połączenia, push i ekran odbierania są dopracowywane pod realne testy na telefonach z Androidem.", Smartphone],
         ],
         verdict: "Najlepszy wybór, gdy ważne są rozmowy, prywatność i szybki rozwój funkcji bez zbędnych dodatków.",
-        note: "Porównanie opisuje kierunek produktu i aktualne funkcje Ghostel. Telegram, Messenger i WhatsApp są znakami towarowymi swoich właścicieli.",
+        note: "Porównanie opisuje kierunek produktu i aktualne funkcje ghostel.app. Telegram, Messenger i WhatsApp są znakami towarowymi swoich właścicieli.",
       }
     : lang === "de"
     ? {
         eyebrow: "Vergleich",
-        title: "Ghostel gegen große Messenger",
-        subtitle: "Ghostel setzt auf private Gespräche, echte Android-Anrufe und Kontokontrolle ohne Social-Media-Ablenkung. Große Apps sind stark durch Reichweite, bringen aber oft Werbung, Kanäle, Algorithmen und Kompromisse mit.",
-        columns: ["Funktion", "Ghostel", "Telegram", "Messenger", "WhatsApp"],
+        title: "ghostel.app gegen große Messenger",
+        subtitle: "ghostel.app setzt auf private Gespräche, echte Android-Anrufe und Kontokontrolle ohne Social-Media-Ablenkung. Große Apps sind stark durch Reichweite, bringen aber oft Werbung, Kanäle, Algorithmen und Kompromisse mit.",
+        columns: ["Funktion", "ghostel.app", "Telegram", "Messenger", "WhatsApp"],
         rows: [
           ["Ende-zu-Ende-Verschlüsselung von Nachrichteninhalten", "yes", "partial", "partial", "yes"],
           ["Verschlüsselte Anhänge und 5-Sekunden-Einmalfotos", "yes", "partial", "partial", "partial"],
@@ -110,17 +110,17 @@ export default function Comparison() {
           ["Schnelle Produktanpassung für eigene Funktionen", "yes", "no", "no", "no"],
         ],
         highlights: [
-          ["Datenschutz als Grundprinzip", "Ghostel ist kein soziales Netzwerk. Der Fokus liegt auf Gesprächen, Kontakten und Kontrolle über eigene Daten.", ShieldCheck],
+          ["Datenschutz als Grundprinzip", "ghostel.app ist kein soziales Netzwerk. Der Fokus liegt auf Gesprächen, Kontakten und Kontrolle über eigene Daten.", ShieldCheck],
           ["Android first", "Anrufe, Push und der Annahmebildschirm werden anhand realer Android-Tests optimiert.", Smartphone],
         ],
         verdict: "Die bessere Wahl, wenn Gespräche, Datenschutz und schnelle Produktentwicklung wichtiger sind als unnötige Extras.",
-        note: "Der Vergleich beschreibt die Produktausrichtung und aktuelle Ghostel-Funktionen. Telegram, Messenger und WhatsApp sind Marken ihrer jeweiligen Eigentümer.",
+        note: "Der Vergleich beschreibt die Produktausrichtung und aktuelle ghostel.app-Funktionen. Telegram, Messenger und WhatsApp sind Marken ihrer jeweiligen Eigentümer.",
       }
     : {
         eyebrow: "Comparison",
-        title: "Ghostel vs the big messengers",
-        subtitle: "Ghostel focuses on private conversations, real Android calls and account control without social-network noise. Large apps are strong at scale, but often add ads, channels, algorithms and compromises.",
-        columns: ["Feature", "Ghostel", "Telegram", "Messenger", "WhatsApp"],
+        title: "ghostel.app vs the big messengers",
+        subtitle: "ghostel.app focuses on private conversations, real Android calls and account control without social-network noise. Large apps are strong at scale, but often add ads, channels, algorithms and compromises.",
+        columns: ["Feature", "ghostel.app", "Telegram", "Messenger", "WhatsApp"],
         rows: [
           ["End-to-end encryption for message content", "yes", "partial", "partial", "yes"],
           ["Encrypted attachments and 5-second view-once photos", "yes", "partial", "partial", "partial"],
@@ -130,11 +130,11 @@ export default function Comparison() {
           ["Fast product changes for custom features", "yes", "no", "no", "no"],
         ],
         highlights: [
-          ["Privacy as the product baseline", "Ghostel is not a social network. It focuses on conversations, contacts and user data control.", ShieldCheck],
+          ["Privacy as the product baseline", "ghostel.app is not a social network. It focuses on conversations, contacts and user data control.", ShieldCheck],
           ["Android first", "Calls, push and the answer screen are tuned through real tests on Android phones.", Smartphone],
         ],
         verdict: "The better fit when conversations, privacy and fast product iteration matter more than unnecessary extras.",
-        note: "This comparison describes Ghostel's product direction and current features. Telegram, Messenger and WhatsApp are trademarks of their respective owners.",
+        note: "This comparison describes ghostel.app's product direction and current features. Telegram, Messenger and WhatsApp are trademarks of their respective owners.",
       };
 
   return (

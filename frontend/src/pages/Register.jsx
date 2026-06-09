@@ -59,7 +59,7 @@ export default function Register() {
             {t("common.register")}
           </h1>
           <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400">
-            Ghostel account
+            ghostel.app account
           </div>
         </div>
 

@@ -1,4 +1,4 @@
-// Lightweight PL/EN/DE translations - Ghostel mobile communication site
+// Lightweight PL/EN/DE translations - ghostel.app mobile communication site
 export const translations = {
   pl: {
     common: {
@@ -38,7 +38,7 @@ export const translations = {
       deleteAccount: "Usuń konto",
     },
     hero: {
-      titleHighlight: "Ghostel —",
+      titleHighlight: "ghostel.app —",
       title: "komunikator, który dzwoni jak trzeba",
       subtitle:
         "Czat, kontakty, połączenia głosowe i powiadomienia push zaprojektowane tak, żeby rozmowa przychodząca była widoczna nawet na zablokowanym ekranie.",
@@ -49,7 +49,7 @@ export const translations = {
     features: {
       title: "Wszystko, czego potrzebuje mobilny komunikator",
       subtitle:
-        "Ghostel łączy szybkie wiadomości, kontakty, statusy, połączenia i kontrolę konta w jednym prostym doświadczeniu.",
+        "ghostel.app łączy szybkie wiadomości, kontakty, statusy, połączenia i kontrolę konta w jednym prostym doświadczeniu.",
       messagesTitle: "Czat i kontakty",
       messagesDesc:
         "Rozmowy 1:1, grupy, zaproszenia po nazwie użytkownika, reakcje i uporządkowana lista kontaktów.",
@@ -70,12 +70,12 @@ export const translations = {
         "Konto można trwale usunąć w aplikacji, razem z tokenami push, kontaktami i danymi prywatnymi.",
     },
     why: {
-      title: "Dlaczego Ghostel",
+      title: "Dlaczego ghostel.app",
       subtitle: "Dla osób, które chcą szybko napisać, zadzwonić i mieć kontrolę nad swoim kontem.",
       speed: "Szybki kontakt",
       speedDesc: "Najważniejsze akcje są blisko: czat, połączenie, kontakt i status.",
       intuitive: "Czytelne połączenia",
-      intuitiveDesc: "Połączenie z aplikacji wygląda jak zdarzenie Ghostel, nie zwykły telefon.",
+      intuitiveDesc: "Połączenie z aplikacji wygląda jak zdarzenie ghostel.app, nie zwykły telefon.",
       stable: "Push dla rozmów",
       stableDesc: "Osobny typ powiadomienia dla połączeń ułatwia odbiór przy wygaszonym ekranie.",
       secure: "Kontrola danych",
@@ -118,7 +118,7 @@ export const translations = {
     },
     pricing: {
       title: "Aplikacja mobilna",
-      subtitle: "Ghostel jest przygotowywany do publikacji w Google Play.",
+      subtitle: "ghostel.app jest przygotowywany do publikacji w Google Play.",
       free: "Android",
       premium: "Testy",
       enterprise: "Kontakt",
@@ -144,7 +144,7 @@ export const translations = {
     },
     faq: {
       title: "Pytania o aplikację",
-      q1: "Czy Ghostel działa na Androidzie?",
+      q1: "Czy ghostel.app działa na Androidzie?",
       a1: "Tak. Aplikacja jest przygotowywana pod Androida i testowana na fizycznych urządzeniach.",
       q2: "Czy połączenia pokazują się na zablokowanym ekranie?",
       a2: "Tak, aplikacja używa osobnego powiadomienia dla połączeń przychodzących i może pokazać pełnoekranowy ekran rozmowy.",
@@ -165,8 +165,8 @@ export const translations = {
       rights: "Wszelkie prawa zastrzeżone.",
     },
     login: {
-      title: "Zaloguj się do Ghostel",
-      subtitle: "Jedno konto do strony i aplikacji Ghostel.",
+      title: "Zaloguj się do ghostel.app",
+      subtitle: "Jedno konto do strony i aplikacji ghostel.app.",
       submit: "Zaloguj",
       adminHint: "Jeśli jesteś administratorem, po zalogowaniu zobaczysz dostęp do panelu.",
       noAccount: "Nie masz konta?",
@@ -175,10 +175,10 @@ export const translations = {
     account: {
       profileLabel: "Konto użytkownika",
       appTitle: "Pełne funkcje są w aplikacji",
-      appDesc: "Czaty, kontakty, połączenia i powiadomienia działają w aplikacji mobilnej Ghostel. Ta strona pomaga zarządzać kontem i dokumentami.",
+      appDesc: "Czaty, kontakty, połączenia i powiadomienia działają w aplikacji mobilnej ghostel.app. Ta strona pomaga zarządzać kontem i dokumentami.",
       openApp: "Otwórz aplikację",
       privacyDesc: "Zasady przetwarzania danych i prywatności.",
-      termsDesc: "Warunki korzystania z usługi Ghostel.",
+      termsDesc: "Warunki korzystania z usługi ghostel.app.",
       deleteDesc: "Instrukcja trwałego usunięcia konta.",
       created: "Konto utworzone",
       footerNote: "Ten panel jest prostym centrum konta. Wiadomości i połączenia pozostają w aplikacji.",
@@ -275,7 +275,7 @@ export const translations = {
       deleteAccount: "Delete account",
     },
     hero: {
-      titleHighlight: "Ghostel —",
+      titleHighlight: "ghostel.app —",
       title: "the messenger that rings clearly",
       subtitle:
         "Chats, contacts, voice calls and push notifications designed so incoming calls are visible even on a locked screen.",
@@ -286,7 +286,7 @@ export const translations = {
     features: {
       title: "Everything a mobile messenger needs",
       subtitle:
-        "Ghostel brings fast messages, contacts, presence, calls and account controls into one clean mobile experience.",
+        "ghostel.app brings fast messages, contacts, presence, calls and account controls into one clean mobile experience.",
       messagesTitle: "Chats and contacts",
       messagesDesc:
         "1:1 chats, groups, username invites, reactions and an organized contacts list.",
@@ -307,12 +307,12 @@ export const translations = {
         "Accounts can be deleted in-app together with push tokens, contacts and private account data.",
     },
     why: {
-      title: "Why Ghostel",
+      title: "Why ghostel.app",
       subtitle: "For people who want to message, call and stay in control of their account.",
       speed: "Fast contact",
       speedDesc: "The core actions are close: chat, call, contact and status.",
       intuitive: "Clear calls",
-      intuitiveDesc: "An app call looks like a Ghostel event, not a random phone call.",
+      intuitiveDesc: "An app call looks like a ghostel.app event, not a random phone call.",
       stable: "Call push",
       stableDesc: "A separate notification type helps incoming calls wake the screen.",
       secure: "Data Export",
@@ -355,7 +355,7 @@ export const translations = {
     },
     pricing: {
       title: "Mobile app",
-      subtitle: "Ghostel is being prepared for Google Play publication.",
+      subtitle: "ghostel.app is being prepared for Google Play publication.",
       free: "Android",
       premium: "Testing",
       enterprise: "Contact",
@@ -381,10 +381,10 @@ export const translations = {
     },
     faq: {
       title: "App FAQ",
-      q1: "Does Ghostel work on Android?",
+      q1: "Does ghostel.app work on Android?",
       a1: "Yes. The app is being prepared for Android and tested on physical devices.",
       q2: "Do calls appear on the locked screen?",
-      a2: "Yes. Ghostel uses a dedicated incoming-call notification path and can show a full-screen call alert.",
+      a2: "Yes. ghostel.app uses a dedicated incoming-call notification path and can show a full-screen call alert.",
       q3: "Can I delete my account?",
       a3: "Yes. The profile screen includes Delete account. A public instruction is available on this site.",
       q4: "Can I export my data?",
@@ -402,8 +402,8 @@ export const translations = {
       rights: "All rights reserved.",
     },
     login: {
-      title: "Sign in to Ghostel",
-      subtitle: "One account for the Ghostel website and mobile app.",
+      title: "Sign in to ghostel.app",
+      subtitle: "One account for the ghostel.app website and mobile app.",
       submit: "Sign in",
       adminHint: "If you are an administrator, the admin panel will appear after sign-in.",
       noAccount: "No account?",
@@ -412,10 +412,10 @@ export const translations = {
     account: {
       profileLabel: "User account",
       appTitle: "Full features are in the app",
-      appDesc: "Chats, contacts, calls and push notifications live in the Ghostel mobile app. This page keeps account links and documents in one place.",
+      appDesc: "Chats, contacts, calls and push notifications live in the ghostel.app mobile app. This page keeps account links and documents in one place.",
       openApp: "Open app",
       privacyDesc: "Data processing and privacy rules.",
-      termsDesc: "Ghostel service terms.",
+      termsDesc: "ghostel.app service terms.",
       deleteDesc: "Instructions for permanent account deletion.",
       created: "Account created",
       footerNote: "This is a lightweight account center. Messages and calls stay in the app.",
@@ -516,7 +516,7 @@ translations.de = {
     deleteAccount: "Konto löschen",
   },
   hero: {
-    titleHighlight: "Ghostel –",
+    titleHighlight: "ghostel.app –",
     title: "der Messenger, der zuverlässig klingelt",
     subtitle: "Chats, Kontakte, Sprachanrufe und Push-Benachrichtigungen, damit eingehende Anrufe auch auf dem Sperrbildschirm sichtbar sind.",
     cta1: "App öffnen",
@@ -525,7 +525,7 @@ translations.de = {
   },
   features: {
     title: "Alles, was ein mobiler Messenger braucht",
-    subtitle: "Ghostel vereint schnelle Nachrichten, Kontakte, Status, Anrufe und Kontoeinstellungen in einer übersichtlichen App.",
+    subtitle: "ghostel.app vereint schnelle Nachrichten, Kontakte, Status, Anrufe und Kontoeinstellungen in einer übersichtlichen App.",
     messagesTitle: "Chats und Kontakte",
     messagesDesc: "Private Chats, Gruppen, Einladungen per Benutzername, Reaktionen und eine geordnete Kontaktliste.",
     groupsTitle: "Status und Profil",
@@ -540,12 +540,12 @@ translations.de = {
     securityDesc: "Konten können zusammen mit Push-Tokens, Kontakten und privaten Kontodaten in der App gelöscht werden.",
   },
   why: {
-    title: "Warum Ghostel",
+    title: "Warum ghostel.app",
     subtitle: "Für Menschen, die schreiben, telefonieren und die Kontrolle über ihr Konto behalten möchten.",
     speed: "Schneller Kontakt",
     speedDesc: "Die wichtigsten Aktionen sind direkt erreichbar: Chat, Anruf, Kontakt und Status.",
     intuitive: "Übersichtliche Anrufe",
-    intuitiveDesc: "Ein App-Anruf erscheint eindeutig als Ghostel-Ereignis.",
+    intuitiveDesc: "Ein App-Anruf erscheint eindeutig als ghostel.app-Ereignis.",
     stable: "Anruf-Push",
     stableDesc: "Ein eigener Benachrichtigungstyp hilft, den Bildschirm bei Anrufen zu aktivieren.",
     secure: "Datenexport",
@@ -576,7 +576,7 @@ translations.de = {
   pricing: {
     ...translations.en.pricing,
     title: "Mobile App",
-    subtitle: "Ghostel wird für die Veröffentlichung bei Google Play vorbereitet.",
+    subtitle: "ghostel.app wird für die Veröffentlichung bei Google Play vorbereitet.",
     free: "Android",
     premium: "Tests",
     enterprise: "Kontakt",
@@ -591,10 +591,10 @@ translations.de = {
   },
   faq: {
     title: "Fragen zur App",
-    q1: "Funktioniert Ghostel auf Android?",
+    q1: "Funktioniert ghostel.app auf Android?",
     a1: "Ja. Die App wird für Android vorbereitet und auf echten Geräten getestet.",
     q2: "Werden Anrufe auf dem Sperrbildschirm angezeigt?",
-    a2: "Ja. Ghostel verwendet eigene Benachrichtigungen für eingehende Anrufe und kann einen Vollbild-Anruf anzeigen.",
+    a2: "Ja. ghostel.app verwendet eigene Benachrichtigungen für eingehende Anrufe und kann einen Vollbild-Anruf anzeigen.",
     q3: "Kann ich mein Konto löschen?",
     a3: "Ja. Im Profil befindet sich die Option Konto löschen. Eine öffentliche Anleitung ist auf dieser Seite verfügbar.",
     q4: "Kann ich meine Daten herunterladen?",
@@ -612,8 +612,8 @@ translations.de = {
     rights: "Alle Rechte vorbehalten.",
   },
   login: {
-    title: "Bei Ghostel anmelden",
-    subtitle: "Ein Konto für die Ghostel-Webseite und die mobile App.",
+    title: "Bei ghostel.app anmelden",
+    subtitle: "Ein Konto für die ghostel.app-Webseite und die mobile App.",
     submit: "Anmelden",
     adminHint: "Administratoren sehen den Adminbereich nach der Anmeldung.",
     noAccount: "Noch kein Konto?",
@@ -622,10 +622,10 @@ translations.de = {
   account: {
     profileLabel: "Benutzerkonto",
     appTitle: "Alle Funktionen befinden sich in der App",
-    appDesc: "Chats, Kontakte, Anrufe und Push-Benachrichtigungen befinden sich in der mobilen Ghostel-App. Diese Seite bündelt Kontolinks und Dokumente.",
+    appDesc: "Chats, Kontakte, Anrufe und Push-Benachrichtigungen befinden sich in der mobilen ghostel.app-App. Diese Seite bündelt Kontolinks und Dokumente.",
     openApp: "App öffnen",
     privacyDesc: "Regeln zur Datenverarbeitung und zum Datenschutz.",
-    termsDesc: "Nutzungsbedingungen des Ghostel-Dienstes.",
+    termsDesc: "Nutzungsbedingungen des ghostel.app-Dienstes.",
     deleteDesc: "Anleitung zur dauerhaften Kontolöschung.",
     created: "Konto erstellt",
     footerNote: "Dies ist eine einfache Kontozentrale. Nachrichten und Anrufe bleiben in der App.",

@@ -7,7 +7,7 @@ export default function BrowserApp() {
   const { lang } = useLang();
   const copy = lang === "pl"
     ? {
-        eyebrow: "Ghostel Web",
+        eyebrow: "ghostel.app Web",
         title: "Twoje rozmowy są dostępne również w przeglądarce",
         subtitle:
           "Zaloguj się na komputerze lub telefonie bez instalowania programu. Wersja webowa korzysta z tego samego konta, kontaktów i rozmów co aplikacja mobilna.",
@@ -23,7 +23,7 @@ export default function BrowserApp() {
       }
     : lang === "de"
     ? {
-        eyebrow: "Ghostel Web",
+        eyebrow: "ghostel.app Web",
         title: "Deine Unterhaltungen sind auch im Browser verfügbar",
         subtitle:
           "Melde dich am Computer oder Telefon an, ohne Software zu installieren. Die Webversion verwendet dasselbe Konto, dieselben Kontakte und Unterhaltungen wie die mobile App.",
@@ -38,7 +38,7 @@ export default function BrowserApp() {
         navigation: ["Chats", "Kontakte", "Anrufe", "Profil"],
       }
     : {
-        eyebrow: "Ghostel Web",
+        eyebrow: "ghostel.app Web",
         title: "Your conversations are also available in the browser",
         subtitle:
           "Sign in on a computer or phone without installing software. The web version uses the same account, contacts and conversations as the mobile app.",
@@ -118,7 +118,7 @@ export default function BrowserApp() {
                   <div className="w-8 h-8 rounded-md bg-cyan-400 text-[#071018] grid place-items-center">
                     <MessageCircle className="w-4 h-4" />
                   </div>
-                  <span className="hidden sm:block font-display text-sm font-bold text-white">Ghostel</span>
+                  <span className="hidden sm:block font-display text-sm font-bold text-white">ghostel.app</span>
                 </div>
                 {copy.navigation.map((item, index) => (
                   <div
@@ -135,7 +135,7 @@ export default function BrowserApp() {
               <div className="flex flex-col">
                 <div className="h-16 border-b border-white/10 flex items-center justify-between px-5">
                   <div>
-                    <div className="text-sm font-semibold text-white">Ghostel Web</div>
+                    <div className="text-sm font-semibold text-white">ghostel.app Web</div>
                     <div className="text-[10px] text-emerald-400 mt-1">{copy.status}</div>
                   </div>
                   <Smartphone className="w-4 h-4 text-zinc-500" />

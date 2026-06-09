@@ -1,4 +1,4 @@
-"""Ghostel FastAPI backend - landing page + admin panel."""
+"""ghostel.app FastAPI backend - landing page + admin panel."""
 from dotenv import load_dotenv
 from pathlib import Path
 
@@ -38,7 +38,7 @@ mongo_url = os.environ["MONGO_URL"]
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ["DB_NAME"]]
 
-app = FastAPI(title="Ghostel API")
+app = FastAPI(title="ghostel.app API")
 api = APIRouter(prefix="/api")
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
@@ -160,7 +160,7 @@ async def _mirror_app_user(app_user: dict, password: str) -> dict:
 # ----- Health -----
 @api.get("/")
 async def root():
-    return {"message": "Ghostel API ready", "version": "1.0"}
+    return {"message": "ghostel.app API ready", "version": "1.0"}
 
 
 # ----- Auth -----
@@ -325,12 +325,12 @@ async def admin_dashboard(request: Request):
             users = await ghostel_client.users()
             source = "ghostel"
         except Exception as e:
-            logger.warning(f"Ghostel API unreachable, falling back to local: {e}")
+            logger.warning(f"ghostel.app API unreachable, falling back to local: {e}")
 
     if source == "ghostel":
         public_users = [_ghostel_user_to_public(u) for u in users]
         activity_chart, registrations_chart = _build_charts(users)
-        # messages chart synthesized — Ghostel exposes only total, not per-day
+        # messages chart synthesized — ghostel.app exposes only total, not per-day
         total_msgs = stats.get("messages", 0)
         per_day_baseline = max(1, total_msgs // 14)
         messages_chart = [
@@ -411,7 +411,7 @@ async def list_users(request: Request, q: str = "", role: str = "", status: str 
             public.sort(key=lambda u: u.get("created_at") or "", reverse=True)
             return public
         except Exception as e:
-            logger.warning(f"Ghostel list_users fallback: {e}")
+            logger.warning(f"ghostel.app list_users fallback: {e}")
     query = {}
     if q:
         query["$or"] = [
@@ -446,7 +446,7 @@ async def get_user_detail(user_id: str, request: Request):
 @api.patch("/admin/users/{user_id}")
 async def update_user(user_id: str, payload: UpdateUserIn, request: Request):
     await require_admin(request, db)
-    # Upstream Ghostel API does not expose PATCH on users — return current data with note
+    # Upstream ghostel.app API does not expose PATCH on users — return current data with note
     update = {k: v for k, v in payload.model_dump().items() if v is not None}
     if not update:
         raise HTTPException(status_code=400, detail="Brak danych do aktualizacji")
@@ -458,7 +458,7 @@ async def update_user(user_id: str, payload: UpdateUserIn, request: Request):
                     pub = _ghostel_user_to_public(u)
                     raise HTTPException(
                         status_code=501,
-                        detail=f"Edycja użytkownika niedostępna w Ghostel API (read-only). Użytkownik: {pub['email']}",
+                        detail=f"Edycja użytkownika niedostępna w ghostel.app API (read-only). Użytkownik: {pub['email']}",
                     )
         except HTTPException:
             raise
@@ -483,7 +483,7 @@ async def delete_user(user_id: str, request: Request):
             if ok:
                 return {"ok": True, "source": "ghostel"}
         except Exception as e:
-            logger.warning(f"Ghostel delete_user error: {e}")
+            logger.warning(f"ghostel.app delete_user error: {e}")
     result = await db.users.delete_one({"id": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Użytkownik nie znaleziony")
@@ -714,7 +714,7 @@ async def on_startup():
 
     if os.environ.get("SEED_SAMPLE_DATA", "").lower() in {"1", "true", "yes"}:
         await seed_sample_data(db)
-    logger.info("Ghostel startup complete")
+    logger.info("ghostel.app startup complete")
 
 
 @app.on_event("shutdown")

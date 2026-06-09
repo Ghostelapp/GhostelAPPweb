@@ -1,4 +1,4 @@
-"""Authentication helpers for Ghostel."""
+"""Authentication helpers for ghostel.app."""
 import os
 import jwt
 import bcrypt

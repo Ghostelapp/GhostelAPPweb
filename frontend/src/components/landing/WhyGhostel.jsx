@@ -18,7 +18,7 @@ export default function WhyGhostel() {
         eyebrow: "Bezpieczeństwo bez niedomówień",
         title: "Co chroni rozmowy już teraz",
         subtitle:
-          "Ghostel rozdziela treść rozmów od danych operacyjnych potrzebnych do działania usługi. Poniżej pokazujemy zabezpieczenia aktywne obecnie oraz kierunki dalszego rozwoju.",
+          "ghostel.app rozdziela treść rozmów od danych operacyjnych potrzebnych do działania usługi. Poniżej pokazujemy zabezpieczenia aktywne obecnie oraz kierunki dalszego rozwoju.",
         currentLabel: "Dostępne obecnie",
         current: [
           { icon: LockKeyhole, title: "E2EE wiadomości i załączników", desc: "Treść jest szyfrowana na urządzeniu. Serwer przechowuje zaszyfrowany ładunek, gdy wszyscy uczestnicy rozmowy mają klucze urządzeń." },
@@ -44,7 +44,7 @@ export default function WhyGhostel() {
         eyebrow: "Sicherheit ohne vage Versprechen",
         title: "Was Unterhaltungen heute schützt",
         subtitle:
-          "Ghostel trennt Gesprächsinhalte von den Betriebsdaten, die für den Dienst erforderlich sind. Hier siehst du die aktuellen Schutzmaßnahmen und die weitere Entwicklungsrichtung.",
+          "ghostel.app trennt Gesprächsinhalte von den Betriebsdaten, die für den Dienst erforderlich sind. Hier siehst du die aktuellen Schutzmaßnahmen und die weitere Entwicklungsrichtung.",
         currentLabel: "Heute verfügbar",
         current: [
           { icon: LockKeyhole, title: "E2EE für Nachrichten und Anhänge", desc: "Inhalte werden auf dem Gerät verschlüsselt. Der Server speichert verschlüsselte Daten, wenn alle Mitglieder Geräteschlüssel besitzen." },
@@ -69,7 +69,7 @@ export default function WhyGhostel() {
         eyebrow: "Security without vague claims",
         title: "What protects conversations today",
         subtitle:
-          "Ghostel separates conversation content from operational data required to run the service. Below are protections available today and the direction of future development.",
+          "ghostel.app separates conversation content from operational data required to run the service. Below are protections available today and the direction of future development.",
         currentLabel: "Available now",
         current: [
           { icon: LockKeyhole, title: "Message and attachment E2EE", desc: "Content is encrypted on-device. The server stores an encrypted payload when all conversation members have device keys." },

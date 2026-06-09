@@ -1,4 +1,4 @@
-"""Backend API tests for Ghostel - auth + admin flows."""
+"""Backend API tests for ghostel.app - auth + admin flows."""
 import os
 import uuid
 import pytest
@@ -255,7 +255,7 @@ class TestSettings:
         assert isinstance(r.json(), dict)
 
     def test_patch_settings_persists(self, admin_token):
-        new_name = f"Ghostel-{uuid.uuid4().hex[:4]}"
+        new_name = f"ghostel.app-{uuid.uuid4().hex[:4]}"
         r = requests.patch(f"{API}/admin/settings", json={"app_name": new_name}, headers=admin_headers(admin_token))
         assert r.status_code == 200
         assert r.json().get("app_name") == new_name

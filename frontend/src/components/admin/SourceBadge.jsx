@@ -2,7 +2,7 @@ import { Info } from "lucide-react";
 
 /**
  * Badge marking sections backed by mock/local data
- * since the upstream Ghostel API does not expose these endpoints yet.
+ * since the upstream ghostel.app API does not expose these endpoints yet.
  */
 export default function SourceBadge({ source = "local", className = "" }) {
   if (source === "ghostel") {
@@ -12,7 +12,7 @@ export default function SourceBadge({ source = "local", className = "" }) {
         className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] bg-cyan-400/10 text-cyan-400 border border-cyan-400/30 ${className}`}
       >
         <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse-soft" />
-        LIVE · Ghostel API
+        LIVE · ghostel.app API
       </span>
     );
   }

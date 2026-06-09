@@ -1,5 +1,5 @@
 {
-  "summary": "Ran comprehensive pytest suite (33 tests) against Ghostel backend covering auth, admin dashboard, users CRUD, groups CRUD, reports moderation, notifications, settings, and CSV exports. All 33 tests PASSED. Auth (Bearer header + ?token= for CSV), RBAC (401 without token, 403 for non-admin), data persistence (PATCH then GET verification), and validation (invalid action, cannot delete self, duplicate email) all behave as specified.",
+  "summary": "Ran comprehensive pytest suite (33 tests) against ghostel.app backend covering auth, admin dashboard, users CRUD, groups CRUD, reports moderation, notifications, settings, and CSV exports. All 33 tests PASSED. Auth (Bearer header + ?token= for CSV), RBAC (401 without token, 403 for non-admin), data persistence (PATCH then GET verification), and validation (invalid action, cannot delete self, duplicate email) all behave as specified.",
   "backend_issues": {
     "critical": [],
     "minor": [

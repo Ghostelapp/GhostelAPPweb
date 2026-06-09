@@ -36,7 +36,7 @@ export default function Sidebar() {
       <div className="px-6 py-6 flex items-center gap-3 border-b divider-soft">
         <BrandLogo className="h-10 w-10" />
         <div>
-          <div className="font-display font-bold text-base text-white leading-none">Ghostel</div>
+          <div className="font-display font-bold text-base text-white leading-none">ghostel.app</div>
           <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1.5">
             Admin panel
           </div>

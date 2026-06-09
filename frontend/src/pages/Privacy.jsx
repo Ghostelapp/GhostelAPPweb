@@ -12,15 +12,15 @@ export default function Privacy() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-6 lg:px-8 pt-32 pb-20">
         <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-          Ghostel
+          ghostel.app
         </p>
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
           {isPl ? "Polityka prywatności" : isDe ? "Datenschutzerklärung" : "Privacy policy"}
         </h1>
         <p className="text-zinc-400 leading-relaxed mb-12">
           {isPl
-            ? "Ta strona opisuje podstawowe zasady przetwarzania danych w aplikacji Ghostel. Przed publikacją uzupełnij ją o oficjalne dane operatora, adres kontaktowy i docelową domenę usługi."
-            : isDe ? "Diese Seite beschreibt die grundlegenden Regeln der Datenverarbeitung in Ghostel. Ergänze sie vor der Veröffentlichung um offizielle Betreiber- und Kontaktangaben." : "This page describes the basic data processing rules for the Ghostel app. Before publication, complete it with the official operator details, contact address and production service domain."}
+            ? "Ta strona opisuje podstawowe zasady przetwarzania danych w aplikacji ghostel.app. Przed publikacją uzupełnij ją o oficjalne dane operatora, adres kontaktowy i docelową domenę usługi."
+            : isDe ? "Diese Seite beschreibt die grundlegenden Regeln der Datenverarbeitung in ghostel.app. Ergänze sie vor der Veröffentlichung um offizielle Betreiber- und Kontaktangaben." : "This page describes the basic data processing rules for the ghostel.app app. Before publication, complete it with the official operator details, contact address and production service domain."}
         </p>
 
         <div className="space-y-10 text-zinc-300 leading-relaxed">
@@ -30,8 +30,8 @@ export default function Privacy() {
             </h2>
             <p>
               {isPl
-                ? "Ghostel może przetwarzać dane konta, takie jak adres e-mail, nazwa użytkownika, nazwa wyświetlana, avatar, status, kontakty, zaproszenia, ustawienia profilu, tokeny push oraz metadane rozmów i połączeń."
-                : isDe ? "Ghostel kann Kontodaten wie E-Mail-Adresse, Benutzername, Anzeigename, Avatar, Status, Kontakte, Einladungen, Profileinstellungen, Push-Tokens sowie Nachrichten- und Anrufmetadaten verarbeiten." : "Ghostel may process account data such as email address, username, display name, avatar, status, contacts, invitations, profile settings, push tokens and message or call metadata."}
+                ? "ghostel.app może przetwarzać dane konta, takie jak adres e-mail, nazwa użytkownika, nazwa wyświetlana, avatar, status, kontakty, zaproszenia, ustawienia profilu, tokeny push oraz metadane rozmów i połączeń."
+                : isDe ? "ghostel.app kann Kontodaten wie E-Mail-Adresse, Benutzername, Anzeigename, Avatar, Status, Kontakte, Einladungen, Profileinstellungen, Push-Tokens sowie Nachrichten- und Anrufmetadaten verarbeiten." : "ghostel.app may process account data such as email address, username, display name, avatar, status, contacts, invitations, profile settings, push tokens and message or call metadata."}
             </p>
           </section>
 
@@ -75,8 +75,8 @@ export default function Privacy() {
             </h2>
             <p>
               {isPl
-                ? "Przed publikacją wpisz tutaj oficjalny adres e-mail operatora aplikacji Ghostel."
-                : isDe ? "Füge hier vor der Veröffentlichung die offizielle Kontaktadresse des Ghostel-Betreibers ein." : "Before publication, add the official contact email for the Ghostel app operator here."}
+                ? "Przed publikacją wpisz tutaj oficjalny adres e-mail operatora aplikacji ghostel.app."
+                : isDe ? "Füge hier vor der Veröffentlichung die offizielle Kontaktadresse des ghostel.app-Betreibers ein." : "Before publication, add the official contact email for the ghostel.app app operator here."}
             </p>
           </section>
         </div>

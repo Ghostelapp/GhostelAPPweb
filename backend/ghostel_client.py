@@ -1,4 +1,4 @@
-"""Client for upstream Ghostel API."""
+"""Client for upstream ghostel.app API."""
 import os
 import time
 import httpx

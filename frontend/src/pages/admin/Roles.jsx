@@ -48,7 +48,7 @@ export default function Roles() {
           </h1>
           <SourceBadge source="ghostel" />
         </div>
-        <p className="text-sm text-zinc-400">Role z Ghostel API · zmiany roli aktualnie read-only.</p>
+        <p className="text-sm text-zinc-400">Role z ghostel.app API · zmiany roli aktualnie read-only.</p>
       </div>
 
       <div className="grid md:grid-cols-3 gap-4">

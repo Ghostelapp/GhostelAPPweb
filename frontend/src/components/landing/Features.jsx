@@ -9,7 +9,7 @@ export default function Features() {
         eyebrow: "Najważniejsze możliwości",
         title: "Komunikacja bez zbędnego chaosu",
         subtitle:
-          "Ghostel skupia wiadomości, kontakty, połączenia i kontrolę prywatności w jednej aplikacji, bez ukrywania ważnych ustawień.",
+          "ghostel.app skupia wiadomości, kontakty, połączenia i kontrolę prywatności w jednej aplikacji, bez ukrywania ważnych ustawień.",
         items: [
           { icon: UserRoundPlus, title: "Wiadomości i kontakty", desc: "Prywatne rozmowy, kontakty po nazwie użytkownika, reakcje i czytelna historia konwersacji." },
           { icon: UsersRound, title: "Rozmowy grupowe", desc: "Twórz grupy, zarządzaj członkami i korzystaj z szyfrowania, gdy urządzenia uczestników mają aktywne klucze." },
@@ -24,7 +24,7 @@ export default function Features() {
         eyebrow: "Wichtigste Funktionen",
         title: "Kommunikation ohne unnötiges Chaos",
         subtitle:
-          "Ghostel vereint Nachrichten, Kontakte, Anrufe und Datenschutzkontrollen in einer App, ohne wichtige Einstellungen zu verstecken.",
+          "ghostel.app vereint Nachrichten, Kontakte, Anrufe und Datenschutzkontrollen in einer App, ohne wichtige Einstellungen zu verstecken.",
         items: [
           { icon: UserRoundPlus, title: "Nachrichten und Kontakte", desc: "Private Unterhaltungen, Kontakte per Benutzername, Reaktionen und ein übersichtlicher Verlauf." },
           { icon: UsersRound, title: "Gruppenunterhaltungen", desc: "Erstelle Gruppen, verwalte Mitglieder und nutze Verschlüsselung, wenn die Geräte aktive Schlüssel besitzen." },
@@ -38,7 +38,7 @@ export default function Features() {
         eyebrow: "Core capabilities",
         title: "Communication without unnecessary noise",
         subtitle:
-          "Ghostel brings messages, contacts, calls and privacy controls into one app without hiding important settings.",
+          "ghostel.app brings messages, contacts, calls and privacy controls into one app without hiding important settings.",
         items: [
           { icon: UserRoundPlus, title: "Messages and contacts", desc: "Private conversations, username-based contacts, reactions and a clear conversation history." },
           { icon: UsersRound, title: "Group conversations", desc: "Create groups, manage members and use encryption when participant devices have active keys." },

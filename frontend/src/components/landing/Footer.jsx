@@ -16,7 +16,7 @@ export default function Footer() {
               <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="font-display font-bold text-xl text-white">Ghostel</span>
+              <span className="font-display font-bold text-xl text-white">ghostel.app</span>
             </div>
             <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
               {t("footer.tagline")}
@@ -37,7 +37,7 @@ export default function Footer() {
 
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 mb-4">
-              Ghostel
+              ghostel.app
             </div>
             <ul className="space-y-3 text-sm">
               <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
@@ -59,7 +59,7 @@ export default function Footer() {
         </div>
 
         <div className="pt-8 border-t divider-soft text-xs text-zinc-500 flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div>© 2026 Ghostel. {t("footer.rights")}</div>
+          <div>© 2026 ghostel.app. {t("footer.rights")}</div>
           <div className="flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
             Android · Push · Voice calls

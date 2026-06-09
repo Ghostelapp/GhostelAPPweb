@@ -37,7 +37,7 @@ export default function PhoneMockup() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-display text-base font-bold text-white leading-none">Ghostel</div>
+              <div className="font-display text-base font-bold text-white leading-none">ghostel.app</div>
               <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.15em] mt-1">
                 Chats. Calls. Push.
               </div>

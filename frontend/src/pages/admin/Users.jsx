@@ -91,7 +91,7 @@ export default function Users() {
             </h1>
             <SourceBadge source="ghostel" />
           </div>
-          <p className="text-sm text-zinc-400">{users.length} użytkowników · źródło: Ghostel API</p>
+          <p className="text-sm text-zinc-400">{users.length} użytkowników · źródło: ghostel.app API</p>
         </div>
         <a
           data-testid="export-users-csv"

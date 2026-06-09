@@ -9,20 +9,20 @@ export default function DeleteAccount() {
 
   const steps = isPl
     ? [
-        "Otwórz aplikację Ghostel i zaloguj się na konto.",
+        "Otwórz aplikację ghostel.app i zaloguj się na konto.",
         "Przejdź do zakładki Profil.",
         "W sekcji Prywatność wybierz Usuń konto.",
         "Potwierdź operację przyciskiem Usuń trwale.",
         "Po zakończeniu aplikacja wyloguje Cię automatycznie.",
       ]
     : isDe ? [
-        "Öffne die Ghostel-App und melde dich an.",
+        "Öffne die ghostel.app-App und melde dich an.",
         "Wechsle zum Tab Profil.",
         "Wähle im Bereich Datenschutz die Option Konto löschen.",
         "Bestätige mit Dauerhaft löschen.",
         "Nach Abschluss wirst du automatisch abgemeldet.",
       ] : [
-        "Open the Ghostel app and sign in.",
+        "Open the ghostel.app app and sign in.",
         "Go to the Profile tab.",
         "In the Privacy section, choose Delete account.",
         "Confirm with Delete permanently.",
@@ -34,15 +34,15 @@ export default function DeleteAccount() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-6 lg:px-8 pt-32 pb-20">
         <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-          {isPl ? "Konto Ghostel" : isDe ? "Ghostel-Konto" : "Ghostel account"}
+          {isPl ? "Konto ghostel.app" : isDe ? "ghostel.app-Konto" : "ghostel.app account"}
         </p>
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
           {isPl ? "Usuwanie konta i danych" : isDe ? "Konto und Daten löschen" : "Account and data deletion"}
         </h1>
         <p className="text-zinc-400 leading-relaxed mb-12">
           {isPl
-            ? "Konto Ghostel można usunąć bezpośrednio w aplikacji. Operacja jest trwała i wymaga zalogowania na konto, które ma zostać usunięte."
-            : isDe ? "Ein Ghostel-Konto kann direkt in der App gelöscht werden. Der Vorgang ist dauerhaft und erfordert die Anmeldung beim zu löschenden Konto." : "A Ghostel account can be deleted directly in the app. The operation is permanent and requires signing in to the account that should be deleted."}
+            ? "Konto ghostel.app można usunąć bezpośrednio w aplikacji. Operacja jest trwała i wymaga zalogowania na konto, które ma zostać usunięte."
+            : isDe ? "Ein ghostel.app-Konto kann direkt in der App gelöscht werden. Der Vorgang ist dauerhaft und erfordert die Anmeldung beim zu löschenden Konto." : "A ghostel.app account can be deleted directly in the app. The operation is permanent and requires signing in to the account that should be deleted."}
         </p>
 
         <div className="grid lg:grid-cols-[1.1fr_0.9fr] gap-6">

@@ -13,7 +13,7 @@ import { Save } from "lucide-react";
 export default function Settings() {
   const { t } = useLang();
   const [s, setS] = useState({
-    app_name: "Ghostel",
+    app_name: "ghostel.app",
     logo_url: "",
     primary_color: "#00E5FF",
     secondary_color: "#B026FF",
@@ -52,7 +52,7 @@ export default function Settings() {
             </h1>
             <SourceBadge source="local" />
           </div>
-          <p className="text-sm text-zinc-400">Lokalna konfiguracja landing page'a Ghostel.</p>
+          <p className="text-sm text-zinc-400">Lokalna konfiguracja landing page'a ghostel.app.</p>
         </div>
         <Button
           data-testid="settings-save-btn"

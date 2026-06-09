@@ -12,7 +12,7 @@ export default function Terms() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-6 lg:px-8 pt-32 pb-20">
         <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-          Ghostel
+          ghostel.app
         </p>
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
           {isPl ? "Regulamin" : isDe ? "Nutzungsbedingungen" : "Terms of service"}
@@ -46,8 +46,8 @@ export default function Terms() {
             {
               title: isPl ? "Kontakt" : isDe ? "Kontakt" : "Contact",
               body: isPl
-                ? "Przed publikacją wpisz tutaj oficjalny adres e-mail operatora aplikacji Ghostel."
-                : isDe ? "Füge hier vor der Veröffentlichung die offizielle Kontaktadresse des Ghostel-Betreibers ein." : "Before publication, add the official contact email for the Ghostel app operator here.",
+                ? "Przed publikacją wpisz tutaj oficjalny adres e-mail operatora aplikacji ghostel.app."
+                : isDe ? "Füge hier vor der Veröffentlichung die offizielle Kontaktadresse des ghostel.app-Betreibers ein." : "Before publication, add the official contact email for the ghostel.app app operator here.",
             },
           ].map((section) => (
             <section key={section.title} className="surface rounded-2xl p-7">

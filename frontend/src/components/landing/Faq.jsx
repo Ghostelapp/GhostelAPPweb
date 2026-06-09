@@ -10,7 +10,7 @@ export default function Faq() {
   const { t, lang } = useLang();
   const items = [
     {
-      q: lang === "pl" ? "Czy Ghostel działa w przeglądarce?" : lang === "de" ? "Funktioniert Ghostel im Browser?" : "Does Ghostel work in a browser?",
+      q: lang === "pl" ? "Czy ghostel.app działa w przeglądarce?" : lang === "de" ? "Funktioniert ghostel.app im Browser?" : "Does ghostel.app work in a browser?",
       a: lang === "pl"
         ? "Wersja przeglądarkowa jest obecnie w budowie. Na ten moment korzystaj z aplikacji Android."
         : lang === "de"

@@ -1,4 +1,4 @@
-"""Seed sample data for Ghostel admin panel."""
+"""Seed sample data for ghostel.app admin panel."""
 import uuid
 import random
 from datetime import datetime, timezone, timedelta
@@ -141,12 +141,12 @@ async def seed_sample_data(db):
     if not existing_settings:
         await db.settings.insert_one({
             "key": "app_settings",
-            "app_name": "Ghostel",
+            "app_name": "ghostel.app",
             "logo_url": "",
             "primary_color": "#00E5FF",
             "secondary_color": "#B026FF",
-            "terms": "Regulamin Ghostel – aktualizuj w panelu administracyjnym.",
-            "privacy": "Polityka prywatności Ghostel – aktualizuj w panelu administracyjnym.",
+            "terms": "Regulamin ghostel.app – aktualizuj w panelu administracyjnym.",
+            "privacy": "Polityka prywatności ghostel.app – aktualizuj w panelu administracyjnym.",
             "maintenance_mode": False,
             "max_file_size_mb": 50,
         })

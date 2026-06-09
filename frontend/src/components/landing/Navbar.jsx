@@ -72,7 +72,7 @@ export default function Navbar() {
             <ShieldCheck className="w-5 h-5" />
           </div>
           <span className="font-display font-bold text-lg tracking-tight text-white">
-            Ghostel
+            ghostel.app
           </span>
         </Link>
 

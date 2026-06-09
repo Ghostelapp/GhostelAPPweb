@@ -87,7 +87,7 @@ export default function Dashboard() {
         <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
           {t("admin.dashboard")}
         </h1>
-        <p className="text-sm text-zinc-400">Real-time overview of your Ghostel community.</p>
+        <p className="text-sm text-zinc-400">Real-time overview of your ghostel.app community.</p>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

@@ -1,7 +1,7 @@
-# Ghostel — Product Requirements
+# ghostel.app — Product Requirements
 
 ## Original Problem Statement
-Build a complete modern website + admin panel for Ghostel, a real-time communication platform (messages, groups, voice calls, push notifications).
+Build a complete modern website + admin panel for ghostel.app, a real-time communication platform (messages, groups, voice calls, push notifications).
 
 **Style:** Premium SaaS · Dark Mode · Glassmorphism · Neon Blue + Purple · Inspired by Discord/Telegram/Signal/Linear.
 
