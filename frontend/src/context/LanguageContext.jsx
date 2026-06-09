@@ -7,7 +7,7 @@ const supportedLanguages = ["pl", "en", "de"];
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {
     const saved = localStorage.getItem("ghostel_lang");
-    return supportedLanguages.includes(saved) ? saved : "pl";
+    return supportedLanguages.includes(saved) ? saved : "en";
   });
 
   useEffect(() => {
