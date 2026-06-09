@@ -1,9 +1,9 @@
 // Android APK is currently shipped from EAS build artifacts so the landing
 // page can point at the newest tested package immediately after a build.
 export const GHOSTEL_APK_URL =
-  "https://expo.dev/artifacts/eas/hAYpQMLh1fBJwwoV3Zk5Xr.apk";
+  "https://expo.dev/artifacts/eas/t6RjxEK2nWiuTRh7zbaA4H.apk";
 
-export const GHOSTEL_ANDROID_VERSION = "1.4.12";
+export const GHOSTEL_ANDROID_VERSION = "1.4.13";
 
 // Desktop builds still use the latest GitHub release asset URL.
 
