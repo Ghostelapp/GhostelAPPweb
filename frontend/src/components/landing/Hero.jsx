@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
 import PhoneMockup from "./PhoneMockup";
+import BrandMark from "@/components/BrandMark";
 
 export default function Hero() {
   const { lang } = useLang();
@@ -67,7 +68,7 @@ export default function Hero() {
             data-testid="hero-title"
             className="font-display text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white leading-[1.02] mb-6"
           >
-            {copy.titleLead}. <span className="text-cyan-400">{copy.title}</span>
+            <BrandMark className="text-[0.82em]" />. <span className="text-cyan-400">{copy.title}</span>
           </h1>
 
           <p

@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Check, Minus, ShieldCheck, Smartphone, X } from "lucide-react";
+import BrandMark from "@/components/BrandMark";
 
 const brands = [
   {
@@ -190,9 +191,11 @@ export default function Comparison() {
                     >
                       <div className="flex flex-col items-center gap-2 text-center">
                         <Logo />
-                        <span className={`text-xs font-black uppercase tracking-[0.12em] ${key === "ghostel" ? "text-cyan-200" : "text-zinc-300"}`}>
-                          {name}
-                        </span>
+                        {key === "ghostel" ? (
+                          <BrandMark className="text-xs" />
+                        ) : (
+                          <span className="text-xs font-black uppercase tracking-[0.12em] text-zinc-300">{name}</span>
+                        )}
                       </div>
                     </th>
                   ))}

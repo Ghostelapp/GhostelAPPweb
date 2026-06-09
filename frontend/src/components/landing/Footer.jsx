@@ -2,6 +2,7 @@ import { useLang } from "@/context/LanguageContext";
 import { Link } from "react-router-dom";
 import { Github, Twitter, Linkedin, ShieldCheck } from "lucide-react";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
+import BrandMark from "@/components/BrandMark";
 
 export default function Footer() {
   const { t } = useLang();
@@ -16,7 +17,7 @@ export default function Footer() {
               <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
-              <span className="font-display font-bold text-xl text-white">ghostel.app</span>
+              <BrandMark className="text-xl" />
             </div>
             <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
               {t("footer.tagline")}
@@ -37,7 +38,7 @@ export default function Footer() {
 
           <div>
             <div className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-500 mb-4">
-              ghostel.app
+              <BrandMark className="text-xs" />
             </div>
             <ul className="space-y-3 text-sm">
               <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>

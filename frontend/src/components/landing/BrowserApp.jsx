@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { ArrowUpRight, Check, Globe2, LockKeyhole, MessageCircle, Monitor, Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLang } from "@/context/LanguageContext";
+import BrandMark from "@/components/BrandMark";
 
 export default function BrowserApp() {
   const { lang } = useLang();
@@ -118,7 +119,7 @@ export default function BrowserApp() {
                   <div className="w-8 h-8 rounded-md bg-cyan-400 text-[#071018] grid place-items-center">
                     <MessageCircle className="w-4 h-4" />
                   </div>
-                  <span className="hidden sm:block font-display text-sm font-bold text-white">ghostel.app</span>
+                  <BrandMark className="hidden text-sm sm:inline-flex" />
                 </div>
                 {copy.navigation.map((item, index) => (
                   <div
@@ -135,7 +136,10 @@ export default function BrowserApp() {
               <div className="flex flex-col">
                 <div className="h-16 border-b border-white/10 flex items-center justify-between px-5">
                   <div>
-                    <div className="text-sm font-semibold text-white">ghostel.app Web</div>
+                    <div className="flex items-center gap-2 text-sm font-semibold text-white">
+                      <BrandMark className="text-sm" />
+                      <span className="text-zinc-500">Web</span>
+                    </div>
                     <div className="text-[10px] text-emerald-400 mt-1">{copy.status}</div>
                   </div>
                   <Smartphone className="w-4 h-4 text-zinc-500" />

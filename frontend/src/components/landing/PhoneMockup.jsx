@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Bell, MessageCircle, ShieldCheck, Phone } from "lucide-react";
+import BrandMark from "@/components/BrandMark";
 
 const fakeChats = [
   { name: "Marta Kowal", text: "Dzwonie za chwile", time: "12:34", unread: 2 },
@@ -37,7 +38,7 @@ export default function PhoneMockup() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <div className="font-display text-base font-bold text-white leading-none">ghostel.app</div>
+              <BrandMark className="text-base leading-none" />
               <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.15em] mt-1">
                 Chats. Calls. Push.
               </div>

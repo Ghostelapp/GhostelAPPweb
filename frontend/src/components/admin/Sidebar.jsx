@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useLang } from "@/context/LanguageContext";
 import BrandLogo from "@/components/BrandLogo";
+import BrandMark from "@/components/BrandMark";
 
 export default function Sidebar() {
   const { t } = useLang();
@@ -36,7 +37,7 @@ export default function Sidebar() {
       <div className="px-6 py-6 flex items-center gap-3 border-b divider-soft">
         <BrandLogo className="h-10 w-10" />
         <div>
-          <div className="font-display font-bold text-base text-white leading-none">ghostel.app</div>
+          <BrandMark className="text-sm leading-none" />
           <div className="text-[10px] text-cyan-400 font-bold uppercase tracking-[0.2em] mt-1.5">
             Admin panel
           </div>

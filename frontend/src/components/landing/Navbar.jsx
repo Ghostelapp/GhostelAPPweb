@@ -6,6 +6,7 @@ import { Download, Menu, X, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import LanguageMenu from "@/components/LanguageMenu";
+import BrandMark from "@/components/BrandMark";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
 
 export default function Navbar() {
@@ -71,9 +72,7 @@ export default function Navbar() {
           <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
             <ShieldCheck className="w-5 h-5" />
           </div>
-          <span className="font-display font-bold text-lg tracking-tight text-white">
-            ghostel.app
-          </span>
+          <BrandMark className="text-lg" />
         </Link>
 
         <nav className="hidden xl:flex items-center gap-1 rounded-xl border border-white/[0.06] bg-white/[0.025] p-1">

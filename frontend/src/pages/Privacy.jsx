@@ -1,6 +1,7 @@
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { useLang } from "@/context/LanguageContext";
+import BrandMark from "@/components/BrandMark";
 
 export default function Privacy() {
   const { lang } = useLang();
@@ -12,7 +13,7 @@ export default function Privacy() {
       <Navbar />
       <main className="max-w-4xl mx-auto px-6 lg:px-8 pt-32 pb-20">
         <p className="text-[10px] font-bold uppercase tracking-[0.25em] text-cyan-400 mb-4">
-          ghostel.app
+          <BrandMark className="text-xs" />
         </p>
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
           {isPl ? "Polityka prywatności" : isDe ? "Datenschutzerklärung" : "Privacy policy"}

@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useLang } from "@/context/LanguageContext";
 import { GHOSTEL_APP_URL } from "@/lib/constants";
 import BrandLogo from "@/components/BrandLogo";
+import BrandMark from "@/components/BrandMark";
 
 function formatDate(value) {
   if (!value) return "—";
@@ -47,7 +48,7 @@ export default function Account() {
         <header className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between border-b border-white/10 pb-6">
           <Link to="/" className="inline-flex items-center gap-2.5">
             <BrandLogo />
-            <span className="font-display font-bold text-lg">ghostel.app</span>
+            <BrandMark className="text-lg" />
           </Link>
           <div className="flex items-center gap-2">
             {user.role === "admin" && (
