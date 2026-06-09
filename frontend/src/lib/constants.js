@@ -1,8 +1,11 @@
-// Stable release asset addresses. GitHub redirects these URLs to assets from
-// the latest published release, so the website never points at missing VPS
-// files or needs changing for every version.
+// Android APK is currently shipped from EAS build artifacts so the landing
+// page can point at the newest tested package immediately after a build.
 export const GHOSTEL_APK_URL =
-  "https://github.com/Ghostelapp/app-Gostel/releases/latest/download/Ghostel-Android.apk";
+  "https://expo.dev/artifacts/eas/hAYpQMLh1fBJwwoV3Zk5Xr.apk";
+
+export const GHOSTEL_ANDROID_VERSION = "1.4.12";
+
+// Desktop builds still use the latest GitHub release asset URL.
 
 export const GHOSTEL_WEB_APP_URL =
   process.env.REACT_APP_GHOSTEL_WEB_APP_URL || "https://app.ghostel.app";

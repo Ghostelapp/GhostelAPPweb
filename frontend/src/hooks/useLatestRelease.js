@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   GHOSTEL_APK_ASSET_NAME,
   GHOSTEL_APK_URL,
+  GHOSTEL_ANDROID_VERSION,
   GHOSTEL_DESKTOP_ASSET_NAME,
   GHOSTEL_DESKTOP_URL,
   GHOSTEL_RELEASE_API_URL,
@@ -11,7 +12,7 @@ const CACHE_KEY = "ghostel-latest-release";
 const CACHE_MAX_AGE_MS = 15 * 60 * 1000;
 
 const fallbackRelease = {
-  version: null,
+  version: GHOSTEL_ANDROID_VERSION || null,
   apkUrl: GHOSTEL_APK_URL,
   desktopUrl: GHOSTEL_DESKTOP_URL,
 };
@@ -22,10 +23,13 @@ function normalizeRelease(release) {
     assets.find((asset) => asset?.name === name)?.browser_download_url;
 
   return {
-    version: String(release?.tag_name || release?.name || "")
-      .trim()
-      .replace(/^v/i, "") || null,
-    apkUrl: findAsset(GHOSTEL_APK_ASSET_NAME) || GHOSTEL_APK_URL,
+    version:
+      GHOSTEL_ANDROID_VERSION ||
+      String(release?.tag_name || release?.name || "")
+        .trim()
+        .replace(/^v/i, "") ||
+      null,
+    apkUrl: GHOSTEL_APK_URL || findAsset(GHOSTEL_APK_ASSET_NAME),
     desktopUrl:
       findAsset(GHOSTEL_DESKTOP_ASSET_NAME) || GHOSTEL_DESKTOP_URL,
   };
