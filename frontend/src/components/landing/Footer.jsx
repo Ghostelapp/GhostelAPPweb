@@ -7,6 +7,15 @@ import BrandMark from "@/components/BrandMark";
 export default function Footer() {
   const { t } = useLang();
   const { version, apkUrl } = useLatestRelease();
+  const socialLinks = [
+    { Icon: Github, label: "GitHub", href: "https://github.com/Ghostelapp" },
+    { Icon: Twitter, label: "X", href: "https://x.com/ghostelapp" },
+    {
+      Icon: Linkedin,
+      label: "LinkedIn",
+      href: "https://www.linkedin.com/in/ghostel-app-2bb5a9415/",
+    },
+  ];
 
   return (
     <footer data-testid="footer-section" className="relative border-t divider-soft pt-16 pb-10">
@@ -23,10 +32,13 @@ export default function Footer() {
               {t("footer.tagline")}
             </p>
             <div className="flex gap-2">
-              {[Github, Twitter, Linkedin].map((Icon, i) => (
+              {socialLinks.map(({ Icon, label, href }, i) => (
                 <a
-                  key={i}
-                  href="#"
+                  key={label}
+                  href={href}
+                  aria-label={label}
+                  target="_blank"
+                  rel="noreferrer"
                   data-testid={`footer-social-${i}`}
                   className="w-9 h-9 rounded-lg surface surface-hover grid place-items-center text-zinc-400 hover:text-cyan-400 transition-colors"
                 >

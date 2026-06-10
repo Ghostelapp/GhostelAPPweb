@@ -49,6 +49,19 @@ export default function Privacy() {
 
           <section className="surface rounded-2xl p-7">
             <h2 className="font-display text-xl font-bold text-white mb-3">
+              {isPl ? "Anonimowe statystyki strony" : isDe ? "Anonyme Website-Statistiken" : "Anonymous website analytics"}
+            </h2>
+            <p>
+              {isPl
+                ? "Strona zbiera anonimowe statystyki techniczne, takie jak odsłony, odwiedzane podstrony, przybliżony kraj, typ urządzenia, przeglądarka, źródło wejścia i czas aktywności. Statystyki nie zapisują pełnego adresu IP."
+                : isDe
+                ? "Die Website erfasst anonyme technische Statistiken wie Seitenaufrufe, besuchte Seiten, ungefähres Land, Gerätetyp, Browser, Zugriffsquelle und Aktivitätsdauer. Vollständige IP-Adressen werden nicht gespeichert."
+                : "The website collects anonymous technical statistics such as page views, visited pages, approximate country, device type, browser, traffic source and activity duration. Full IP addresses are not stored."}
+            </p>
+          </section>
+
+          <section className="surface rounded-2xl p-7">
+            <h2 className="font-display text-xl font-bold text-white mb-3">
               {isPl ? "Uprawnienia aplikacji" : isDe ? "App-Berechtigungen" : "App permissions"}
             </h2>
             <ul className="list-disc pl-5 space-y-2">

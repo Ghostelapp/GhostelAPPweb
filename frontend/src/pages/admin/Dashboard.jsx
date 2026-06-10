@@ -1,12 +1,23 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
-import { Users, MessageSquare, UsersRound, ShieldAlert, Activity } from "lucide-react";
+import {
+  Users,
+  MessageSquare,
+  UsersRound,
+  ShieldAlert,
+  Activity,
+  Eye,
+  Globe2,
+  Radio,
+  Clock3,
+} from "lucide-react";
 import {
   LineChart,
   Line,
   AreaChart,
   Area,
+  ComposedChart,
   BarChart,
   Bar,
   XAxis,
@@ -61,6 +72,31 @@ const ChartTooltip = ({ active, payload, label }) => {
   );
 };
 
+const formatDuration = (seconds) => {
+  if (!seconds) return "0s";
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  return minutes ? `${minutes}m ${remainder}s` : `${remainder}s`;
+};
+
+const Ranking = ({ title, rows }) => (
+  <div className="surface rounded-2xl p-5">
+    <h4 className="text-xs font-bold uppercase tracking-[0.15em] text-zinc-400 mb-4">{title}</h4>
+    <div className="space-y-3">
+      {rows?.length ? (
+        rows.map((row) => (
+          <div key={row.name} className="flex items-center gap-3 text-sm">
+            <span className="text-zinc-300 truncate flex-1">{row.name}</span>
+            <span className="font-display font-bold text-cyan-400 tabular-nums">{row.count}</span>
+          </div>
+        ))
+      ) : (
+        <div className="text-xs text-zinc-600">No data yet</div>
+      )}
+    </div>
+  </div>
+);
+
 export default function Dashboard() {
   const { t } = useLang();
   const [data, setData] = useState(null);
@@ -80,6 +116,7 @@ export default function Dashboard() {
     { icon: UsersRound, label: t("admin.totalGroups"), value: data.stats.total_groups, accent: "cyan" },
     { icon: ShieldAlert, label: t("admin.pendingReports"), value: data.stats.pending_reports, accent: "amber" },
   ];
+  const analytics = data.website_analytics;
 
   return (
     <div data-testid="admin-dashboard" className="space-y-8">
@@ -128,6 +165,67 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {analytics && (
+        <section data-testid="website-analytics" className="space-y-4">
+          <div>
+            <div className="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400 mb-1">
+              Website analytics
+            </div>
+            <h2 className="font-display text-2xl font-black text-white">ghostel.app traffic</h2>
+            <p className="text-xs text-zinc-500 mt-1">
+              Anonymous traffic statistics. Active now means activity within the last 5 minutes.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+            <StatCard icon={Radio} label="Active now" value={analytics.active_now} accent="emerald" idx={0} />
+            <StatCard icon={Eye} label="Views today" value={analytics.pageviews_today} accent="cyan" idx={1} />
+            <StatCard icon={Eye} label="Total views" value={analytics.total_pageviews} accent="purple" idx={2} />
+            <StatCard icon={Globe2} label="Unique visitors" value={analytics.total_visitors} accent="cyan" idx={3} />
+            <StatCard
+              icon={Clock3}
+              label="Average session"
+              value={formatDuration(analytics.average_duration_seconds)}
+              accent="amber"
+              idx={4}
+            />
+          </div>
+
+          <div className="glass rounded-2xl p-6">
+            <div className="mb-6">
+              <div className="text-xs font-bold uppercase tracking-[0.15em] text-cyan-400 mb-1">
+                Last 30 days
+              </div>
+              <h3 className="font-display text-lg font-bold text-white">Views and unique visitors</h3>
+            </div>
+            <ResponsiveContainer width="100%" height={260}>
+              <ComposedChart data={analytics.daily}>
+                <defs>
+                  <linearGradient id="websiteViews" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#00e5ff" stopOpacity={0.5} />
+                    <stop offset="100%" stopColor="#00e5ff" stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
+                <XAxis dataKey="day" stroke="#52525b" fontSize={10} tickFormatter={(value) => value.slice(5)} />
+                <YAxis stroke="#52525b" fontSize={11} />
+                <Tooltip content={<ChartTooltip />} />
+                <Area type="monotone" dataKey="pageviews" stroke="#00e5ff" fill="url(#websiteViews)" strokeWidth={2} />
+                <Line type="monotone" dataKey="visitors" stroke="#d946ef" strokeWidth={2} dot={false} />
+              </ComposedChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="grid sm:grid-cols-2 xl:grid-cols-5 gap-4">
+            <Ranking title="Countries" rows={analytics.countries} />
+            <Ranking title="Top pages" rows={analytics.top_pages} />
+            <Ranking title="Traffic sources" rows={analytics.referrers} />
+            <Ranking title="Devices" rows={analytics.devices} />
+            <Ranking title="Browsers" rows={analytics.browsers} />
+          </div>
+        </section>
       )}
 
       <div className="grid lg:grid-cols-2 gap-4">

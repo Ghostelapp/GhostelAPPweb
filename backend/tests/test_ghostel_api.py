@@ -104,13 +104,15 @@ class TestDashboard:
         r = requests.get(f"{API}/admin/dashboard", headers=admin_headers(admin_token))
         assert r.status_code == 200
         d = r.json()
-        for key in ("stats", "activity_chart", "registrations_chart", "messages_chart", "recent_activity"):
+        for key in ("stats", "activity_chart", "registrations_chart", "messages_chart", "recent_activity", "website_analytics"):
             assert key in d, f"missing {key}"
         for sk in ("total_users", "active_users", "total_messages", "total_groups", "pending_reports"):
             assert sk in d["stats"]
         assert isinstance(d["activity_chart"], list) and len(d["activity_chart"]) == 14
         assert isinstance(d["registrations_chart"], list) and len(d["registrations_chart"]) == 14
         assert isinstance(d["messages_chart"], list) and len(d["messages_chart"]) == 14
+        for key in ("total_pageviews", "pageviews_today", "total_visitors", "active_now", "daily", "countries"):
+            assert key in d["website_analytics"]
 
     def test_dashboard_requires_auth(self):
         r = requests.get(f"{API}/admin/dashboard")
@@ -119,6 +121,33 @@ class TestDashboard:
     def test_dashboard_forbidden_for_user(self, user_token):
         r = requests.get(f"{API}/admin/dashboard", headers=admin_headers(user_token))
         assert r.status_code == 403
+
+
+class TestWebsiteAnalytics:
+    def test_public_pageview_event(self):
+        marker = uuid.uuid4().hex
+        r = requests.post(
+            f"{API}/analytics/event",
+            json={
+                "event": "pageview",
+                "visitor_id": f"visitor_{marker}",
+                "session_id": f"session_{marker}",
+                "path": "/privacy",
+                "language": "pl-PL",
+                "country": "PL",
+            },
+        )
+        assert r.status_code == 204
+
+    def test_rejects_invalid_visitor_id(self):
+        r = requests.post(
+            f"{API}/analytics/event",
+            json={
+                "visitor_id": "invalid visitor id",
+                "session_id": "session_12345678",
+            },
+        )
+        assert r.status_code == 422
 
 
 # ---- Admin: Users ----

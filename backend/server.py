@@ -11,8 +11,9 @@ import logging
 import io
 import csv
 import httpx
+from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List
+from typing import Optional, List, Literal
 
 from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, Query
 from fastapi.responses import StreamingResponse
@@ -102,6 +103,18 @@ class SettingsIn(BaseModel):
     max_file_size_mb: Optional[int] = None
 
 
+class WebsiteEventIn(BaseModel):
+    event: Literal["pageview", "heartbeat"] = "pageview"
+    visitor_id: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
+    session_id: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
+    path: str = Field(default="/", max_length=300)
+    referrer: str = Field(default="", max_length=500)
+    language: str = Field(default="", max_length=40)
+    timezone: str = Field(default="", max_length=80)
+    country: str = Field(default="", max_length=8)
+    screen: str = Field(default="", max_length=40)
+
+
 # ----- helpers -----
 def _set_cookies(response: Response, access: str, refresh: str):
     response.set_cookie("access_token", access, httponly=True, secure=False, samesite="lax", max_age=60 * 60 * 12, path="/")
@@ -157,10 +170,172 @@ async def _mirror_app_user(app_user: dict, password: str) -> dict:
     return doc
 
 
+def _website_client_info(request: Request) -> tuple[str, str]:
+    user_agent = request.headers.get("user-agent", "").lower()
+    if "edg/" in user_agent:
+        browser = "Edge"
+    elif "firefox/" in user_agent:
+        browser = "Firefox"
+    elif "chrome/" in user_agent or "crios/" in user_agent:
+        browser = "Chrome"
+    elif "safari/" in user_agent:
+        browser = "Safari"
+    else:
+        browser = "Other"
+
+    if any(value in user_agent for value in ("mobile", "android", "iphone")):
+        device = "Mobile"
+    elif any(value in user_agent for value in ("ipad", "tablet")):
+        device = "Tablet"
+    else:
+        device = "Desktop"
+    return browser, device
+
+
+def _website_country(request: Request, reported_country: str) -> str:
+    for header in (
+        "cf-ipcountry",
+        "x-vercel-ip-country",
+        "cloudfront-viewer-country",
+        "x-country-code",
+    ):
+        value = request.headers.get(header, "").strip().upper()
+        if len(value) == 2 and value.isalpha():
+            return value
+    value = reported_country.strip().upper()
+    return value if len(value) == 2 and value.isalpha() else "UNKNOWN"
+
+
+async def _website_analytics() -> dict:
+    now = datetime.now(timezone.utc)
+    today = now.strftime("%Y-%m-%d")
+    active_since = now - timedelta(minutes=5)
+    thirty_days_ago = now - timedelta(days=29)
+
+    total_pageviews = await db.website_pageviews.count_documents({})
+    pageviews_today = await db.website_pageviews.count_documents({"created_at": {"$gte": today}})
+    total_visitors = len(await db.website_sessions.distinct("visitor_id"))
+    active_now = len(
+        await db.website_sessions.distinct("visitor_id", {"last_seen_at": {"$gte": active_since}})
+    )
+
+    duration_rows = await db.website_sessions.aggregate(
+        [
+            {"$project": {"duration": {"$subtract": ["$last_seen_at", "$first_seen_at"]}}},
+            {"$group": {"_id": None, "average": {"$avg": "$duration"}}},
+        ]
+    ).to_list(1)
+    average_duration_seconds = round((duration_rows[0]["average"] or 0) / 1000) if duration_rows else 0
+
+    async def grouped(collection, field: str, limit: int = 8) -> list[dict]:
+        return await collection.aggregate(
+            [
+                {"$match": {field: {"$nin": [None, ""]}}},
+                {"$group": {"_id": f"${field}", "count": {"$sum": 1}}},
+                {"$sort": {"count": -1}},
+                {"$limit": limit},
+                {"$project": {"_id": 0, "name": "$_id", "count": 1}},
+            ]
+        ).to_list(limit)
+
+    daily_rows = await db.website_pageviews.aggregate(
+        [
+            {"$match": {"created_dt": {"$gte": thirty_days_ago}}},
+            {
+                "$group": {
+                    "_id": {"$dateToString": {"format": "%Y-%m-%d", "date": "$created_dt"}},
+                    "pageviews": {"$sum": 1},
+                    "visitors": {"$addToSet": "$visitor_id"},
+                }
+            },
+            {"$sort": {"_id": 1}},
+            {
+                "$project": {
+                    "_id": 0,
+                    "day": "$_id",
+                    "pageviews": 1,
+                    "visitors": {"$size": "$visitors"},
+                }
+            },
+        ]
+    ).to_list(31)
+
+    daily_map = {row["day"]: row for row in daily_rows}
+    daily = []
+    for offset in range(29, -1, -1):
+        day = (now - timedelta(days=offset)).strftime("%Y-%m-%d")
+        daily.append(daily_map.get(day, {"day": day, "pageviews": 0, "visitors": 0}))
+
+    return {
+        "total_pageviews": total_pageviews,
+        "pageviews_today": pageviews_today,
+        "total_visitors": total_visitors,
+        "active_now": active_now,
+        "average_duration_seconds": average_duration_seconds,
+        "daily": daily,
+        "countries": await grouped(db.website_sessions, "country", 10),
+        "top_pages": await grouped(db.website_pageviews, "path", 10),
+        "referrers": await grouped(db.website_sessions, "referrer_host", 8),
+        "devices": await grouped(db.website_sessions, "device", 5),
+        "browsers": await grouped(db.website_sessions, "browser", 8),
+    }
+
+
 # ----- Health -----
 @api.get("/")
 async def root():
     return {"message": "ghostel.app API ready", "version": "1.0"}
+
+
+@api.post("/analytics/event", status_code=204)
+async def website_event(payload: WebsiteEventIn, request: Request):
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+    browser, device = _website_client_info(request)
+    country = _website_country(request, payload.country)
+    referrer_host = urlparse(payload.referrer).hostname or "Direct"
+    path = payload.path.split("?")[0][:300] or "/"
+
+    await db.website_sessions.update_one(
+        {"session_id": payload.session_id},
+        {
+            "$setOnInsert": {
+                "session_id": payload.session_id,
+                "visitor_id": payload.visitor_id,
+                "first_seen_at": now,
+                "created_at": now_iso,
+                "referrer": payload.referrer,
+                "referrer_host": referrer_host,
+            },
+            "$set": {
+                "last_seen_at": now,
+                "last_seen": now_iso,
+                "path": path,
+                "country": country,
+                "language": payload.language,
+                "timezone": payload.timezone,
+                "screen": payload.screen,
+                "browser": browser,
+                "device": device,
+            },
+        },
+        upsert=True,
+    )
+
+    if payload.event == "pageview":
+        await db.website_pageviews.insert_one(
+            {
+                "visitor_id": payload.visitor_id,
+                "session_id": payload.session_id,
+                "path": path,
+                "country": country,
+                "browser": browser,
+                "device": device,
+                "created_dt": now,
+                "created_at": now_iso,
+            }
+        )
+    return Response(status_code=204)
 
 
 # ----- Auth -----
@@ -316,6 +491,7 @@ def _build_charts(users: list):
 @api.get("/admin/dashboard")
 async def admin_dashboard(request: Request):
     await require_admin(request, db)
+    website_analytics = await _website_analytics()
     stats = None
     users = []
     source = "local"
@@ -356,6 +532,7 @@ async def admin_dashboard(request: Request):
             "registrations_chart": registrations_chart,
             "messages_chart": messages_chart,
             "recent_activity": recent_activity,
+            "website_analytics": website_analytics,
         }
 
     # Fallback local
@@ -389,6 +566,7 @@ async def admin_dashboard(request: Request):
         "registrations_chart": registrations,
         "messages_chart": messages_chart,
         "recent_activity": [_public_user(u) for u in recent_users],
+        "website_analytics": website_analytics,
     }
 
 
@@ -690,6 +868,11 @@ async def on_startup():
     await db.users.create_index("id", unique=True)
     await db.groups.create_index("id", unique=True)
     await db.messages.create_index("created_at")
+    await db.website_sessions.create_index("session_id", unique=True)
+    await db.website_sessions.create_index("visitor_id")
+    await db.website_sessions.create_index("last_seen_at")
+    await db.website_pageviews.create_index("created_dt")
+    await db.website_pageviews.create_index("path")
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD")
