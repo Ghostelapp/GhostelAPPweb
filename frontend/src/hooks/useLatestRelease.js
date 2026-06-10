@@ -8,7 +8,7 @@ import {
   GHOSTEL_RELEASE_API_URL,
 } from "@/lib/constants";
 
-const CACHE_KEY = "ghostel-latest-release";
+const CACHE_KEY = `ghostel-latest-release-${GHOSTEL_ANDROID_VERSION}`;
 const CACHE_MAX_AGE_MS = 15 * 60 * 1000;
 
 const fallbackRelease = {
@@ -43,7 +43,11 @@ function readCachedRelease() {
       Date.now() - cached.savedAt < CACHE_MAX_AGE_MS &&
       cached.release
     ) {
-      return cached.release;
+      return {
+        ...cached.release,
+        version: GHOSTEL_ANDROID_VERSION,
+        apkUrl: GHOSTEL_APK_URL,
+      };
     }
   } catch {
     // A missing or invalid cache should never block download buttons.
