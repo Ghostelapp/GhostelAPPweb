@@ -7,6 +7,7 @@ import Comparison from "@/components/landing/Comparison";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Pricing from "@/components/landing/Pricing";
 import Faq from "@/components/landing/Faq";
+import SupportProject from "@/components/landing/SupportProject";
 import Footer from "@/components/landing/Footer";
 
 export default function Landing() {
@@ -22,6 +23,7 @@ export default function Landing() {
         <HowItWorks />
         <Pricing />
         <Faq />
+        <SupportProject />
       </main>
       <Footer />
     </div>
