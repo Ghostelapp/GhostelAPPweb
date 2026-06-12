@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import api, { API, formatApiError, buildExportUrl } from "@/lib/api";
+import api, { formatApiError, downloadExport } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
 import SourceBadge from "@/components/admin/SourceBadge";
 import {
@@ -93,14 +93,15 @@ export default function Users() {
           </div>
           <p className="text-sm text-zinc-400">{users.length} użytkowników · źródło: ghostel.app API</p>
         </div>
-        <a
+        <button
           data-testid="export-users-csv"
-          href={buildExportUrl("users")}
+          type="button"
+          onClick={() => downloadExport("users").catch((e) => toast.error(formatApiError(e)))}
           className="inline-flex items-center gap-2 px-4 h-10 rounded-full glass text-sm text-zinc-200 hover:text-cyan-400 hover:border-cyan-400/40"
         >
           <Download className="w-4 h-4" />
           {t("admin.exportCsv")}
-        </a>
+        </button>
       </div>
 
       <div className="relative max-w-sm">

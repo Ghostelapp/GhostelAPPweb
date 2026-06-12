@@ -25,11 +25,12 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 
 def create_access_token(user_id: str, email: str, role: str) -> str:
+    lifetime_minutes = max(5, int(os.environ.get("ACCESS_TOKEN_MINUTES", "60")))
     payload = {
         "sub": user_id,
         "email": email,
         "role": role,
-        "exp": datetime.now(timezone.utc) + timedelta(hours=12),
+        "exp": datetime.now(timezone.utc) + timedelta(minutes=lifetime_minutes),
         "type": "access",
     }
     return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
@@ -59,9 +60,6 @@ def extract_token(request: Request) -> str | None:
 
 async def get_current_user(request: Request, db):
     token = extract_token(request)
-    if not token:
-        # also allow ?token=... for download links
-        token = request.query_params.get("token")
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     try:

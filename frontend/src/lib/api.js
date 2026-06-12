@@ -13,27 +13,25 @@ export const API = `${BACKEND_URL}/api`;
 
 const api = axios.create({
   baseURL: API,
+  withCredentials: true,
 });
 
 const TOKEN_KEY = "ghostel_token";
 
 export function getToken() {
-  return localStorage.getItem(TOKEN_KEY);
+  return null;
 }
 
 export function setToken(token) {
-  if (token) localStorage.setItem(TOKEN_KEY, token);
-  else localStorage.removeItem(TOKEN_KEY);
+  // Remove tokens saved by older builds. Authentication now uses HttpOnly cookies.
+  try {
+    localStorage.removeItem(TOKEN_KEY);
+  } catch {
+    // Storage can be unavailable in strict browser privacy modes.
+  }
 }
 
-api.interceptors.request.use((config) => {
-  const token = getToken();
-  if (token) {
-    config.headers = config.headers || {};
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+setToken(null);
 
 api.interceptors.response.use(
   (r) => r,
@@ -58,7 +56,16 @@ export function formatApiError(err) {
   return String(detail);
 }
 
-export function buildExportUrl(kind) {
-  const token = getToken();
-  return `${API}/admin/export/${kind}?token=${encodeURIComponent(token || "")}`;
+export async function downloadExport(kind) {
+  const response = await api.get(`/admin/export/${kind}`, { responseType: "blob" });
+  const disposition = response.headers["content-disposition"] || "";
+  const filename = disposition.match(/filename="?([^"]+)"?/)?.[1] || `ghostel-${kind}.csv`;
+  const url = URL.createObjectURL(response.data);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 }

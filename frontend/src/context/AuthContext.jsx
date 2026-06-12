@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import api, { formatApiError, setToken, getToken } from "../lib/api";
+import api, { formatApiError, setToken } from "../lib/api";
 
 const AuthContext = createContext(null);
 
@@ -8,12 +8,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = getToken();
-    if (!token) {
-      setUser(false);
-      setLoading(false);
-      return;
-    }
     api
       .get("/auth/me")
       .then((res) => setUser(res.data))
@@ -24,10 +18,14 @@ export function AuthProvider({ children }) {
       .finally(() => setLoading(false));
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (email, password, totpCode = "") => {
     try {
-      const { data } = await api.post("/auth/login", { email, password });
-      if (data.access_token) setToken(data.access_token);
+      const { data } = await api.post("/auth/login", {
+        email,
+        password,
+        totp_code: totpCode || null,
+      });
+      if (data.requires_2fa) return { ok: false, requires_2fa: true };
       setUser(data);
       return { ok: true, user: data };
     } catch (e) {
@@ -43,7 +41,6 @@ export function AuthProvider({ children }) {
         password,
         username: username || null,
       });
-      if (data.access_token) setToken(data.access_token);
       setUser(data);
       return { ok: true, user: data };
     } catch (e) {

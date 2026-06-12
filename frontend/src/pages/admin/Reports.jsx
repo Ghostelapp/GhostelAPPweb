@@ -1,6 +1,7 @@
-import { buildExportUrl } from "@/lib/api";
+import { downloadExport, formatApiError } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
 import { Download, Activity, UserPlus, Flag, UsersRound } from "lucide-react";
+import { toast } from "sonner";
 
 const reports = [
   { kind: "activity", icon: Activity, title: "Aktywność użytkowników", desc: "Last activity per user.", color: "cyan" },
@@ -41,14 +42,15 @@ export default function Reports() {
                 <div className="flex-1 min-w-0">
                   <h3 className="font-display text-lg font-bold text-white mb-1">{r.title}</h3>
                   <p className="text-sm text-zinc-400 mb-4">{r.desc}</p>
-                  <a
+                  <button
                     data-testid={`download-${r.kind}-csv`}
-                    href={buildExportUrl(r.kind)}
+                    type="button"
+                    onClick={() => downloadExport(r.kind).catch((e) => toast.error(formatApiError(e)))}
                     className="inline-flex items-center gap-2 text-xs font-semibold text-cyan-400 hover:text-cyan-300"
                   >
                     <Download className="w-3.5 h-3.5" />
                     {t("admin.exportCsv")}
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>

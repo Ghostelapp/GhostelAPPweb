@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import api, { API, formatApiError, buildExportUrl } from "@/lib/api";
+import api, { formatApiError, downloadExport } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
 import SourceBadge from "@/components/admin/SourceBadge";
 import {
@@ -104,14 +104,15 @@ export default function Groups() {
           <p className="text-sm text-zinc-400">{groups.length} grup · workspace management coming in v1.1</p>
         </div>
         <div className="flex gap-3">
-          <a
+          <button
             data-testid="export-groups-csv"
-            href={buildExportUrl("groups")}
+            type="button"
+            onClick={() => downloadExport("groups").catch((e) => toast.error(formatApiError(e)))}
             className="inline-flex items-center gap-2 px-4 h-10 rounded-full glass text-sm text-zinc-200 hover:text-cyan-400"
           >
             <Download className="w-4 h-4" />
             {t("admin.exportCsv")}
-          </a>
+          </button>
           <Button
             data-testid="create-group-btn"
             onClick={() => setCreating(true)}

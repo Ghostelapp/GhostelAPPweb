@@ -15,6 +15,8 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [totpCode, setTotpCode] = useState("");
+  const [requires2FA, setRequires2FA] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -27,11 +29,14 @@ export default function Login() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const res = await login(email, password);
+    const res = await login(email, password, totpCode);
     setLoading(false);
     if (res.ok) {
       toast.success("Signed in");
       navigate(res.user.role === "admin" ? "/admin" : "/account");
+    } else if (res.requires_2fa) {
+      setRequires2FA(true);
+      setError("");
     } else {
       setError(res.error);
       toast.error(res.error);
@@ -78,6 +83,26 @@ export default function Login() {
               placeholder="twoj@email.pl"
             />
           </div>
+          {requires2FA && (
+            <div>
+              <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
+                2FA code
+              </Label>
+              <Input
+                data-testid="login-totp-input"
+                inputMode="numeric"
+                autoComplete="one-time-code"
+                required
+                minLength={6}
+                maxLength={8}
+                value={totpCode}
+                onChange={(e) => setTotpCode(e.target.value.replace(/\D/g, ""))}
+                className="mt-2 bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
+                placeholder="123456"
+                autoFocus
+              />
+            </div>
+          )}
           <div>
             <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
               {t("common.password")}

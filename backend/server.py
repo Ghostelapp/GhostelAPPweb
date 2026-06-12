@@ -11,6 +11,7 @@ import logging
 import io
 import csv
 import httpx
+import hashlib
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Literal
@@ -19,6 +20,8 @@ from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depend
 from fastapi.responses import StreamingResponse
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
 from pydantic import BaseModel, EmailStr, Field
 
 from auth_utils import (
@@ -58,6 +61,7 @@ class RegisterIn(BaseModel):
 class LoginIn(BaseModel):
     email: EmailStr
     password: str
+    totp_code: Optional[str] = Field(default=None, min_length=6, max_length=8)
 
 
 class UpdateUserIn(BaseModel):
@@ -116,9 +120,65 @@ class WebsiteEventIn(BaseModel):
 
 
 # ----- helpers -----
+def _client_ip(request: Request) -> str:
+    peer = request.client.host if request.client else ""
+    if peer in {"127.0.0.1", "::1"}:
+        forwarded = request.headers.get("x-forwarded-for", "")
+        if forwarded:
+            return forwarded.split(",", 1)[0].strip()
+    return peer or "unknown"
+
+
+async def _enforce_rate_limit(
+    scope: str,
+    identifier: str,
+    *,
+    limit: int,
+    window_seconds: int,
+) -> None:
+    now = datetime.now(timezone.utc)
+    bucket = int(now.timestamp()) // window_seconds
+    digest = hashlib.sha256(identifier.encode("utf-8")).hexdigest()
+    key = f"{scope}:{digest}:{bucket}"
+    try:
+        row = await db.rate_limits.find_one_and_update(
+            {"key": key},
+            {
+                "$inc": {"count": 1},
+                "$setOnInsert": {
+                    "key": key,
+                    "scope": scope,
+                    "expires_at": now + timedelta(seconds=window_seconds * 2),
+                },
+            },
+            upsert=True,
+            return_document=ReturnDocument.AFTER,
+        )
+    except DuplicateKeyError:
+        row = await db.rate_limits.find_one_and_update(
+            {"key": key},
+            {"$inc": {"count": 1}},
+            return_document=ReturnDocument.AFTER,
+        )
+    if row and row.get("count", 0) > limit:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many requests. Try again later.",
+            headers={"Retry-After": str(window_seconds)},
+        )
+
+
+def _cookie_secure() -> bool:
+    configured = os.environ.get("COOKIE_SECURE")
+    if configured is not None:
+        return configured.lower() in {"1", "true", "yes"}
+    return os.environ.get("FRONTEND_URL", "").lower().startswith("https://")
+
+
 def _set_cookies(response: Response, access: str, refresh: str):
-    response.set_cookie("access_token", access, httponly=True, secure=False, samesite="lax", max_age=60 * 60 * 12, path="/")
-    response.set_cookie("refresh_token", refresh, httponly=True, secure=False, samesite="lax", max_age=60 * 60 * 24 * 7, path="/")
+    secure = _cookie_secure()
+    response.set_cookie("access_token", access, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 12, path="/")
+    response.set_cookie("refresh_token", refresh, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 24 * 7, path="/")
 
 
 def _public_user(u: dict) -> dict:
@@ -146,18 +206,15 @@ def _upstream_detail(exc: httpx.HTTPStatusError) -> str:
     return exc.response.text or "Błąd API aplikacji"
 
 
-async def _mirror_app_user(app_user: dict, password: str) -> dict:
+async def _mirror_app_user(app_user: dict) -> dict:
     now = datetime.now(timezone.utc).isoformat()
     email = (app_user.get("email") or "").lower()
     existing = await db.users.find_one({"email": email}) if email else None
-    existing_role = existing.get("role") if existing else None
-    role = "admin" if existing_role == "admin" else app_user.get("role", "user")
     doc = {
         "id": app_user.get("id") or (existing or {}).get("id") or str(uuid.uuid4()),
         "name": app_user.get("name") or email,
         "email": email,
-        "password_hash": hash_password(password),
-        "role": role,
+        "role": app_user.get("role", "user"),
         "status": "blocked" if app_user.get("status") == "blocked" else "active",
         "avatar": app_user.get("avatar") or "",
         "created_at": app_user.get("created_at") or (existing or {}).get("created_at") or now,
@@ -166,7 +223,11 @@ async def _mirror_app_user(app_user: dict, password: str) -> dict:
         "username": app_user.get("username", ""),
         "title": app_user.get("title", ""),
     }
-    await db.users.update_one({"email": email}, {"$set": doc}, upsert=True)
+    await db.users.update_one(
+        {"email": email},
+        {"$set": doc, "$unset": {"password_hash": ""}},
+        upsert=True,
+    )
     return doc
 
 
@@ -289,8 +350,22 @@ async def root():
 
 @api.post("/analytics/event", status_code=204)
 async def website_event(payload: WebsiteEventIn, request: Request):
+    await _enforce_rate_limit(
+        "analytics-ip", _client_ip(request), limit=180, window_seconds=60
+    )
+    await _enforce_rate_limit(
+        "analytics-session", payload.session_id, limit=12, window_seconds=60
+    )
+    if payload.event == "pageview":
+        await _enforce_rate_limit(
+            "analytics-pageview-session",
+            payload.session_id,
+            limit=30,
+            window_seconds=10 * 60,
+        )
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
+    expires_at = now + timedelta(days=180)
     browser, device = _website_client_info(request)
     country = _website_country(request, payload.country)
     referrer_host = urlparse(payload.referrer).hostname or "Direct"
@@ -309,6 +384,7 @@ async def website_event(payload: WebsiteEventIn, request: Request):
             },
             "$set": {
                 "last_seen_at": now,
+                "expires_at": expires_at,
                 "last_seen": now_iso,
                 "path": path,
                 "country": country,
@@ -333,6 +409,7 @@ async def website_event(payload: WebsiteEventIn, request: Request):
                 "device": device,
                 "created_dt": now,
                 "created_at": now_iso,
+                "expires_at": expires_at,
             }
         )
     return Response(status_code=204)
@@ -340,8 +417,11 @@ async def website_event(payload: WebsiteEventIn, request: Request):
 
 # ----- Auth -----
 @api.post("/auth/register")
-async def register(payload: RegisterIn, response: Response):
+async def register(payload: RegisterIn, response: Response, request: Request):
     email = payload.email.lower().strip()
+    await _enforce_rate_limit(
+        "auth-register-ip", _client_ip(request), limit=10, window_seconds=60 * 60
+    )
     if await db.users.find_one({"email": email}):
         raise HTTPException(status_code=400, detail="Email już zarejestrowany")
 
@@ -364,7 +444,7 @@ async def register(payload: RegisterIn, response: Response):
         app_user = app_data.get("user")
         if not app_user:
             raise HTTPException(status_code=502, detail="API aplikacji nie zwróciło danych użytkownika")
-        doc = await _mirror_app_user(app_user, payload.password)
+        doc = await _mirror_app_user(app_user)
     else:
         user_id = str(uuid.uuid4())
         doc = {
@@ -389,13 +469,24 @@ async def register(payload: RegisterIn, response: Response):
 
 
 @api.post("/auth/login")
-async def login(payload: LoginIn, response: Response):
+async def login(payload: LoginIn, response: Response, request: Request):
     email = payload.email.lower().strip()
+    await _enforce_rate_limit(
+        "auth-login-ip", _client_ip(request), limit=30, window_seconds=5 * 60
+    )
+    await _enforce_rate_limit(
+        "auth-login-email", email, limit=10, window_seconds=5 * 60
+    )
     user = await db.users.find_one({"email": email})
-    if not user or not verify_password(payload.password, user["password_hash"]):
+    if ghostel_client.has_public_api:
+        # The app backend is authoritative for passwords, roles and 2FA.
+        user = None
+    if not user or not verify_password(payload.password, user.get("password_hash", "")):
         if ghostel_client.has_public_api:
             try:
-                app_data = await ghostel_client.public_login(email, payload.password)
+                app_data = await ghostel_client.public_login(
+                    email, payload.password, payload.totp_code
+                )
             except httpx.HTTPStatusError as e:
                 raise HTTPException(status_code=401, detail=_upstream_detail(e))
             except httpx.RequestError:
@@ -403,11 +494,11 @@ async def login(payload: LoginIn, response: Response):
                     raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
                 raise HTTPException(status_code=503, detail="Nie można połączyć się z API aplikacji. Spróbuj ponownie za chwilę.")
             if app_data.get("requires_2fa"):
-                raise HTTPException(status_code=401, detail="To konto ma włączone 2FA. Zaloguj się w aplikacji.")
+                return {"requires_2fa": True}
             app_user = app_data.get("user")
             if not app_user:
                 raise HTTPException(status_code=502, detail="API aplikacji nie zwróciło danych użytkownika")
-            user = await _mirror_app_user(app_user, payload.password)
+            user = await _mirror_app_user(app_user)
         else:
             raise HTTPException(status_code=401, detail="Nieprawidłowy email lub hasło")
     if user.get("status") == "blocked":
@@ -861,6 +952,17 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["Referrer-Policy"] = "no-referrer"
+    response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+
 # ----- Startup -----
 @app.on_event("startup")
 async def on_startup():
@@ -871,8 +973,12 @@ async def on_startup():
     await db.website_sessions.create_index("session_id", unique=True)
     await db.website_sessions.create_index("visitor_id")
     await db.website_sessions.create_index("last_seen_at")
+    await db.website_sessions.create_index("expires_at", expireAfterSeconds=0)
     await db.website_pageviews.create_index("created_dt")
     await db.website_pageviews.create_index("path")
+    await db.website_pageviews.create_index("expires_at", expireAfterSeconds=0)
+    await db.rate_limits.create_index("key", unique=True)
+    await db.rate_limits.create_index("expires_at", expireAfterSeconds=0)
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD")

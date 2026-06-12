@@ -304,10 +304,9 @@ class TestCSVExport:
         first = r.text.splitlines()[0]
         assert "," in first
 
-    def test_export_with_query_token(self, admin_token):
+    def test_export_rejects_query_token(self, admin_token):
         r = requests.get(f"{API}/admin/export/users", params={"token": admin_token})
-        assert r.status_code == 200
-        assert r.headers.get("content-type", "").startswith("text/csv")
+        assert r.status_code == 401
 
     def test_export_unknown_kind(self, admin_token):
         r = requests.get(f"{API}/admin/export/unknown", headers=admin_headers(admin_token))
