@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { useLang } from "@/context/LanguageContext";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Check, Download, Globe2, MonitorDown } from "lucide-react";
+import { Check, Download, Globe2, MonitorDown, Smartphone } from "lucide-react";
 import { useLatestRelease } from "@/hooks/useLatestRelease";
 import { cn } from "@/lib/utils";
 
@@ -35,6 +35,20 @@ export default function Pricing() {
       icon: Download,
     },
     {
+      name: "iOS",
+      label: lang === "pl" ? "W przygotowaniu" : lang === "de" ? "In Vorbereitung" : "Coming soon",
+      cta: lang === "pl" ? "Wersja iOS w przygotowaniu" : lang === "de" ? "iOS-Version in Vorbereitung" : "iOS version coming soon",
+      features: lang === "pl"
+        ? ["Przygotowujemy wersję na iPhone", "To samo konto i kontakty", "Czat i połączenia głosowe", "Publikacja po testach iOS"]
+        : lang === "de"
+        ? ["Wir bereiten die iPhone-Version vor", "Dasselbe Konto und dieselben Kontakte", "Chats und Sprachanrufe", "Veröffentlichung nach iOS-Tests"]
+        : ["We are preparing the iPhone version", "The same account and contacts", "Chat and voice calls", "Release after iOS testing"],
+      popular: false,
+      testid: "pricing-ios",
+      disabled: true,
+      icon: Smartphone,
+    },
+    {
       name: lang === "pl" ? "Wersja desktopowa" : lang === "de" ? "Desktop-App" : "Desktop app",
       label: lang === "pl" ? "W budowie" : lang === "de" ? "In Entwicklung" : "In development",
       cta: lang === "pl" ? "Wersja Windows w budowie" : lang === "de" ? "Windows-App in Entwicklung" : "Windows app in development",
@@ -62,14 +76,14 @@ export default function Pricing() {
           </h2>
           <p className="text-base text-zinc-400">
             {lang === "pl"
-              ? "Pobierz aplikację na Androida. Wersje Web i Windows są obecnie w budowie."
+              ? "Pobierz aplikację na Androida. Wersje iOS, Web i Windows są obecnie w przygotowaniu."
               : lang === "de"
-              ? "Lade die Android-App herunter. Die Web- und Windows-Versionen befinden sich derzeit in Entwicklung."
-              : "Download the Android app. Web and Windows versions are currently in development."}
+              ? "Lade die Android-App herunter. Die iOS-, Web- und Windows-Versionen befinden sich derzeit in Vorbereitung."
+              : "Download the Android app. iOS, Web and Windows versions are currently in preparation."}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-5 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
           {plans.map((p, i) => (
             <motion.div
               key={p.name}
