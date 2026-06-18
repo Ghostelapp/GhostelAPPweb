@@ -11,6 +11,8 @@ import Privacy from "@/pages/Privacy";
 import DeleteAccount from "@/pages/DeleteAccount";
 import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
+import Status from "@/pages/Status";
+import Changelog from "@/pages/Changelog";
 import AdminLayout from "@/pages/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import Users from "@/pages/admin/Users";
@@ -65,6 +67,8 @@ function App() {
               <Route path="/delete-account" element={<DeleteAccount />} />
               <Route path="/terms" element={<Terms />} />
               <Route path="/contact" element={<Contact />} />
+              <Route path="/status" element={<Status />} />
+              <Route path="/updates" element={<Changelog />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/account" element={<Account />} />

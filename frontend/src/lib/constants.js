@@ -18,6 +18,12 @@ export const GHOSTEL_RELEASE_API_URL =
   process.env.REACT_APP_GHOSTEL_RELEASE_API_URL ||
   "https://api.github.com/repos/Ghostelapp/app-Gostel/releases/latest";
 
+export const GHOSTEL_MOBILE_API_URL =
+  process.env.REACT_APP_GHOSTEL_MOBILE_API_URL || "https://api.ghostel.app";
+
+export const GHOSTEL_PANEL_API_URL =
+  process.env.REACT_APP_BACKEND_URL || "https://panel-api.ghostel.app";
+
 export const GHOSTEL_APK_ASSET_NAME = "Ghostel-Android.apk";
 export const GHOSTEL_DESKTOP_ASSET_NAME = "Ghostel-Desktop-Windows-Setup.exe";
 
