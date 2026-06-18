@@ -23,6 +23,7 @@ import Settings from "@/pages/admin/Settings";
 import Reports from "@/pages/admin/Reports";
 import NoAccess from "@/pages/NoAccess";
 import WebsiteAnalytics from "@/components/WebsiteAnalytics";
+import FloatingSupport from "@/components/FloatingSupport";
 
 function AdminGuard({ children }) {
   const { user, loading } = useAuth();
@@ -45,6 +46,7 @@ function App() {
         <AuthProvider>
           <BrowserRouter>
             <WebsiteAnalytics />
+            <FloatingSupport />
             <Toaster
               position="top-right"
               theme="dark"
