@@ -10,12 +10,14 @@ import Account from "@/pages/Account";
 import Privacy from "@/pages/Privacy";
 import DeleteAccount from "@/pages/DeleteAccount";
 import Terms from "@/pages/Terms";
+import Contact from "@/pages/Contact";
 import AdminLayout from "@/pages/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import Users from "@/pages/admin/Users";
 import Groups from "@/pages/admin/Groups";
 import Moderation from "@/pages/admin/Moderation";
 import Notifications from "@/pages/admin/Notifications";
+import Support from "@/pages/admin/Support";
 import Roles from "@/pages/admin/Roles";
 import Settings from "@/pages/admin/Settings";
 import Reports from "@/pages/admin/Reports";
@@ -60,6 +62,7 @@ function App() {
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/delete-account" element={<DeleteAccount />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/contact" element={<Contact />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/account" element={<Account />} />
@@ -76,6 +79,7 @@ function App() {
                 <Route path="groups" element={<Groups />} />
                 <Route path="moderation" element={<Moderation />} />
                 <Route path="notifications" element={<Notifications />} />
+                <Route path="support" element={<Support />} />
                 <Route path="roles" element={<Roles />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="reports" element={<Reports />} />

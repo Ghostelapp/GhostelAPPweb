@@ -33,6 +33,7 @@ export default function Navbar() {
   ];
   const mobileLinks = [
     ...primaryLinks,
+    { href: "/contact", label: t("footer.contact") },
     { href: "/privacy", label: t("nav.privacy") },
     { href: "/delete-account", label: t("nav.deleteAccount") },
   ];

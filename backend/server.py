@@ -12,6 +12,7 @@ import io
 import csv
 import httpx
 import hashlib
+import re
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Literal
@@ -117,6 +118,23 @@ class WebsiteEventIn(BaseModel):
     timezone: str = Field(default="", max_length=80)
     country: str = Field(default="", max_length=8)
     screen: str = Field(default="", max_length=40)
+
+
+class ContactSupportIn(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    email: EmailStr
+    subject: str = Field(min_length=4, max_length=160)
+    category: Literal["account", "technical", "billing", "security", "feedback", "other"] = "other"
+    message: str = Field(min_length=20, max_length=5000)
+    app_platform: Optional[Literal["ios", "android", "web", "desktop", "unknown"]] = "unknown"
+    app_version: Optional[str] = Field(default="", max_length=40)
+
+
+class SupportTicketUpdateIn(BaseModel):
+    status: Optional[Literal["new", "open", "waiting", "resolved", "closed"]] = None
+    priority: Optional[Literal["low", "normal", "high", "urgent"]] = None
+    assigned_to: Optional[str] = Field(default=None, max_length=120)
+    admin_note: Optional[str] = Field(default=None, max_length=4000)
 
 
 # ----- helpers -----
@@ -267,6 +285,27 @@ def _website_country(request: Request, reported_country: str) -> str:
     return value if len(value) == 2 and value.isalpha() else "UNKNOWN"
 
 
+def _support_public_id(now: datetime) -> str:
+    return f"GST-{now.strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
+
+
+def _support_priority(category: str, subject: str, message: str) -> str:
+    text = f"{subject} {message}".lower()
+    urgent_terms = ("urgent", "pilne", "natychmiast", "security", "hack", "wlam", "breach", "leak")
+    high_terms = ("logowanie", "login", "platnosc", "payment", "crash", "nie dziala", "call", "polaczen")
+    if category == "security" or any(term in text for term in urgent_terms):
+        return "high"
+    if any(term in text for term in high_terms):
+        return "normal"
+    return "normal"
+
+
+def _support_public_doc(doc: dict) -> dict:
+    doc.pop("_id", None)
+    doc.pop("ip_hash", None)
+    return doc
+
+
 async def _website_analytics() -> dict:
     now = datetime.now(timezone.utc)
     today = now.strftime("%Y-%m-%d")
@@ -413,6 +452,52 @@ async def website_event(payload: WebsiteEventIn, request: Request):
             }
         )
     return Response(status_code=204)
+
+
+# ----- Contact support -----
+@api.post("/contact")
+async def create_support_ticket(payload: ContactSupportIn, request: Request):
+    ip = _client_ip(request)
+    email = payload.email.lower().strip()
+    await _enforce_rate_limit("support-ip", ip, limit=6, window_seconds=60 * 60)
+    await _enforce_rate_limit("support-email", email, limit=3, window_seconds=60 * 60)
+
+    now = datetime.now(timezone.utc)
+    now_iso = now.isoformat()
+    ticket_id = str(uuid.uuid4())
+    public_id = _support_public_id(now)
+    priority = _support_priority(payload.category, payload.subject, payload.message)
+    doc = {
+        "id": ticket_id,
+        "public_id": public_id,
+        "name": payload.name.strip(),
+        "email": email,
+        "subject": payload.subject.strip(),
+        "category": payload.category,
+        "message": payload.message.strip(),
+        "app_platform": payload.app_platform or "unknown",
+        "app_version": (payload.app_version or "").strip(),
+        "status": "new",
+        "priority": priority,
+        "source": "website",
+        "assigned_to": "",
+        "admin_note": "",
+        "history": [
+            {
+                "at": now_iso,
+                "actor": "system",
+                "action": "created",
+                "changes": {"status": "new", "priority": priority},
+            }
+        ],
+        "user_agent": request.headers.get("user-agent", "")[:500],
+        "ip_hash": hashlib.sha256(ip.encode("utf-8")).hexdigest(),
+        "created_at": now_iso,
+        "updated_at": now_iso,
+        "resolved_at": None,
+    }
+    await db.support_tickets.insert_one(doc)
+    return {"ok": True, "ticket_id": public_id, "status": "new"}
 
 
 # ----- Auth -----
@@ -888,6 +973,102 @@ async def update_settings(payload: SettingsIn, request: Request):
     return s
 
 
+# ----- Admin: Contact support -----
+@api.get("/admin/support")
+async def list_support_tickets(
+    request: Request,
+    status: Optional[str] = Query(default=None),
+    priority: Optional[str] = Query(default=None),
+    category: Optional[str] = Query(default=None),
+    q: Optional[str] = Query(default=None, max_length=120),
+):
+    await require_admin(request, db)
+    query: dict = {}
+    if status and status != "all":
+        query["status"] = status
+    if priority and priority != "all":
+        query["priority"] = priority
+    if category and category != "all":
+        query["category"] = category
+    if q:
+        needle = q.strip()
+        if needle:
+            pattern = re.escape(needle)
+            query["$or"] = [
+                {"public_id": {"$regex": pattern, "$options": "i"}},
+                {"name": {"$regex": pattern, "$options": "i"}},
+                {"email": {"$regex": pattern, "$options": "i"}},
+                {"subject": {"$regex": pattern, "$options": "i"}},
+                {"message": {"$regex": pattern, "$options": "i"}},
+            ]
+
+    tickets = await db.support_tickets.find(query, {"_id": 0, "ip_hash": 0}).sort("created_at", -1).to_list(500)
+    summary = {
+        "total": await db.support_tickets.count_documents({}),
+        "new": await db.support_tickets.count_documents({"status": "new"}),
+        "open": await db.support_tickets.count_documents({"status": {"$in": ["new", "open", "waiting"]}}),
+        "resolved": await db.support_tickets.count_documents({"status": {"$in": ["resolved", "closed"]}}),
+        "urgent": await db.support_tickets.count_documents({"priority": "urgent"}),
+        "high": await db.support_tickets.count_documents({"priority": "high"}),
+    }
+    return {"items": tickets, "summary": summary}
+
+
+@api.get("/admin/support/{ticket_id}")
+async def get_support_ticket(ticket_id: str, request: Request):
+    await require_admin(request, db)
+    ticket = await db.support_tickets.find_one(
+        {"$or": [{"id": ticket_id}, {"public_id": ticket_id}]},
+        {"_id": 0, "ip_hash": 0},
+    )
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Support ticket not found")
+    return ticket
+
+
+@api.patch("/admin/support/{ticket_id}")
+async def update_support_ticket(ticket_id: str, payload: SupportTicketUpdateIn, request: Request):
+    admin = await require_admin(request, db)
+    current = await db.support_tickets.find_one({"$or": [{"id": ticket_id}, {"public_id": ticket_id}]})
+    if not current:
+        raise HTTPException(status_code=404, detail="Support ticket not found")
+
+    incoming = payload.model_dump()
+    update = {k: v for k, v in incoming.items() if v is not None}
+    if not update:
+        raise HTTPException(status_code=400, detail="No changes provided")
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    update["updated_at"] = now_iso
+    if update.get("status") in {"resolved", "closed"}:
+        update["resolved_at"] = now_iso
+    elif update.get("status") in {"new", "open", "waiting"}:
+        update["resolved_at"] = None
+
+    changes = {
+        key: {"from": current.get(key), "to": value}
+        for key, value in update.items()
+        if key != "updated_at" and current.get(key) != value
+    }
+    if not changes:
+        ticket = _support_public_doc(current)
+        return ticket
+
+    history_entry = {
+        "at": now_iso,
+        "actor": admin.get("email") or admin.get("id") or "admin",
+        "action": "updated",
+        "changes": changes,
+    }
+    ticket = await db.support_tickets.find_one_and_update(
+        {"id": current["id"]},
+        {"$set": update, "$push": {"history": history_entry}},
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0, "ip_hash": 0},
+    )
+    return ticket
+
+
 # ----- Admin: Reports / CSV export -----
 @api.get("/admin/export/{kind}")
 async def export_csv(kind: str, request: Request):
@@ -917,6 +1098,22 @@ async def export_csv(kind: str, request: Request):
         reports = await db.reports.find({}, {"_id": 0}).to_list(2000)
         for r in reports:
             writer.writerow([r.get("id"), r.get("type"), r.get("target"), r.get("reporter"), r.get("reason"), r.get("status"), r.get("created_at")])
+    elif kind == "support":
+        writer.writerow(["public_id", "name", "email", "category", "subject", "status", "priority", "assigned_to", "created_at", "updated_at"])
+        tickets = await db.support_tickets.find({}, {"_id": 0, "ip_hash": 0, "message": 0, "history": 0}).sort("created_at", -1).to_list(5000)
+        for t in tickets:
+            writer.writerow([
+                t.get("public_id"),
+                t.get("name"),
+                t.get("email"),
+                t.get("category"),
+                t.get("subject"),
+                t.get("status"),
+                t.get("priority"),
+                t.get("assigned_to"),
+                t.get("created_at"),
+                t.get("updated_at"),
+            ])
     elif kind == "activity":
         writer.writerow(["user_id", "name", "email", "last_active"])
         users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("last_active", -1).to_list(2000)
@@ -979,6 +1176,13 @@ async def on_startup():
     await db.website_pageviews.create_index("expires_at", expireAfterSeconds=0)
     await db.rate_limits.create_index("key", unique=True)
     await db.rate_limits.create_index("expires_at", expireAfterSeconds=0)
+    await db.support_tickets.create_index("id", unique=True)
+    await db.support_tickets.create_index("public_id", unique=True)
+    await db.support_tickets.create_index("email")
+    await db.support_tickets.create_index("status")
+    await db.support_tickets.create_index("priority")
+    await db.support_tickets.create_index("category")
+    await db.support_tickets.create_index("created_at")
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD")

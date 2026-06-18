@@ -276,6 +276,68 @@ class TestNotifications:
         assert d["recipients"] >= 1
 
 
+# ---- Contact support ----
+class TestSupportTickets:
+    def test_public_contact_creates_ticket(self, admin_token):
+        email = f"support_{uuid.uuid4().hex[:8]}@ghostel.app"
+        payload = {
+            "name": "Support Test",
+            "email": email,
+            "category": "technical",
+            "app_platform": "web",
+            "app_version": "test",
+            "subject": "Test support ticket",
+            "message": "This is an automated support ticket created by the API test suite.",
+        }
+        created = requests.post(f"{API}/contact", json=payload)
+        assert created.status_code == 200, created.text
+        ticket_id = created.json()["ticket_id"]
+        assert ticket_id.startswith("GST-")
+
+        listed = requests.get(
+            f"{API}/admin/support",
+            params={"q": ticket_id},
+            headers=admin_headers(admin_token),
+        )
+        assert listed.status_code == 200, listed.text
+        items = listed.json()["items"]
+        assert items and items[0]["public_id"] == ticket_id
+        assert items[0]["email"] == email
+
+    def test_support_update(self, admin_token):
+        email = f"support_update_{uuid.uuid4().hex[:8]}@ghostel.app"
+        created = requests.post(
+            f"{API}/contact",
+            json={
+                "name": "Support Update Test",
+                "email": email,
+                "category": "account",
+                "app_platform": "android",
+                "subject": "Update support ticket",
+                "message": "This ticket is used to verify admin status updates and notes.",
+            },
+        )
+        assert created.status_code == 200, created.text
+        ticket_id = created.json()["ticket_id"]
+
+        updated = requests.patch(
+            f"{API}/admin/support/{ticket_id}",
+            json={"status": "open", "priority": "high", "assigned_to": "qa", "admin_note": "checked"},
+            headers=admin_headers(admin_token),
+        )
+        assert updated.status_code == 200, updated.text
+        data = updated.json()
+        assert data["status"] == "open"
+        assert data["priority"] == "high"
+        assert data["assigned_to"] == "qa"
+        assert data["admin_note"] == "checked"
+        assert data["history"]
+
+    def test_support_requires_admin(self):
+        r = requests.get(f"{API}/admin/support")
+        assert r.status_code == 401
+
+
 # ---- Admin: Settings ----
 class TestSettings:
     def test_get_settings(self, admin_token):
@@ -295,7 +357,7 @@ class TestSettings:
 
 # ---- Admin: CSV export ----
 class TestCSVExport:
-    @pytest.mark.parametrize("kind", ["users", "groups", "reports", "activity"])
+    @pytest.mark.parametrize("kind", ["users", "groups", "reports", "activity", "support"])
     def test_export_with_bearer(self, admin_token, kind):
         r = requests.get(f"{API}/admin/export/{kind}", headers=admin_headers(admin_token))
         assert r.status_code == 200, r.text

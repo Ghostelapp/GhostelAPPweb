@@ -54,7 +54,7 @@ export default function Footer() {
             </div>
             <ul className="space-y-3 text-sm">
               <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
-              <li><a href="mailto:support@ghostel.app" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</a></li>
+              <li><Link to="/contact" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</Link></li>
               <li><a href={apkUrl} data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")} Android{version ? ` v${version}` : ""}</a></li>
             </ul>
           </div>
