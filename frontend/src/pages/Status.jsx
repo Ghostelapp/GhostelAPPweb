@@ -1,57 +1,72 @@
 import { useEffect, useState } from "react";
-import { Activity, CheckCircle2, AlertTriangle, RefreshCcw } from "lucide-react";
+import { Activity, CheckCircle2, AlertTriangle, RefreshCcw, Clock3 } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
-import { GHOSTEL_MOBILE_API_URL, GHOSTEL_PANEL_API_URL } from "@/lib/constants";
+import { GHOSTEL_PANEL_API_URL } from "@/lib/constants";
 
-const services = [
-  { key: "website", name: "ghostel.app website", url: "https://ghostel.app", type: "head" },
-  { key: "app_api", name: "Mobile app API", url: `${GHOSTEL_MOBILE_API_URL}/api/`, type: "json" },
-  { key: "panel_api", name: "Website panel API", url: `${GHOSTEL_PANEL_API_URL}/api/`, type: "json" },
-];
+const statusCopy = {
+  operational: {
+    label: "All checked services operational",
+    className: "border-emerald-400/20 bg-emerald-400/10",
+    icon: "text-emerald-300",
+  },
+  degraded: {
+    label: "Some services need attention",
+    className: "border-amber-400/20 bg-amber-400/10",
+    icon: "text-amber-300",
+  },
+  outage: {
+    label: "Major service outage",
+    className: "border-red-400/20 bg-red-400/10",
+    icon: "text-red-300",
+  },
+};
 
-async function checkService(service) {
-  const started = performance.now();
-  const response = await fetch(service.url, {
-    method: service.type === "head" ? "HEAD" : "GET",
-    cache: "no-store",
-  });
-  return {
-    ...service,
-    ok: response.ok,
-    status: response.status,
-    latency: Math.round(performance.now() - started),
-  };
+function formatTime(value) {
+  if (!value) return "No check yet";
+  try {
+    return new Date(value).toLocaleString();
+  } catch {
+    return String(value);
+  }
 }
 
 export default function Status() {
-  const [rows, setRows] = useState([]);
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [checkedAt, setCheckedAt] = useState(null);
+  const [error, setError] = useState("");
 
   const load = async () => {
     setLoading(true);
-    const results = await Promise.all(
-      services.map((service) =>
-        checkService(service).catch((error) => ({
-          ...service,
-          ok: false,
-          status: "error",
-          latency: null,
-          error: error?.message || "Unavailable",
-        }))
-      )
-    );
-    setRows(results);
-    setCheckedAt(new Date());
-    setLoading(false);
+    setError("");
+    try {
+      const response = await fetch(`${GHOSTEL_PANEL_API_URL}/api/status`, {
+        cache: "no-store",
+        headers: { Accept: "application/json" },
+      });
+      if (!response.ok) throw new Error(`Status API returned HTTP ${response.status}`);
+      setData(await response.json());
+    } catch (err) {
+      setError(err?.message || "Status API unavailable");
+      setData({
+        overall_status: "degraded",
+        generated_at: new Date().toISOString(),
+        services: [],
+        incidents: [],
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     load();
   }, []);
 
-  const allOk = rows.length > 0 && rows.every((row) => row.ok);
+  const overall = data?.overall_status || "degraded";
+  const copy = statusCopy[overall] || statusCopy.degraded;
+  const services = data?.services || [];
+  const incidents = data?.incidents || [];
 
   return (
     <div className="min-h-screen bg-[#070a0f] text-white">
@@ -66,20 +81,24 @@ export default function Status() {
             Ghostel service status
           </h1>
           <p className="mt-4 max-w-2xl text-zinc-400">
-            Live check for the public website, mobile API and website admin API.
+            Server-side status for the public website, mobile API and website panel API.
           </p>
         </div>
 
-        <div className={`mb-6 rounded-3xl border p-6 ${allOk ? "border-emerald-400/20 bg-emerald-400/10" : "border-amber-400/20 bg-amber-400/10"}`}>
+        <div className={`mb-6 rounded-3xl border p-6 ${copy.className}`}>
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-3">
-              {allOk ? <CheckCircle2 className="h-7 w-7 text-emerald-300" /> : <AlertTriangle className="h-7 w-7 text-amber-300" />}
+              {overall === "operational" ? (
+                <CheckCircle2 className={`h-7 w-7 ${copy.icon}`} />
+              ) : (
+                <AlertTriangle className={`h-7 w-7 ${copy.icon}`} />
+              )}
               <div>
                 <div className="font-display text-2xl font-bold">
-                  {loading ? "Checking services..." : allOk ? "All checked services operational" : "Some services need attention"}
+                  {loading ? "Checking services..." : copy.label}
                 </div>
                 <div className="text-sm text-zinc-400">
-                  {checkedAt ? `Last checked: ${checkedAt.toLocaleString()}` : "No check yet"}
+                  Last checked: {formatTime(data?.generated_at)}
                 </div>
               </div>
             </div>
@@ -93,10 +112,11 @@ export default function Status() {
               Refresh
             </button>
           </div>
+          {error && <div className="mt-4 rounded-xl border border-red-400/20 bg-red-400/10 p-3 text-sm text-red-200">{error}</div>}
         </div>
 
         <div className="grid gap-4">
-          {rows.map((row) => (
+          {services.map((row) => (
             <div key={row.key} className="glass rounded-2xl p-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
@@ -110,9 +130,9 @@ export default function Status() {
                   <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400">
                     HTTP {row.status}
                   </span>
-                  {row.latency != null && (
+                  {row.latency_ms != null && (
                     <span className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400">
-                      {row.latency} ms
+                      {row.latency_ms} ms
                     </span>
                   )}
                 </div>
@@ -121,6 +141,33 @@ export default function Status() {
             </div>
           ))}
         </div>
+
+        <section className="mt-8 rounded-3xl border border-white/10 bg-white/[0.03] p-6">
+          <div className="mb-4 flex items-center gap-2">
+            <Clock3 className="h-5 w-5 text-cyan-300" />
+            <h2 className="font-display text-2xl font-bold">Incident history</h2>
+          </div>
+          {incidents.length === 0 ? (
+            <p className="text-sm text-zinc-400">No public incidents reported.</p>
+          ) : (
+            <div className="space-y-3">
+              {incidents.map((incident) => (
+                <div key={incident.id || incident.title} className="rounded-2xl border border-white/10 p-4">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="font-semibold text-white">{incident.title}</div>
+                    <div className="text-xs text-zinc-500">{formatTime(incident.updated_at)}</div>
+                  </div>
+                  {incident.message && <p className="mt-2 text-sm text-zinc-400">{incident.message}</p>}
+                  {incident.status && (
+                    <span className="mt-3 inline-flex rounded-full border border-white/10 px-3 py-1 text-xs uppercase tracking-[0.12em] text-zinc-400">
+                      {incident.status}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
       </main>
       <Footer />
     </div>

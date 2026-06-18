@@ -1,6 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { API } from "@/lib/api";
+import { ANALYTICS_CONSENT_EVENT, getAnalyticsConsent } from "@/lib/privacy";
 
 const VISITOR_KEY = "ghostel-website-visitor";
 const SESSION_KEY = "ghostel-website-session";
@@ -48,21 +49,36 @@ function sendEvent(event, path) {
 export default function WebsiteAnalytics() {
   const location = useLocation();
   const path = location.pathname;
+  const [consent, setConsent] = useState(() => getAnalyticsConsent());
 
   useEffect(() => {
-    if (!path.startsWith("/admin")) {
+    const update = () => setConsent(getAnalyticsConsent());
+    window.addEventListener(ANALYTICS_CONSENT_EVENT, update);
+    window.addEventListener("storage", update);
+    return () => {
+      window.removeEventListener(ANALYTICS_CONSENT_EVENT, update);
+      window.removeEventListener("storage", update);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (consent === "accepted" && !path.startsWith("/admin")) {
       sendEvent("pageview", path);
     }
-  }, [path]);
+  }, [path, consent]);
 
   useEffect(() => {
     const heartbeat = window.setInterval(() => {
-      if (document.visibilityState === "visible" && !path.startsWith("/admin")) {
+      if (
+        consent === "accepted" &&
+        document.visibilityState === "visible" &&
+        !path.startsWith("/admin")
+      ) {
         sendEvent("heartbeat", path);
       }
     }, 60_000);
     return () => window.clearInterval(heartbeat);
-  }, [path]);
+  }, [path, consent]);
 
   return null;
 }

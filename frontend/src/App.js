@@ -26,6 +26,65 @@ import Reports from "@/pages/admin/Reports";
 import NoAccess from "@/pages/NoAccess";
 import WebsiteAnalytics from "@/components/WebsiteAnalytics";
 import FloatingSupport from "@/components/FloatingSupport";
+import PrivacyConsent from "@/components/PrivacyConsent";
+import Seo from "@/components/Seo";
+
+const seo = {
+  home: {
+    title: "ghostel.app | Private encrypted messaging",
+    description:
+      "Private encrypted conversations, voice calls, push notifications and secure contact management in one app.",
+    path: "/",
+  },
+  privacy: {
+    title: "Privacy policy | ghostel.app",
+    description:
+      "How ghostel.app processes account, device, support and website analytics data.",
+    path: "/privacy",
+  },
+  deleteAccount: {
+    title: "Delete account | ghostel.app",
+    description:
+      "Instructions for deleting your ghostel.app account and related private data.",
+    path: "/delete-account",
+  },
+  terms: {
+    title: "Terms | ghostel.app",
+    description: "Terms and service rules for ghostel.app.",
+    path: "/terms",
+  },
+  contact: {
+    title: "Contact support | ghostel.app",
+    description:
+      "Contact Ghostel support for account, technical, security or feedback issues.",
+    path: "/contact",
+  },
+  status: {
+    title: "System status | ghostel.app",
+    description: "Live status for the Ghostel website, mobile API and panel API.",
+    path: "/status",
+  },
+  updates: {
+    title: "Build changelog | ghostel.app",
+    description: "Public changelog for Ghostel Android, iOS, website and admin panel builds.",
+    path: "/updates",
+  },
+  noindex: {
+    title: "ghostel.app",
+    description: "ghostel.app private area.",
+    path: "/",
+    robots: "noindex, nofollow",
+  },
+};
+
+function Page({ meta, children }) {
+  return (
+    <>
+      <Seo {...meta} />
+      {children}
+    </>
+  );
+}
 
 function AdminGuard({ children }) {
   const { user, loading } = useAuth();
@@ -49,6 +108,7 @@ function App() {
           <BrowserRouter>
             <WebsiteAnalytics />
             <FloatingSupport />
+            <PrivacyConsent />
             <Toaster
               position="top-right"
               theme="dark"
@@ -62,22 +122,24 @@ function App() {
               }}
             />
             <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/privacy" element={<Privacy />} />
-              <Route path="/delete-account" element={<DeleteAccount />} />
-              <Route path="/terms" element={<Terms />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/status" element={<Status />} />
-              <Route path="/updates" element={<Changelog />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/account" element={<Account />} />
+              <Route path="/" element={<Page meta={seo.home}><Landing /></Page>} />
+              <Route path="/privacy" element={<Page meta={seo.privacy}><Privacy /></Page>} />
+              <Route path="/delete-account" element={<Page meta={seo.deleteAccount}><DeleteAccount /></Page>} />
+              <Route path="/terms" element={<Page meta={seo.terms}><Terms /></Page>} />
+              <Route path="/contact" element={<Page meta={seo.contact}><Contact /></Page>} />
+              <Route path="/status" element={<Page meta={seo.status}><Status /></Page>} />
+              <Route path="/updates" element={<Page meta={seo.updates}><Changelog /></Page>} />
+              <Route path="/login" element={<Page meta={seo.noindex}><Login /></Page>} />
+              <Route path="/register" element={<Page meta={seo.noindex}><Register /></Page>} />
+              <Route path="/account" element={<Page meta={seo.noindex}><Account /></Page>} />
               <Route
                 path="/admin"
                 element={
-                  <AdminGuard>
-                    <AdminLayout />
-                  </AdminGuard>
+                  <Page meta={seo.noindex}>
+                    <AdminGuard>
+                      <AdminLayout />
+                    </AdminGuard>
+                  </Page>
                 }
               >
                 <Route index element={<Dashboard />} />

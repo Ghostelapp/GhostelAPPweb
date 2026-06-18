@@ -3,10 +3,108 @@ import Footer from "@/components/landing/Footer";
 import { useLang } from "@/context/LanguageContext";
 import BrandMark from "@/components/BrandMark";
 
+const sections = {
+  pl: {
+    title: "Polityka prywatnosci",
+    intro:
+      "Ta strona opisuje podstawowe zasady przetwarzania danych w aplikacji i serwisie ghostel.app.",
+    dataTitle: "Jakie dane przetwarzamy",
+    data:
+      "ghostel.app moze przetwarzac dane konta, takie jak adres e-mail, nazwa uzytkownika, nazwa wyswietlana, avatar, status, kontakty, zaproszenia, ustawienia profilu, tokeny push oraz metadane rozmow i polaczen.",
+    purposeTitle: "Cel przetwarzania",
+    purpose:
+      "Dane sa wykorzystywane do dzialania konta, logowania, kontaktow, wiadomosci, polaczen glosowych, powiadomien push, ustawien bezpieczenstwa, eksportu danych i obslugi uslugi.",
+    analyticsTitle: "Statystyki strony",
+    analytics:
+      "Strona moze zbierac techniczne statystyki, takie jak odslony, odwiedzane podstrony, przyblizony kraj, typ urzadzenia, przegladarka, zrodlo wejscia i czas aktywnosci. Nie zapisujemy pelnego adresu IP.",
+    consent:
+      "Statystyki strony sa wysylane dopiero po akceptacji komunikatu prywatnosci. Wybor jest zapisywany lokalnie w przegladarce i moze zostac usuniety przez wyczyszczenie danych strony.",
+    permissionsTitle: "Uprawnienia aplikacji",
+    permissions: [
+      "Mikrofon: rozmowy glosowe i wiadomosci audio.",
+      "Aparat i zdjecia: avatar oraz obrazy w rozmowach.",
+      "Powiadomienia: wiadomosci i polaczenia przychodzace.",
+      "Full-screen intent: ekran polaczenia przychodzacego.",
+    ],
+    deleteTitle: "Eksport i usuwanie danych",
+    delete:
+      "W profilu aplikacji uzytkownik moze pobrac swoje dane oraz trwale usunac konto. Usuniecie konta usuwa profil, kontakty, zaproszenia, tokeny push i dane prywatne, a wiadomosci wyslane do innych osob moga zostac zanonimizowane.",
+    contactTitle: "Kontakt",
+    contact:
+      "W sprawach prywatnosci, bezpieczenstwa i danych konta skontaktuj sie przez formularz supportu albo napisz na support@ghostel.app.",
+  },
+  en: {
+    title: "Privacy policy",
+    intro:
+      "This page describes the basic data processing rules for the ghostel.app app and website.",
+    dataTitle: "Data we process",
+    data:
+      "ghostel.app may process account data such as email address, username, display name, avatar, status, contacts, invitations, profile settings, push tokens and message or call metadata.",
+    purposeTitle: "Purpose of processing",
+    purpose:
+      "Data is used to operate accounts, sign-in, contacts, messages, voice calls, push notifications, security settings, data export and service maintenance.",
+    analyticsTitle: "Website analytics",
+    analytics:
+      "The website may collect technical statistics such as page views, visited pages, approximate country, device type, browser, traffic source and activity duration. Full IP addresses are not stored.",
+    consent:
+      "Website analytics are sent only after accepting the privacy notice. The choice is stored locally in the browser and can be removed by clearing site data.",
+    permissionsTitle: "App permissions",
+    permissions: [
+      "Microphone: voice calls and audio messages.",
+      "Camera and photos: avatar and images in conversations.",
+      "Notifications: messages and incoming calls.",
+      "Full-screen intent: incoming call screen.",
+    ],
+    deleteTitle: "Data export and deletion",
+    delete:
+      "The app profile lets users export their data and permanently delete the account. Account deletion removes profile, contacts, invitations, push tokens and private data, while messages sent to other users may be anonymized.",
+    contactTitle: "Contact",
+    contact:
+      "For privacy, security and account data matters, contact support through the form or email support@ghostel.app.",
+  },
+  de: {
+    title: "Datenschutzerklaerung",
+    intro:
+      "Diese Seite beschreibt die grundlegenden Regeln der Datenverarbeitung in der ghostel.app App und Website.",
+    dataTitle: "Verarbeitete Daten",
+    data:
+      "ghostel.app kann Kontodaten wie E-Mail-Adresse, Benutzername, Anzeigename, Avatar, Status, Kontakte, Einladungen, Profileinstellungen, Push-Tokens sowie Nachrichten- und Anrufmetadaten verarbeiten.",
+    purposeTitle: "Zweck der Verarbeitung",
+    purpose:
+      "Daten werden fuer Konten, Anmeldung, Kontakte, Nachrichten, Sprachanrufe, Push-Benachrichtigungen, Sicherheitseinstellungen, Datenexport und Betrieb des Dienstes verwendet.",
+    analyticsTitle: "Website-Statistiken",
+    analytics:
+      "Die Website kann technische Statistiken wie Seitenaufrufe, besuchte Seiten, ungefaehres Land, Geraetetyp, Browser, Zugriffsquelle und Aktivitaetsdauer erfassen. Vollstaendige IP-Adressen werden nicht gespeichert.",
+    consent:
+      "Website-Statistiken werden erst nach Zustimmung im Datenschutzhinweis gesendet. Die Auswahl wird lokal im Browser gespeichert und kann durch Loeschen der Website-Daten entfernt werden.",
+    permissionsTitle: "App-Berechtigungen",
+    permissions: [
+      "Mikrofon: Sprachanrufe und Audionachrichten.",
+      "Kamera und Fotos: Avatar und Bilder in Unterhaltungen.",
+      "Benachrichtigungen: Nachrichten und eingehende Anrufe.",
+      "Vollbildanzeige: Bildschirm fuer eingehende Anrufe.",
+    ],
+    deleteTitle: "Datenexport und Loeschung",
+    delete:
+      "Im App-Profil koennen Benutzer ihre Daten exportieren und das Konto dauerhaft loeschen. Dabei werden Profil, Kontakte, Einladungen, Push-Tokens und private Daten entfernt.",
+    contactTitle: "Kontakt",
+    contact:
+      "Bei Fragen zu Datenschutz, Sicherheit und Kontodaten kontaktiere den Support ueber das Formular oder schreibe an support@ghostel.app.",
+  },
+};
+
+function PolicySection({ title, children }) {
+  return (
+    <section className="surface rounded-2xl p-7">
+      <h2 className="font-display text-xl font-bold text-white mb-3">{title}</h2>
+      {children}
+    </section>
+  );
+}
+
 export default function Privacy() {
   const { lang } = useLang();
-  const isPl = lang === "pl";
-  const isDe = lang === "de";
+  const text = sections[lang] || sections.en;
 
   return (
     <div className="min-h-screen bg-zinc-950 text-white">
@@ -16,83 +114,39 @@ export default function Privacy() {
           <BrandMark className="text-xs" />
         </p>
         <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-tight mb-5">
-          {isPl ? "Polityka prywatności" : isDe ? "Datenschutzerklärung" : "Privacy policy"}
+          {text.title}
         </h1>
-        <p className="text-zinc-400 leading-relaxed mb-12">
-          {isPl
-            ? "Ta strona opisuje podstawowe zasady przetwarzania danych w aplikacji ghostel.app. Przed publikacją uzupełnij ją o oficjalne dane operatora, adres kontaktowy i docelową domenę usługi."
-            : isDe ? "Diese Seite beschreibt die grundlegenden Regeln der Datenverarbeitung in ghostel.app. Ergänze sie vor der Veröffentlichung um offizielle Betreiber- und Kontaktangaben." : "This page describes the basic data processing rules for the ghostel.app app. Before publication, complete it with the official operator details, contact address and production service domain."}
-        </p>
+        <p className="text-zinc-400 leading-relaxed mb-12">{text.intro}</p>
 
         <div className="space-y-10 text-zinc-300 leading-relaxed">
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Jakie dane przetwarzamy" : isDe ? "Verarbeitete Daten" : "Data we process"}
-            </h2>
-            <p>
-              {isPl
-                ? "ghostel.app może przetwarzać dane konta, takie jak adres e-mail, nazwa użytkownika, nazwa wyświetlana, avatar, status, kontakty, zaproszenia, ustawienia profilu, tokeny push oraz metadane rozmów i połączeń."
-                : isDe ? "ghostel.app kann Kontodaten wie E-Mail-Adresse, Benutzername, Anzeigename, Avatar, Status, Kontakte, Einladungen, Profileinstellungen, Push-Tokens sowie Nachrichten- und Anrufmetadaten verarbeiten." : "ghostel.app may process account data such as email address, username, display name, avatar, status, contacts, invitations, profile settings, push tokens and message or call metadata."}
-            </p>
-          </section>
+          <PolicySection title={text.dataTitle}>
+            <p>{text.data}</p>
+          </PolicySection>
 
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Cel przetwarzania" : isDe ? "Zweck der Verarbeitung" : "Purpose of processing"}
-            </h2>
-            <p>
-              {isPl
-                ? "Dane są wykorzystywane do działania konta, logowania, kontaktów, wiadomości, połączeń głosowych, powiadomień push, ustawień bezpieczeństwa, eksportu danych i obsługi usługi."
-                : isDe ? "Daten werden für Konten, Anmeldung, Kontakte, Nachrichten, Sprachanrufe, Push-Benachrichtigungen, Sicherheitseinstellungen, Datenexport und Betrieb des Dienstes verwendet." : "Data is used to operate accounts, sign-in, contacts, messages, voice calls, push notifications, security settings, data export and service maintenance."}
-            </p>
-          </section>
+          <PolicySection title={text.purposeTitle}>
+            <p>{text.purpose}</p>
+          </PolicySection>
 
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Anonimowe statystyki strony" : isDe ? "Anonyme Website-Statistiken" : "Anonymous website analytics"}
-            </h2>
-            <p>
-              {isPl
-                ? "Strona zbiera anonimowe statystyki techniczne, takie jak odsłony, odwiedzane podstrony, przybliżony kraj, typ urządzenia, przeglądarka, źródło wejścia i czas aktywności. Statystyki nie zapisują pełnego adresu IP."
-                : isDe
-                ? "Die Website erfasst anonyme technische Statistiken wie Seitenaufrufe, besuchte Seiten, ungefähres Land, Gerätetyp, Browser, Zugriffsquelle und Aktivitätsdauer. Vollständige IP-Adressen werden nicht gespeichert."
-                : "The website collects anonymous technical statistics such as page views, visited pages, approximate country, device type, browser, traffic source and activity duration. Full IP addresses are not stored."}
-            </p>
-          </section>
+          <PolicySection title={text.analyticsTitle}>
+            <p>{text.analytics}</p>
+            <p className="mt-3">{text.consent}</p>
+          </PolicySection>
 
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Uprawnienia aplikacji" : isDe ? "App-Berechtigungen" : "App permissions"}
-            </h2>
+          <PolicySection title={text.permissionsTitle}>
             <ul className="list-disc pl-5 space-y-2">
-              <li>{isPl ? "Mikrofon: rozmowy głosowe i wiadomości audio." : isDe ? "Mikrofon: Sprachanrufe und Audionachrichten." : "Microphone: voice calls and audio messages."}</li>
-              <li>{isPl ? "Aparat i zdjęcia: avatar oraz obrazy w rozmowach." : isDe ? "Kamera und Fotos: Avatar und Bilder in Unterhaltungen." : "Camera and photos: avatar and images in conversations."}</li>
-              <li>{isPl ? "Powiadomienia: wiadomości i połączenia przychodzące." : isDe ? "Benachrichtigungen: Nachrichten und eingehende Anrufe." : "Notifications: messages and incoming calls."}</li>
-              <li>{isPl ? "Full-screen intent: ekran połączenia przychodzącego." : isDe ? "Vollbildanzeige: Bildschirm für eingehende Anrufe." : "Full-screen intent: incoming call screen."}</li>
+              {text.permissions.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
             </ul>
-          </section>
+          </PolicySection>
 
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Eksport i usuwanie danych" : isDe ? "Datenexport und Löschung" : "Data export and deletion"}
-            </h2>
-            <p>
-              {isPl
-                ? "W profilu aplikacji użytkownik może pobrać swoje dane oraz trwale usunąć konto. Usunięcie konta usuwa profil, kontakty, zaproszenia, tokeny push i dane prywatne, a wiadomości wysłane do innych osób mogą zostać zanonimizowane."
-                : isDe ? "Im App-Profil können Benutzer ihre Daten exportieren und das Konto dauerhaft löschen. Dabei werden Profil, Kontakte, Einladungen, Push-Tokens und private Daten entfernt." : "The app profile lets users export their data and permanently delete the account. Account deletion removes profile, contacts, invitations, push tokens and private data, while messages sent to other users may be anonymized."}
-            </p>
-          </section>
+          <PolicySection title={text.deleteTitle}>
+            <p>{text.delete}</p>
+          </PolicySection>
 
-          <section className="surface rounded-2xl p-7">
-            <h2 className="font-display text-xl font-bold text-white mb-3">
-              {isPl ? "Kontakt" : isDe ? "Kontakt" : "Contact"}
-            </h2>
-            <p>
-              {isPl
-                ? "Przed publikacją wpisz tutaj oficjalny adres e-mail operatora aplikacji ghostel.app."
-                : isDe ? "Füge hier vor der Veröffentlichung die offizielle Kontaktadresse des ghostel.app-Betreibers ein." : "Before publication, add the official contact email for the ghostel.app app operator here."}
-            </p>
-          </section>
+          <PolicySection title={text.contactTitle}>
+            <p>{text.contact}</p>
+          </PolicySection>
         </div>
       </main>
       <Footer />

@@ -1,0 +1,25 @@
+{
+  "short_name": "Ghostel",
+  "name": "ghostel.app",
+  "description": "Private messaging, voice calls and secure contact management.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#070a0f",
+  "theme_color": "#0a0e14",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/logo192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

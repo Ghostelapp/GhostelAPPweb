@@ -13,6 +13,8 @@ import csv
 import httpx
 import hashlib
 import re
+import asyncio
+import time
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Literal
@@ -306,6 +308,78 @@ def _support_public_doc(doc: dict) -> dict:
     return doc
 
 
+async def _check_status_service(client: httpx.AsyncClient, service: dict) -> dict:
+    started = time.perf_counter()
+    try:
+        response = await client.request(service["method"], service["url"])
+        latency_ms = round((time.perf_counter() - started) * 1000)
+        return {
+            "key": service["key"],
+            "name": service["name"],
+            "url": service["url"],
+            "ok": response.status_code < 400,
+            "status": response.status_code,
+            "latency_ms": latency_ms,
+        }
+    except Exception as exc:
+        latency_ms = round((time.perf_counter() - started) * 1000)
+        return {
+            "key": service["key"],
+            "name": service["name"],
+            "url": service["url"],
+            "ok": False,
+            "status": "error",
+            "latency_ms": latency_ms,
+            "error": str(exc),
+        }
+
+
+async def _public_service_status() -> dict:
+    services = [
+        {
+            "key": "website",
+            "name": "ghostel.app website",
+            "url": os.environ.get("PUBLIC_WEBSITE_URL", "https://ghostel.app"),
+            "method": "HEAD",
+        },
+        {
+            "key": "mobile_api",
+            "name": "Mobile app API",
+            "url": os.environ.get("GHOSTEL_MOBILE_API_URL", "https://api.ghostel.app/api/"),
+            "method": "GET",
+        },
+        {
+            "key": "panel_api",
+            "name": "Website panel API",
+            "url": os.environ.get("PANEL_API_URL", "https://panel-api.ghostel.app/api/"),
+            "method": "GET",
+        },
+    ]
+    async with httpx.AsyncClient(timeout=5.0, follow_redirects=True) as http_client:
+        rows = await asyncio.gather(
+            *[_check_status_service(http_client, service) for service in services]
+        )
+
+    if all(row["ok"] for row in rows):
+        overall = "operational"
+    elif any(row["ok"] for row in rows):
+        overall = "degraded"
+    else:
+        overall = "outage"
+
+    incidents = await db.status_incidents.find(
+        {"public": {"$ne": False}},
+        {"_id": 0},
+    ).sort("updated_at", -1).limit(10).to_list(10)
+
+    return {
+        "overall_status": overall,
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "services": rows,
+        "incidents": incidents,
+    }
+
+
 async def _website_analytics() -> dict:
     now = datetime.now(timezone.utc)
     today = now.strftime("%Y-%m-%d")
@@ -498,6 +572,11 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
     }
     await db.support_tickets.insert_one(doc)
     return {"ok": True, "ticket_id": public_id, "status": "new"}
+
+
+@api.get("/status")
+async def public_status():
+    return await _public_service_status()
 
 
 # ----- Auth -----
@@ -1139,7 +1218,13 @@ _extra_origins = [
     for origin in os.environ.get("ADDITIONAL_CORS_ORIGINS", "").split(",")
     if origin.strip()
 ]
-_origins = list({_frontend, "http://localhost:3000", *_extra_origins})
+_origins = list({
+    _frontend,
+    "http://localhost:3000",
+    "https://ghostel.app",
+    "https://www.ghostel.app",
+    *_extra_origins,
+})
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
@@ -1183,6 +1268,8 @@ async def on_startup():
     await db.support_tickets.create_index("priority")
     await db.support_tickets.create_index("category")
     await db.support_tickets.create_index("created_at")
+    await db.status_incidents.create_index("updated_at")
+    await db.status_incidents.create_index("public")
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD")
