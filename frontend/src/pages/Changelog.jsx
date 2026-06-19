@@ -6,6 +6,17 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
+    date: "2026-06-19",
+    title: "Lock-screen call continuity",
+    items: [
+      "Fixed incoming calls disappearing after unlocking the phone.",
+      "Prevented duplicate Android full-screen call intents and ringtone restarts.",
+      "Restored pending calls only while they remain active on the server.",
+      "Published matching Android and iOS build numbers for version 1.4.18.",
+    ],
+  },
+  {
+    version: "1.4.17",
     date: "2026-06-18",
     title: "Support, diagnostics and device controls",
     items: [
