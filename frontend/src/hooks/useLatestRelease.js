@@ -21,10 +21,14 @@ function normalizeRelease(release) {
   const assets = Array.isArray(release?.assets) ? release.assets : [];
   const findAsset = (name) =>
     assets.find((asset) => asset?.name === name)?.browser_download_url;
+  const releaseVersion = String(release?.tag_name || "").replace(/^v/i, "");
+  const matchesCurrentAndroid = releaseVersion === GHOSTEL_ANDROID_VERSION;
 
   return {
     version: GHOSTEL_ANDROID_VERSION,
-    apkUrl: findAsset(GHOSTEL_APK_ASSET_NAME) || GHOSTEL_APK_URL,
+    apkUrl:
+      (matchesCurrentAndroid && findAsset(GHOSTEL_APK_ASSET_NAME)) ||
+      GHOSTEL_APK_URL,
     desktopUrl:
       findAsset(GHOSTEL_DESKTOP_ASSET_NAME) || GHOSTEL_DESKTOP_URL,
   };
@@ -81,3 +85,4 @@ export function useLatestRelease() {
 
   return release;
 }
+
