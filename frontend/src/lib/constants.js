@@ -30,4 +30,3 @@ export const GHOSTEL_DESKTOP_ASSET_NAME = "Ghostel-Desktop-Windows-Setup.exe";
 // continue to use the stable direct APK URL above.
 export const GHOSTEL_APP_URL =
   process.env.REACT_APP_GHOSTEL_APP_URL || GHOSTEL_APK_URL;
-
