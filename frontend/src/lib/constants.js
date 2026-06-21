@@ -1,11 +1,10 @@
-// Stable release asset addresses. GitHub redirects these URLs to assets from
-// the latest published release, so the website never needs changing for every
-// Android build.
+// Stable release addresses. Android falls back to the production API so a new
+// verified APK can go live before GitHub finishes publishing its release asset.
 export const GHOSTEL_APK_URL =
   process.env.REACT_APP_GHOSTEL_APK_URL ||
-  "https://github.com/Ghostelapp/app-Gostel/releases/latest/download/Ghostel-Android.apk";
+  "https://api.ghostel.app/app-release.apk";
 
-export const GHOSTEL_ANDROID_VERSION = "1.4.18";
+export const GHOSTEL_ANDROID_VERSION = "1.4.24";
 
 export const GHOSTEL_WEB_APP_URL =
   process.env.REACT_APP_GHOSTEL_WEB_APP_URL || "https://app.ghostel.app";
@@ -31,3 +30,4 @@ export const GHOSTEL_DESKTOP_ASSET_NAME = "Ghostel-Desktop-Windows-Setup.exe";
 // continue to use the stable direct APK URL above.
 export const GHOSTEL_APP_URL =
   process.env.REACT_APP_GHOSTEL_APP_URL || GHOSTEL_APK_URL;
+
