@@ -6,13 +6,24 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-06-19",
-    title: "Lock-screen call continuity",
+    date: "2026-06-21",
+    title: "iOS and Android call interoperability",
     items: [
-      "Fixed incoming calls disappearing after unlocking the phone.",
-      "Prevented duplicate Android full-screen call intents and ringtone restarts.",
-      "Restored pending calls only while they remain active on the server.",
-      "Published matching Android and iOS build numbers for version 1.4.18.",
+      "Restored Unified Plan audio tracks for consistent iOS and Android negotiation.",
+      "Allowed direct low-latency ICE routes with Cloudflare TURN fallback.",
+      "Removed repeated native audio-session resets that caused dropouts and interference.",
+      "Published Android build 24 and iOS build 20 as version 1.4.24.",
+    ],
+  },
+  {
+    version: "1.4.23",
+    date: "2026-06-20",
+    title: "Mobile lock-screen call stability",
+    items: [
+      "Started the Android microphone foreground service before WebRTC connects.",
+      "Restored active incoming calls after Android and iOS unlock transitions.",
+      "Re-applied mobile audio routing and ICE recovery when the app resumes.",
+      "Published Android build 23 and iOS build 19 as version 1.4.23.",
     ],
   },
   {
@@ -97,3 +108,4 @@ export default function Changelog() {
     </div>
   );
 }
+
