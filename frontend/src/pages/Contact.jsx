@@ -121,6 +121,7 @@ export default function Contact() {
   const text = copy[lang] || copy.en;
   const [sent, setSent] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [startedAt] = useState(() => Date.now());
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -129,6 +130,7 @@ export default function Contact() {
     app_version: "",
     subject: "",
     message: "",
+    website: "",
   });
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
@@ -137,7 +139,10 @@ export default function Contact() {
     event.preventDefault();
     setSubmitting(true);
     try {
-      const response = await api.post("/contact", form);
+      const response = await api.post("/contact", {
+        ...form,
+        submitted_after_ms: Math.max(0, Date.now() - startedAt),
+      });
       setSent(response.data);
       toast.success(text.successTitle);
     } catch (error) {
@@ -207,6 +212,15 @@ export default function Contact() {
                 </div>
               ) : (
                 <form data-testid="contact-support-form" onSubmit={submit} className="space-y-5">
+                  <input
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={form.website}
+                    onChange={(e) => update("website", e.target.value)}
+                    name="website"
+                    className="hidden"
+                    aria-hidden="true"
+                  />
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                       <Label className="text-xs uppercase tracking-wider text-zinc-400">{text.name}</Label>

@@ -60,11 +60,13 @@ export default function FloatingSupport() {
   const text = copy[lang] || copy.en;
   const [open, setOpen] = useState(false);
   const [sending, setSending] = useState(false);
+  const [startedAt, setStartedAt] = useState(() => Date.now());
   const [form, setForm] = useState({
     name: "",
     email: "",
     subject: "",
     message: "",
+    website: "",
   });
 
   if (location.pathname.startsWith("/admin")) return null;
@@ -80,10 +82,12 @@ export default function FloatingSupport() {
         category: "technical",
         app_platform: "unknown",
         app_version: "",
+        submitted_after_ms: Math.max(0, Date.now() - startedAt),
       });
       toast.success(response.data?.ticket_id ? `${text.success}: ${response.data.ticket_id}` : text.success);
-      setForm({ name: "", email: "", subject: "", message: "" });
+      setForm({ name: "", email: "", subject: "", message: "", website: "" });
       setOpen(false);
+      setStartedAt(Date.now());
     } catch (error) {
       toast.error(formatApiError(error));
     } finally {
@@ -112,6 +116,15 @@ export default function FloatingSupport() {
           </div>
 
           <form onSubmit={submit} className="space-y-3">
+            <input
+              tabIndex={-1}
+              autoComplete="off"
+              value={form.website}
+              onChange={(event) => update("website", event.target.value)}
+              name="website"
+              className="hidden"
+              aria-hidden="true"
+            />
             <input
               required
               minLength={2}
@@ -166,7 +179,12 @@ export default function FloatingSupport() {
 
       <button
         type="button"
-        onClick={() => setOpen((value) => !value)}
+        onClick={() =>
+          setOpen((value) => {
+            if (!value) setStartedAt(Date.now());
+            return !value;
+          })
+        }
         data-testid="floating-support-button"
         aria-label={text.subtitle}
         className="group ml-auto flex items-center gap-3 rounded-2xl border border-cyan-400/25 bg-[#071018]/90 px-4 py-3 text-left text-white shadow-2xl shadow-cyan-950/40 backdrop-blur-xl transition-all hover:-translate-y-0.5 hover:border-cyan-300/50 hover:bg-[#0a1420]"

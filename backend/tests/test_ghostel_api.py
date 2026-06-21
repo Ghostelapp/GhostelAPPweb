@@ -97,6 +97,17 @@ class TestAuth:
         r = requests.get(f"{API}/auth/me", headers={"Authorization": "Bearer not.a.real.jwt"})
         assert r.status_code == 401
 
+    def test_logout_revokes_bearer_token(self):
+        if not ADMIN_PASSWORD:
+            pytest.skip("ADMIN_PASSWORD env var is required for admin API tests")
+        login = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
+        assert login.status_code == 200, login.text
+        token = login.json()["access_token"]
+        logout = requests.post(f"{API}/auth/logout", headers={"Authorization": f"Bearer {token}"})
+        assert logout.status_code == 200, logout.text
+        me = requests.get(f"{API}/auth/me", headers={"Authorization": f"Bearer {token}"})
+        assert me.status_code == 401
+
 
 # ---- Admin: Dashboard ----
 class TestDashboard:

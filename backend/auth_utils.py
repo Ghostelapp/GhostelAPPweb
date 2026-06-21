@@ -1,5 +1,6 @@
 """Authentication helpers for ghostel.app."""
 import os
+import uuid
 import jwt
 import bcrypt
 from datetime import datetime, timezone, timedelta
@@ -32,6 +33,7 @@ def create_access_token(user_id: str, email: str, role: str) -> str:
         "role": role,
         "exp": datetime.now(timezone.utc) + timedelta(minutes=lifetime_minutes),
         "type": "access",
+        "jti": str(uuid.uuid4()),
     }
     return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
@@ -41,6 +43,7 @@ def create_refresh_token(user_id: str) -> str:
         "sub": user_id,
         "exp": datetime.now(timezone.utc) + timedelta(days=7),
         "type": "refresh",
+        "jti": str(uuid.uuid4()),
     }
     return jwt.encode(payload, get_jwt_secret(), algorithm=JWT_ALGORITHM)
 
@@ -70,6 +73,8 @@ async def get_current_user(request: Request, db):
         raise HTTPException(status_code=401, detail="Invalid token")
     if payload.get("type") != "access":
         raise HTTPException(status_code=401, detail="Invalid token type")
+    if payload.get("jti") and await db.revoked_tokens.find_one({"jti": payload["jti"]}, {"_id": 1}):
+        raise HTTPException(status_code=401, detail="Token revoked")
     user = await db.users.find_one({"id": payload["sub"]})
     if not user:
         raise HTTPException(status_code=401, detail="User not found")

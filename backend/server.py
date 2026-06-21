@@ -20,7 +20,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Optional, List, Literal
 
 from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, Query
-from fastapi.responses import StreamingResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo import ReturnDocument
@@ -130,6 +130,8 @@ class ContactSupportIn(BaseModel):
     message: str = Field(min_length=20, max_length=5000)
     app_platform: Optional[Literal["ios", "android", "web", "desktop", "unknown"]] = "unknown"
     app_version: Optional[str] = Field(default="", max_length=40)
+    website: Optional[str] = Field(default="", max_length=120)
+    submitted_after_ms: Optional[int] = Field(default=0, ge=0, le=600000)
 
 
 class SupportTicketUpdateIn(BaseModel):
@@ -199,6 +201,33 @@ def _set_cookies(response: Response, access: str, refresh: str):
     secure = _cookie_secure()
     response.set_cookie("access_token", access, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 12, path="/")
     response.set_cookie("refresh_token", refresh, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 24 * 7, path="/")
+
+
+async def _revoke_token(raw_token: Optional[str]) -> None:
+    token = (raw_token or "").strip()
+    if not token:
+        return
+    try:
+        payload = decode_token(token)
+    except Exception:
+        return
+    jti = payload.get("jti")
+    expires_at = payload.get("exp")
+    if not jti or not expires_at:
+        return
+    try:
+        expiry = datetime.fromtimestamp(expires_at, tz=timezone.utc)
+    except Exception:
+        return
+    await db.revoked_tokens.update_one(
+        {"jti": jti},
+        {"$set": {"jti": jti, "expires_at": expiry}},
+        upsert=True,
+    )
+
+
+def _origin_allowed(origin: str) -> bool:
+    return not origin or origin in _origins
 
 
 def _public_user(u: dict) -> dict:
@@ -538,6 +567,10 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
 
     now = datetime.now(timezone.utc)
     now_iso = now.isoformat()
+    if (payload.website or "").strip():
+        return {"ok": True, "ticket_id": _support_public_id(now), "status": "new"}
+    if payload.submitted_after_ms and payload.submitted_after_ms < 1500:
+        raise HTTPException(status_code=400, detail="Please wait a moment before submitting the form.")
     ticket_id = str(uuid.uuid4())
     public_id = _support_public_id(now)
     priority = _support_priority(payload.category, payload.subject, payload.message)
@@ -677,7 +710,9 @@ async def login(payload: LoginIn, response: Response, request: Request):
 
 
 @api.post("/auth/logout")
-async def logout(response: Response):
+async def logout(response: Response, request: Request):
+    await _revoke_token(extract_token(request))
+    await _revoke_token(request.cookies.get("refresh_token"))
     response.delete_cookie("access_token", path="/")
     response.delete_cookie("refresh_token", path="/")
     return {"ok": True}
@@ -1236,12 +1271,20 @@ app.add_middleware(
 
 @app.middleware("http")
 async def security_headers(request: Request, call_next):
+    if request.method not in {"GET", "HEAD", "OPTIONS"}:
+        origin = request.headers.get("origin", "")
+        if origin and not _origin_allowed(origin):
+            return JSONResponse(status_code=403, content={"detail": "Origin not allowed"})
     response = await call_next(request)
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+    response.headers["Cross-Origin-Resource-Policy"] = "same-site"
+    if request.url.path.startswith(("/api/auth", "/api/admin", "/api/contact")):
+        response.headers["Cache-Control"] = "no-store"
     return response
 
 
@@ -1261,6 +1304,8 @@ async def on_startup():
     await db.website_pageviews.create_index("expires_at", expireAfterSeconds=0)
     await db.rate_limits.create_index("key", unique=True)
     await db.rate_limits.create_index("expires_at", expireAfterSeconds=0)
+    await db.revoked_tokens.create_index("jti", unique=True)
+    await db.revoked_tokens.create_index("expires_at", expireAfterSeconds=0)
     await db.support_tickets.create_index("id", unique=True)
     await db.support_tickets.create_index("public_id", unique=True)
     await db.support_tickets.create_index("email")
