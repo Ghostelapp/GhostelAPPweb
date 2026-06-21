@@ -7,10 +7,10 @@ import { getAnalyticsConsent, setAnalyticsConsent } from "@/lib/privacy";
 const copy = {
   pl: {
     title: "Prywatne statystyki strony",
-    body: "Uzywamy technicznych statystyk strony, zeby mierzyc odslony, status uslug i najczestsze problemy. Nie zapisujemy pelnego adresu IP.",
-    accept: "Akceptuje",
-    decline: "Wylacz",
-    privacy: "Polityka prywatnosci",
+    body: "Używamy technicznych statystyk strony, żeby mierzyć odsłony, status usług i najczęstsze problemy. Nie zapisujemy pełnego adresu IP.",
+    accept: "Akceptuję",
+    decline: "Wyłącz",
+    privacy: "Polityka prywatności",
   },
   en: {
     title: "Private website analytics",
@@ -25,6 +25,16 @@ const copy = {
     accept: "Akzeptieren",
     decline: "Deaktivieren",
     privacy: "Datenschutz",
+  },
+  es: {
+    title: "Estadísticas privadas del sitio",
+    body: "Usamos estadísticas técnicas para medir las visitas, el estado del servicio y los problemas frecuentes. No guardamos direcciones IP completas.",
+    accept: "Aceptar", decline: "Desactivar", privacy: "Política de privacidad",
+  },
+  fr: {
+    title: "Statistiques privées du site",
+    body: "Nous utilisons des statistiques techniques pour mesurer les visites, l’état du service et les problèmes fréquents. Nous ne conservons pas les adresses IP complètes.",
+    accept: "Accepter", decline: "Désactiver", privacy: "Politique de confidentialité",
   },
 };
 

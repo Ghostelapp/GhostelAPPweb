@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import BrandLogo from "@/components/BrandLogo";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Login() {
   const { t } = useLang();
@@ -107,13 +108,13 @@ export default function Login() {
             <Label className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
               {t("common.password")}
             </Label>
-            <Input
+            <PasswordInput
               data-testid="login-password-input"
-              type="password"
               required
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-2 bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
+              className="bg-[#0a0e14] border-white/10 text-white h-11 rounded-lg focus-visible:ring-cyan-400 focus-visible:border-cyan-400/40"
               placeholder="••••••••"
             />
           </div>

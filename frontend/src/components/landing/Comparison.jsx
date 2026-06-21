@@ -45,17 +45,17 @@ const brands = [
 
 const marks = {
   yes: {
-    label: { pl: "Tak", de: "Ja", en: "Yes" },
+    label: { pl: "Tak", de: "Ja", en: "Yes", es: "Sí", fr: "Oui" },
     className: "border-emerald-300/25 bg-emerald-300/10 text-emerald-200",
     Icon: Check,
   },
   partial: {
-    label: { pl: "Częściowo", de: "Teilweise", en: "Partial" },
+    label: { pl: "Częściowo", de: "Teilweise", en: "Partial", es: "Parcial", fr: "Partiel" },
     className: "border-amber-300/25 bg-amber-300/10 text-amber-200",
     Icon: Minus,
   },
   no: {
-    label: { pl: "Nie", de: "Nein", en: "No" },
+    label: { pl: "Nie", de: "Nein", en: "No", es: "No", fr: "Non" },
     className: "border-zinc-500/25 bg-zinc-500/10 text-zinc-400",
     Icon: X,
   },
@@ -75,7 +75,7 @@ function Mark({ value, lang, compact = false }) {
 
 export default function Comparison() {
   const { lang } = useLang();
-  const copy = lang === "pl"
+  let copy = lang === "pl"
     ? {
         eyebrow: "Porównanie",
         title: "ghostel.app kontra wielkie komunikatory",
@@ -137,6 +137,48 @@ export default function Comparison() {
         verdict: "The better fit when conversations, privacy and fast product iteration matter more than unnecessary extras.",
         note: "This comparison describes ghostel.app's product direction and current features. Telegram, Messenger and WhatsApp are trademarks of their respective owners.",
       };
+
+  if (lang === "es") {
+    copy = {
+      eyebrow: "Comparación", title: "ghostel.app frente a los grandes mensajeros",
+      subtitle: "ghostel.app se centra en conversaciones privadas, llamadas móviles reales y control de la cuenta sin el ruido de una red social.",
+      columns: ["Función", "ghostel.app", "Telegram", "Messenger", "WhatsApp"],
+      rows: [
+        ["Cifrado de extremo a extremo del contenido", "yes", "partial", "partial", "yes"],
+        ["Archivos cifrados y fotos de una sola visualización", "yes", "partial", "partial", "partial"],
+        ["Alertas de llamada a pantalla completa en Android", "yes", "partial", "partial", "partial"],
+        ["Exportación de datos y eliminación de la cuenta", "yes", "partial", "partial", "partial"],
+        ["Sin canales públicos, publicidad ni ruido social", "yes", "partial", "no", "partial"],
+        ["Desarrollo rápido de funciones para los usuarios", "yes", "no", "no", "no"],
+      ],
+      highlights: [
+        ["Privacidad desde el diseño", "ghostel.app no es una red social. Se centra en las conversaciones, los contactos y el control de los datos.", ShieldCheck],
+        ["Pruebas móviles reales", "Las llamadas, las notificaciones push y la pantalla de respuesta se prueban en teléfonos reales.", Smartphone],
+      ],
+      verdict: "Una opción adecuada cuando importan la privacidad, las conversaciones y el desarrollo rápido sin extras innecesarios.",
+      note: "Esta comparación describe la orientación y las funciones actuales de ghostel.app. Las demás marcas pertenecen a sus respectivos propietarios.",
+    };
+  } else if (lang === "fr") {
+    copy = {
+      eyebrow: "Comparaison", title: "ghostel.app face aux grandes messageries",
+      subtitle: "ghostel.app privilégie les conversations privées, les appels mobiles réels et le contrôle du compte, sans le bruit d’un réseau social.",
+      columns: ["Fonction", "ghostel.app", "Telegram", "Messenger", "WhatsApp"],
+      rows: [
+        ["Chiffrement de bout en bout du contenu", "yes", "partial", "partial", "yes"],
+        ["Pièces jointes chiffrées et photos à vue unique", "yes", "partial", "partial", "partial"],
+        ["Alertes d’appel plein écran sur Android", "yes", "partial", "partial", "partial"],
+        ["Export des données et suppression du compte", "yes", "partial", "partial", "partial"],
+        ["Aucun canal public, publicité ou bruit social", "yes", "partial", "no", "partial"],
+        ["Développement rapide de fonctions utiles", "yes", "no", "no", "no"],
+      ],
+      highlights: [
+        ["Confidentialité dès la conception", "ghostel.app n’est pas un réseau social. Le service se concentre sur les conversations, les contacts et le contrôle des données.", ShieldCheck],
+        ["Tests mobiles réels", "Les appels, les notifications push et l’écran de réponse sont testés sur de vrais téléphones.", Smartphone],
+      ],
+      verdict: "Un choix pertinent lorsque la confidentialité, les conversations et l’évolution rapide comptent plus que les fonctions superflues.",
+      note: "Cette comparaison décrit l’orientation et les fonctions actuelles de ghostel.app. Les autres marques appartiennent à leurs propriétaires respectifs.",
+    };
+  }
 
   return (
     <section id="comparison" data-testid="comparison-section" className="relative py-24 sm:py-32">

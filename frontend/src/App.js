@@ -28,6 +28,7 @@ import WebsiteAnalytics from "@/components/WebsiteAnalytics";
 import FloatingSupport from "@/components/FloatingSupport";
 import PrivacyConsent from "@/components/PrivacyConsent";
 import Seo from "@/components/Seo";
+import ScrollToTop from "@/components/ScrollToTop";
 
 const seo = {
   home: {
@@ -108,6 +109,7 @@ function App() {
           <BrowserRouter>
             <WebsiteAnalytics />
             <FloatingSupport />
+            <ScrollToTop />
             <PrivacyConsent />
             <Toaster
               position="top-right"

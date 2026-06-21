@@ -8,17 +8,46 @@ import { cn } from "@/lib/utils";
 export default function Pricing() {
   const { t, lang } = useLang();
   const { version, apkUrl } = useLatestRelease();
+  const pricingCopy = {
+    pl: {
+      webName: "Wersja webowa", development: "W budowie", webCta: "Wersja webowa w budowie",
+      webFeatures: ["Bez instalowania programu", "To samo konto i kontakty", "Czat, połączenia i ustawienia", "Możliwość instalacji jako PWA"],
+      androidCta: "Pobierz APK na Androida", iosLabel: "W przygotowaniu", iosCta: "Wersja iOS w przygotowaniu",
+      iosFeatures: ["Przygotowujemy wersję na iPhone", "To samo konto i kontakty", "Czat i połączenia głosowe", "Publikacja po testach iOS"],
+    },
+    de: {
+      webName: "Web-App", development: "In Entwicklung", webCta: "Web-App in Entwicklung",
+      webFeatures: ["Keine Softwareinstallation", "Dasselbe Konto und dieselben Kontakte", "Chats, Anrufe und Einstellungen", "Als PWA installierbar"],
+      androidCta: "Android-APK herunterladen", iosLabel: "In Vorbereitung", iosCta: "iOS-Version in Vorbereitung",
+      iosFeatures: ["Wir bereiten die iPhone-Version vor", "Dasselbe Konto und dieselben Kontakte", "Chats und Sprachanrufe", "Veröffentlichung nach iOS-Tests"],
+    },
+    en: {
+      webName: "Web app", development: "In development", webCta: "Web app in development",
+      webFeatures: ["No software installation", "The same account and contacts", "Chat, calls and settings", "Installable as a PWA"],
+      androidCta: "Download Android APK", iosLabel: "Coming soon", iosCta: "iOS version coming soon",
+      iosFeatures: ["We are preparing the iPhone version", "The same account and contacts", "Chat and voice calls", "Release after iOS testing"],
+    },
+    es: {
+      webName: "Aplicación web", development: "En desarrollo", webCta: "Aplicación web en desarrollo",
+      webFeatures: ["Sin instalar programas", "La misma cuenta y contactos", "Chats, llamadas y ajustes", "Instalable como PWA"],
+      androidCta: "Descargar APK para Android", iosLabel: "En preparación", iosCta: "Versión para iOS en preparación",
+      iosFeatures: ["Preparamos la versión para iPhone", "La misma cuenta y contactos", "Chats y llamadas de voz", "Publicación después de las pruebas en iOS"],
+    },
+    fr: {
+      webName: "Application web", development: "En développement", webCta: "Application web en développement",
+      webFeatures: ["Aucun logiciel à installer", "Le même compte et les mêmes contacts", "Discussions, appels et paramètres", "Installation possible en PWA"],
+      androidCta: "Télécharger l’APK Android", iosLabel: "En préparation", iosCta: "Version iOS en préparation",
+      iosFeatures: ["Nous préparons la version iPhone", "Le même compte et les mêmes contacts", "Discussions et appels vocaux", "Publication après les tests iOS"],
+    },
+  };
+  const localCopy = pricingCopy[lang] || pricingCopy.en;
 
   const plans = [
     {
-      name: lang === "pl" ? "Wersja webowa" : lang === "de" ? "Web-App" : "Web app",
-      label: lang === "pl" ? "W budowie" : lang === "de" ? "In Entwicklung" : "In development",
-      cta: lang === "pl" ? "Wersja webowa w budowie" : lang === "de" ? "Web-App in Entwicklung" : "Web app in development",
-      features: lang === "pl"
-        ? ["Bez instalowania programu", "To samo konto i kontakty", "Czat, połączenia i ustawienia", "Możliwość instalacji jako PWA"]
-        : lang === "de"
-        ? ["Keine Softwareinstallation", "Dasselbe Konto und dieselben Kontakte", "Chats, Anrufe und Einstellungen", "Als PWA installierbar"]
-        : ["No software installation", "The same account and contacts", "Chat, calls and settings", "Installable as a PWA"],
+      name: localCopy.webName,
+      label: localCopy.development,
+      cta: localCopy.webCta,
+      features: localCopy.webFeatures,
       popular: false,
       testid: "pricing-web",
       disabled: true,
@@ -27,7 +56,7 @@ export default function Pricing() {
     {
       name: t("pricing.free"),
       label: version ? `APK ${version}` : "APK latest",
-      cta: lang === "pl" ? "Pobierz APK na Androida" : lang === "de" ? "Android-APK herunterladen" : "Download Android APK",
+      cta: localCopy.androidCta,
       features: [t("pricing.freeF1"), t("pricing.freeF2"), t("pricing.freeF3"), t("pricing.freeF4")],
       popular: false,
       testid: "pricing-android",
@@ -36,13 +65,9 @@ export default function Pricing() {
     },
     {
       name: "iOS",
-      label: lang === "pl" ? "W przygotowaniu" : lang === "de" ? "In Vorbereitung" : "Coming soon",
-      cta: lang === "pl" ? "Wersja iOS w przygotowaniu" : lang === "de" ? "iOS-Version in Vorbereitung" : "iOS version coming soon",
-      features: lang === "pl"
-        ? ["Przygotowujemy wersję na iPhone", "To samo konto i kontakty", "Czat i połączenia głosowe", "Publikacja po testach iOS"]
-        : lang === "de"
-        ? ["Wir bereiten die iPhone-Version vor", "Dasselbe Konto und dieselben Kontakte", "Chats und Sprachanrufe", "Veröffentlichung nach iOS-Tests"]
-        : ["We are preparing the iPhone version", "The same account and contacts", "Chat and voice calls", "Release after iOS testing"],
+      label: localCopy.iosLabel,
+      cta: localCopy.iosCta,
+      features: localCopy.iosFeatures,
       popular: false,
       testid: "pricing-ios",
       disabled: true,

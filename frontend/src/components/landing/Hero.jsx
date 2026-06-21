@@ -7,9 +7,9 @@ import PhoneMockup from "./PhoneMockup";
 import BrandMark from "@/components/BrandMark";
 
 export default function Hero() {
-  const { lang } = useLang();
+  const { lang, t } = useLang();
   const { version, apkUrl } = useLatestRelease();
-  const copy = lang === "pl"
+  let copy = lang === "pl"
     ? {
         tag: "Prywatna komunikacja na co dzień",
         titleLead: "ghostel.app",
@@ -41,6 +41,20 @@ export default function Hero() {
         secondary: "Download for Android",
         signals: ["Message E2EE", "2FA and PIN lock", "Encrypted calls"],
       };
+
+  if (lang === "es" || lang === "fr") {
+    copy = {
+      tag: t("hero.tag"),
+      titleLead: "ghostel.app",
+      title: t("hero.title"),
+      subtitle: t("hero.subtitle"),
+      primary: lang === "es" ? "Web en desarrollo" : "Version web en développement",
+      secondary: lang === "es" ? "Descargar para Android" : "Télécharger pour Android",
+      signals: lang === "es"
+        ? ["Mensajes E2EE", "2FA y bloqueo con PIN", "Llamadas cifradas"]
+        : ["Messages E2EE", "2FA et verrouillage par PIN", "Appels chiffrés"],
+    };
+  }
 
   return (
     <section

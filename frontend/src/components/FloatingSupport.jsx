@@ -10,13 +10,13 @@ const copy = {
     label: "Support",
     title: "Potrzebujesz pomocy?",
     subtitle: "Napisz do Ghostel Support",
-    name: "Imie",
+    name: "Imię",
     email: "Email",
     subject: "Temat",
     message: "Opis problemu",
-    send: "Wyslij",
-    full: "Pelny formularz",
-    success: "Zgloszenie przyjete",
+    send: "Wyślij",
+    full: "Pełny formularz",
+    success: "Zgłoszenie przyjęte",
   },
   en: {
     label: "Support",
@@ -41,6 +41,16 @@ const copy = {
     send: "Senden",
     full: "Vollstaendiges Formular",
     success: "Support-Anfrage erhalten",
+  },
+  es: {
+    label: "Soporte", title: "¿Necesitas ayuda?", subtitle: "Contacta con el soporte de Ghostel",
+    name: "Nombre", email: "Correo electrónico", subject: "Asunto", message: "Descripción del problema",
+    send: "Enviar", full: "Formulario completo", success: "Solicitud de soporte recibida",
+  },
+  fr: {
+    label: "Assistance", title: "Besoin d’aide ?", subtitle: "Contactez l’assistance Ghostel",
+    name: "Nom", email: "Adresse e-mail", subject: "Objet", message: "Description du problème",
+    send: "Envoyer", full: "Formulaire complet", success: "Demande d’assistance reçue",
   },
 };
 

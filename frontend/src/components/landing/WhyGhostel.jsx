@@ -13,7 +13,7 @@ import {
 
 export default function WhyGhostel() {
   const { lang } = useLang();
-  const copy = lang === "pl"
+  let copy = lang === "pl"
     ? {
         eyebrow: "Bezpieczeństwo bez niedomówień",
         title: "Co chroni rozmowy już teraz",
@@ -90,6 +90,48 @@ export default function WhyGhostel() {
         transparency:
           "Important: the server still processes account data, push tokens, conversation membership, presence and metadata required to deliver messages and calls.",
       };
+
+  if (lang === "es" || lang === "fr") {
+    const isEs = lang === "es";
+    copy = {
+      eyebrow: isEs ? "Seguridad sin promesas vagas" : "Une sécurité sans promesses vagues",
+      title: isEs ? "Qué protege las conversaciones hoy" : "Ce qui protège les conversations aujourd’hui",
+      subtitle: isEs
+        ? "ghostel.app separa el contenido de las conversaciones de los datos operativos necesarios para prestar el servicio."
+        : "ghostel.app sépare le contenu des conversations des données opérationnelles nécessaires au service.",
+      currentLabel: isEs ? "Disponible actualmente" : "Disponible actuellement",
+      current: isEs ? [
+        { icon: LockKeyhole, title: "E2EE de mensajes y archivos", desc: "El contenido se cifra en el dispositivo antes de llegar al servidor." },
+        { icon: KeyRound, title: "Verificación de claves", desc: "Un cambio de clave pausa el envío hasta que se confirma la nueva huella." },
+        { icon: ShieldCheck, title: "Llamadas cifradas", desc: "La señalización usa E2EE y el audio está protegido por WebRTC DTLS-SRTP." },
+        { icon: Fingerprint, title: "2FA y bloqueo con PIN", desc: "La cuenta admite 2FA y la aplicación puede protegerse con un PIN local." },
+        { icon: Smartphone, title: "Datos protegidos en el dispositivo", desc: "Los tokens y las claves privadas se guardan en el almacén seguro del sistema." },
+        { icon: UserX, title: "Privacidad y control", desc: "El bloqueo, la exportación y la eliminación de la cuenta están disponibles para el usuario." },
+      ] : [
+        { icon: LockKeyhole, title: "E2EE des messages et fichiers", desc: "Le contenu est chiffré sur l’appareil avant d’atteindre le serveur." },
+        { icon: KeyRound, title: "Vérification des clés", desc: "Un changement de clé suspend l’envoi jusqu’à la confirmation de la nouvelle empreinte." },
+        { icon: ShieldCheck, title: "Appels chiffrés", desc: "La signalisation utilise l’E2EE et l’audio est protégé par WebRTC DTLS-SRTP." },
+        { icon: Fingerprint, title: "2FA et verrouillage par PIN", desc: "Le compte prend en charge la 2FA et l’application peut être protégée par un PIN local." },
+        { icon: Smartphone, title: "Données protégées sur l’appareil", desc: "Les jetons et les clés privées sont conservés dans le stockage sécurisé du système." },
+        { icon: UserX, title: "Confidentialité et contrôle", desc: "Le blocage, l’export et la suppression du compte sont accessibles à l’utilisateur." },
+      ],
+      roadmapLabel: isEs ? "Dirección de desarrollo" : "Orientation du développement",
+      roadmapTitle: isEs ? "Próximas capas de protección" : "Les prochaines couches de protection",
+      roadmapNote: isEs ? "La hoja de ruta puede cambiar según los resultados de las pruebas y auditorías." : "La feuille de route peut évoluer selon les résultats des tests et des audits.",
+      roadmap: isEs ? [
+        { icon: Radar, title: "Auditoría de seguridad independiente", desc: "Revisión externa de la arquitectura, las aplicaciones y la infraestructura." },
+        { icon: KeyRound, title: "Gestión multidispositivo ampliada", desc: "Gestión más clara de dispositivos de confianza, sesiones y cambios de claves." },
+        { icon: BellRing, title: "Alertas de seguridad", desc: "Mejores avisos sobre inicios de sesión, cambios de seguridad y actividad sospechosa." },
+      ] : [
+        { icon: Radar, title: "Audit de sécurité indépendant", desc: "Examen externe de l’architecture, des applications et de l’infrastructure." },
+        { icon: KeyRound, title: "Gestion multi-appareils avancée", desc: "Gestion plus claire des appareils de confiance, des sessions et des changements de clés." },
+        { icon: BellRing, title: "Alertes de sécurité", desc: "Meilleures notifications pour les connexions, changements de sécurité et activités suspectes." },
+      ],
+      transparency: isEs
+        ? "Importante: el servidor sigue tratando los datos de la cuenta, tokens push y metadatos necesarios para entregar mensajes y llamadas."
+        : "Important : le serveur traite toujours les données du compte, les jetons push et les métadonnées nécessaires à l’acheminement des messages et des appels.",
+    };
+  }
 
   return (
     <section id="why" data-testid="why-section" className="relative py-24 sm:py-32 border-y divider-soft">

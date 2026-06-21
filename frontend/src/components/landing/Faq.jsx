@@ -8,14 +8,18 @@ import {
 
 export default function Faq() {
   const { t, lang } = useLang();
+  const browserFaq = {
+    pl: ["Czy ghostel.app działa w przeglądarce?", "Wersja przeglądarkowa jest obecnie w budowie. Na ten moment korzystaj z aplikacji Android."],
+    de: ["Funktioniert ghostel.app im Browser?", "Die Browserversion befindet sich derzeit in Entwicklung. Verwende vorerst die Android-App."],
+    en: ["Does ghostel.app work in a browser?", "The browser version is currently in development. For now, use the Android app."],
+    es: ["¿Funciona ghostel.app en el navegador?", "La versión web está actualmente en desarrollo. Por ahora, utiliza la aplicación para Android."],
+    fr: ["ghostel.app fonctionne-t-il dans le navigateur ?", "La version web est actuellement en développement. Pour le moment, utilisez l’application Android."],
+  };
+  const [browserQuestion, browserAnswer] = browserFaq[lang] || browserFaq.en;
   const items = [
     {
-      q: lang === "pl" ? "Czy ghostel.app działa w przeglądarce?" : lang === "de" ? "Funktioniert ghostel.app im Browser?" : "Does ghostel.app work in a browser?",
-      a: lang === "pl"
-        ? "Wersja przeglądarkowa jest obecnie w budowie. Na ten moment korzystaj z aplikacji Android."
-        : lang === "de"
-        ? "Die Browserversion befindet sich derzeit in Entwicklung. Verwende vorerst die Android-App."
-        : "The browser version is currently in development. For now, use the Android app.",
+      q: browserQuestion,
+      a: browserAnswer,
     },
     { q: t("faq.q1"), a: t("faq.a1") },
     { q: t("faq.q2"), a: t("faq.a2") },

@@ -3,8 +3,8 @@ import { useLang } from "@/context/LanguageContext";
 import { BellRing, Download, PhoneCall, ShieldCheck, UserRoundPlus, UsersRound } from "lucide-react";
 
 export default function Features() {
-  const { lang } = useLang();
-  const copy = lang === "pl"
+  const { lang, t } = useLang();
+  let copy = lang === "pl"
     ? {
         eyebrow: "Najważniejsze możliwości",
         title: "Komunikacja bez zbędnego chaosu",
@@ -48,6 +48,22 @@ export default function Features() {
           { icon: ShieldCheck, title: "Account and app protection", desc: "Enable 2FA, protect the app with a PIN and manage blocked users." },
         ],
       };
+
+  if (lang === "es" || lang === "fr") {
+    copy = {
+      eyebrow: lang === "es" ? "Funciones principales" : "Fonctionnalités principales",
+      title: t("features.title"),
+      subtitle: t("features.subtitle"),
+      items: [
+        { icon: UserRoundPlus, title: t("features.messagesTitle"), desc: t("features.messagesDesc") },
+        { icon: UsersRound, title: t("features.groupsTitle"), desc: t("features.groupsDesc") },
+        { icon: PhoneCall, title: t("features.voiceTitle"), desc: t("features.voiceDesc") },
+        { icon: BellRing, title: t("features.filesTitle"), desc: t("features.filesDesc") },
+        { icon: Download, title: t("features.pushTitle"), desc: t("features.pushDesc") },
+        { icon: ShieldCheck, title: t("features.securityTitle"), desc: t("features.securityDesc") },
+      ],
+    };
+  }
 
   return (
     <section id="features" data-testid="features-section" className="relative py-24 sm:py-32">

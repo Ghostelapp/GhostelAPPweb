@@ -22,12 +22,12 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2.5 mb-4">
+            <Link to="/" aria-label="ghostel.app - homepage" className="flex items-center gap-2.5 mb-4 w-fit">
               <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <BrandMark className="text-xl" />
-            </div>
+            </Link>
             <p className="text-sm text-zinc-400 mb-6 max-w-sm leading-relaxed">
               {t("footer.tagline")}
             </p>

@@ -8,9 +8,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const languages = [
-  { code: "pl", short: "PL", label: "Polski" },
-  { code: "en", short: "EN", label: "English" },
   { code: "de", short: "DE", label: "Deutsch" },
+  { code: "en", short: "EN", label: "English" },
+  { code: "es", short: "ES", label: "Español" },
+  { code: "fr", short: "FR", label: "Français" },
+  { code: "pl", short: "PL", label: "Polski" },
 ];
 
 export default function LanguageMenu({ compact = false }) {

@@ -8,7 +8,7 @@ const reports = [
   { kind: "users", icon: UserPlus, title: "Rejestracje", desc: "Wszyscy użytkownicy z datą rejestracji.", color: "purple" },
   { kind: "reports", icon: Flag, title: "Zgłoszenia", desc: "Pełna historia zgłoszeń.", color: "amber" },
   { kind: "groups", icon: UsersRound, title: "Statystyki grup", desc: "Lista grup z liczbą członków.", color: "cyan" },
-  { kind: "support", icon: LifeBuoy, title: "Support", desc: "Zgloszenia z formularza kontaktowego.", color: "purple" },
+  { kind: "support", icon: LifeBuoy, title: "Support", desc: "Zgłoszenia z formularza kontaktowego.", color: "purple" },
 ];
 
 export default function Reports() {

@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { translations } from "../i18n/translations";
 
 const LanguageContext = createContext(null);
-const supportedLanguages = ["pl", "en", "de"];
+const supportedLanguages = ["de", "en", "es", "fr", "pl"];
 
 export function LanguageProvider({ children }) {
   const [lang, setLang] = useState(() => {

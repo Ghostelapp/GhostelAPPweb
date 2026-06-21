@@ -6,7 +6,7 @@ import BrandMark from "@/components/BrandMark";
 
 export default function BrowserApp() {
   const { lang } = useLang();
-  const copy = lang === "pl"
+  let copy = lang === "pl"
     ? {
         eyebrow: "ghostel.app Web",
         title: "Twoje rozmowy są dostępne również w przeglądarce",
@@ -53,6 +53,22 @@ export default function BrowserApp() {
         message: "The web version is currently being prepared.",
         navigation: ["Chats", "Contacts", "Calls", "Profile"],
       };
+
+  if (lang === "es") {
+    copy = {
+      eyebrow: "ghostel.app Web", title: "Tus conversaciones también estarán disponibles en el navegador",
+      subtitle: "Inicia sesión desde un ordenador o teléfono sin instalar ningún programa. La versión web utilizará la misma cuenta, contactos y conversaciones que la aplicación móvil.",
+      cta: "Aplicación web en desarrollo", points: ["Conversaciones privadas y de grupo en tiempo real", "Contactos, llamadas y ajustes de la cuenta", "Instalación como PWA sin tienda de aplicaciones"],
+      status: "En desarrollo", message: "La versión web se está preparando actualmente.", navigation: ["Chats", "Contactos", "Llamadas", "Perfil"],
+    };
+  } else if (lang === "fr") {
+    copy = {
+      eyebrow: "ghostel.app Web", title: "Vos conversations seront aussi disponibles dans le navigateur",
+      subtitle: "Connectez-vous depuis un ordinateur ou un téléphone sans installer de logiciel. La version web utilisera le même compte, les mêmes contacts et les mêmes conversations que l’application mobile.",
+      cta: "Application web en développement", points: ["Conversations privées et de groupe en temps réel", "Contacts, appels et paramètres du compte", "Installation en PWA sans boutique d’applications"],
+      status: "En développement", message: "La version web est actuellement en préparation.", navigation: ["Discussions", "Contacts", "Appels", "Profil"],
+    };
+  }
 
   return (
     <section id="web-app" data-testid="web-app-section" className="relative py-24 sm:py-32 border-y border-white/5 bg-white/[0.015]">

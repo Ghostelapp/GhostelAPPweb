@@ -5,18 +5,18 @@ import { useLang } from "@/context/LanguageContext";
 
 export default function PhoneMockup() {
   const { lang } = useLang();
-  const copy = lang === "pl"
+  let copy = lang === "pl"
     ? {
         pushReady: "Push gotowy",
         strapline: "Chats. Calls. Push.",
         cta: "Zacznij teraz",
         floatingCall: "Dzwoni Marta",
-        floatingPush: "Pelnoekranowy push",
-        voiceCall: "Polaczenie glosowe",
+        floatingPush: "Pełnoekranowy push",
+        voiceCall: "Połączenie głosowe",
         chats: [
-          { name: "Marta Kowal", text: "Dzwonie za chwile", time: "12:34", unread: 2 },
-          { name: "Zespol", text: "Nowa wiadomosc w grupie", time: "12:30", unread: 5 },
-          { name: "Kamil", text: "Polaczenie zakonczone - 02:14", time: "12:15", unread: 0 },
+          { name: "Marta Kowal", text: "Dzwonię za chwilę", time: "12:34", unread: 2 },
+          { name: "Zespół", text: "Nowa wiadomość w grupie", time: "12:30", unread: 5 },
+          { name: "Kamil", text: "Połączenie zakończone - 02:14", time: "12:15", unread: 0 },
           { name: "Support", text: "Eksport danych gotowy", time: "11:58", unread: 1 },
         ],
       }
@@ -49,6 +49,30 @@ export default function PhoneMockup() {
             { name: "Support", text: "Data export is ready", time: "11:58", unread: 1 },
           ],
         };
+
+  if (lang === "es") {
+    copy = {
+      pushReady: "Push activo", strapline: "Chats. Llamadas. Push.", cta: "Empezar ahora",
+      floatingCall: "Marta está llamando", floatingPush: "Push a pantalla completa", voiceCall: "Llamada de voz",
+      chats: [
+        { name: "Marta Kowal", text: "Te llamo en un minuto", time: "12:34", unread: 2 },
+        { name: "Equipo", text: "Nuevo mensaje en el grupo", time: "12:30", unread: 5 },
+        { name: "Kamil", text: "Llamada finalizada - 02:14", time: "12:15", unread: 0 },
+        { name: "Soporte", text: "La exportación está lista", time: "11:58", unread: 1 },
+      ],
+    };
+  } else if (lang === "fr") {
+    copy = {
+      pushReady: "Push actif", strapline: "Discussions. Appels. Push.", cta: "Commencer",
+      floatingCall: "Marta appelle", floatingPush: "Push en plein écran", voiceCall: "Appel vocal",
+      chats: [
+        { name: "Marta Kowal", text: "Je t’appelle dans une minute", time: "12:34", unread: 2 },
+        { name: "Équipe", text: "Nouveau message dans le groupe", time: "12:30", unread: 5 },
+        { name: "Kamil", text: "Appel terminé - 02:14", time: "12:15", unread: 0 },
+        { name: "Assistance", text: "L’export est prêt", time: "11:58", unread: 1 },
+      ],
+    };
+  }
 
   return (
     <div className="relative w-[300px] sm:w-[330px] animate-floaty">
