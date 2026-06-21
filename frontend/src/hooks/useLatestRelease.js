@@ -85,4 +85,3 @@ export function useLatestRelease() {
 
   return release;
 }
-
