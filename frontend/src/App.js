@@ -13,6 +13,7 @@ import Terms from "@/pages/Terms";
 import Contact from "@/pages/Contact";
 import Status from "@/pages/Status";
 import Changelog from "@/pages/Changelog";
+import TesterAccess from "@/pages/TesterAccess";
 import AdminLayout from "@/pages/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
 import Users from "@/pages/admin/Users";
@@ -69,6 +70,12 @@ const seo = {
     title: "Build changelog | ghostel.app",
     description: "Public changelog for Ghostel Android, iOS, website and admin panel builds.",
     path: "/updates",
+  },
+  testers: {
+    title: "Ghostel testers | Private access",
+    description: "Private Ghostel tester instructions for Android and iPhone.",
+    path: "/tester-access/ghostel-v1425-join-7k92",
+    robots: "noindex, nofollow, noarchive, nosnippet",
   },
   noindex: {
     title: "ghostel.app",
@@ -131,6 +138,7 @@ function App() {
               <Route path="/contact" element={<Page meta={seo.contact}><Contact /></Page>} />
               <Route path="/status" element={<Page meta={seo.status}><Status /></Page>} />
               <Route path="/updates" element={<Page meta={seo.updates}><Changelog /></Page>} />
+              <Route path="/tester-access/ghostel-v1425-join-7k92" element={<Page meta={seo.testers}><TesterAccess /></Page>} />
               <Route path="/login" element={<Page meta={seo.noindex}><Login /></Page>} />
               <Route path="/register" element={<Page meta={seo.noindex}><Register /></Page>} />
               <Route path="/account" element={<Page meta={seo.noindex}><Account /></Page>} />
