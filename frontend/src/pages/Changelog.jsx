@@ -6,13 +6,13 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-06-21",
-    title: "iOS and Android call interoperability",
+    date: "2026-06-22",
+    title: "Cross-platform call acceptance",
     items: [
-      "Restored Unified Plan audio tracks for consistent iOS and Android negotiation.",
-      "Allowed direct low-latency ICE routes with Cloudflare TURN fallback.",
-      "Removed repeated native audio-session resets that caused dropouts and interference.",
-      "Published Android build 24 and iOS build 20 as version 1.4.24.",
+      "Stopped Android ringback immediately when an iPhone accepts the call.",
+      "Persisted call acceptance so temporary WebSocket disconnects do not lose the event.",
+      "Stopped duplicate ringing on other devices signed into the callee account.",
+      "Published Android build 26 and iOS build 22 as version 1.4.26.",
     ],
   },
   {
