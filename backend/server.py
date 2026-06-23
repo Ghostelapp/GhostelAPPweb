@@ -126,10 +126,13 @@ class ContactSupportIn(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     email: EmailStr
     subject: str = Field(min_length=4, max_length=160)
-    category: Literal["account", "technical", "billing", "security", "feedback", "other"] = "other"
+    category: Literal["account", "technical", "billing", "security", "feedback", "tester", "other"] = "other"
     message: str = Field(min_length=20, max_length=5000)
     app_platform: Optional[Literal["ios", "android", "web", "desktop", "unknown"]] = "unknown"
     app_version: Optional[str] = Field(default="", max_length=40)
+    tester_platform: Optional[Literal["android", "ios"]] = None
+    store_email: Optional[EmailStr] = None
+    device_model: Optional[str] = Field(default="", max_length=120)
     website: Optional[str] = Field(default="", max_length=120)
     submitted_after_ms: Optional[int] = Field(default=0, ge=0, le=600000)
 
@@ -326,6 +329,8 @@ def _support_priority(category: str, subject: str, message: str) -> str:
     high_terms = ("logowanie", "login", "platnosc", "payment", "crash", "nie dziala", "call", "polaczen")
     if category == "security" or any(term in text for term in urgent_terms):
         return "high"
+    if category == "tester":
+        return "normal"
     if any(term in text for term in high_terms):
         return "normal"
     return "normal"
@@ -584,9 +589,12 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
         "message": payload.message.strip(),
         "app_platform": payload.app_platform or "unknown",
         "app_version": (payload.app_version or "").strip(),
+        "tester_platform": payload.tester_platform or None,
+        "store_email": str(payload.store_email or email).lower().strip(),
+        "device_model": (payload.device_model or "").strip(),
         "status": "new",
         "priority": priority,
-        "source": "website",
+        "source": "tester_access" if payload.category == "tester" else "website",
         "assigned_to": "",
         "admin_note": "",
         "history": [
@@ -1112,8 +1120,10 @@ async def list_support_tickets(
                 {"public_id": {"$regex": pattern, "$options": "i"}},
                 {"name": {"$regex": pattern, "$options": "i"}},
                 {"email": {"$regex": pattern, "$options": "i"}},
+                {"store_email": {"$regex": pattern, "$options": "i"}},
                 {"subject": {"$regex": pattern, "$options": "i"}},
                 {"message": {"$regex": pattern, "$options": "i"}},
+                {"device_model": {"$regex": pattern, "$options": "i"}},
             ]
 
     tickets = await db.support_tickets.find(query, {"_id": 0, "ip_hash": 0}).sort("created_at", -1).to_list(500)
@@ -1124,6 +1134,7 @@ async def list_support_tickets(
         "resolved": await db.support_tickets.count_documents({"status": {"$in": ["resolved", "closed"]}}),
         "urgent": await db.support_tickets.count_documents({"priority": "urgent"}),
         "high": await db.support_tickets.count_documents({"priority": "high"}),
+        "tester": await db.support_tickets.count_documents({"category": "tester"}),
     }
     return {"items": tickets, "summary": summary}
 
@@ -1213,18 +1224,24 @@ async def export_csv(kind: str, request: Request):
         for r in reports:
             writer.writerow([r.get("id"), r.get("type"), r.get("target"), r.get("reporter"), r.get("reason"), r.get("status"), r.get("created_at")])
     elif kind == "support":
-        writer.writerow(["public_id", "name", "email", "category", "subject", "status", "priority", "assigned_to", "created_at", "updated_at"])
+        writer.writerow(["public_id", "name", "email", "store_email", "category", "tester_platform", "device_model", "app_platform", "app_version", "subject", "status", "priority", "assigned_to", "source", "created_at", "updated_at"])
         tickets = await db.support_tickets.find({}, {"_id": 0, "ip_hash": 0, "message": 0, "history": 0}).sort("created_at", -1).to_list(5000)
         for t in tickets:
             writer.writerow([
                 t.get("public_id"),
                 t.get("name"),
                 t.get("email"),
+                t.get("store_email"),
                 t.get("category"),
+                t.get("tester_platform"),
+                t.get("device_model"),
+                t.get("app_platform"),
+                t.get("app_version"),
                 t.get("subject"),
                 t.get("status"),
                 t.get("priority"),
                 t.get("assigned_to"),
+                t.get("source"),
                 t.get("created_at"),
                 t.get("updated_at"),
             ])
@@ -1312,6 +1329,8 @@ async def on_startup():
     await db.support_tickets.create_index("status")
     await db.support_tickets.create_index("priority")
     await db.support_tickets.create_index("category")
+    await db.support_tickets.create_index("store_email")
+    await db.support_tickets.create_index("source")
     await db.support_tickets.create_index("created_at")
     await db.status_incidents.create_index("updated_at")
     await db.status_incidents.create_index("public")

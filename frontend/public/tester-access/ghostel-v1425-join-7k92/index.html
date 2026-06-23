@@ -137,6 +137,81 @@
         padding: 22px;
         margin-top: 18px;
       }
+      .tester-form {
+        margin-bottom: 24px;
+        padding: 24px;
+      }
+      .tester-form .intro {
+        display: grid;
+        grid-template-columns: 0.9fr 1.1fr;
+        gap: 22px;
+      }
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .field.full {
+        grid-column: 1 / -1;
+      }
+      label {
+        color: #cbd5e1;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      input, select, textarea {
+        width: 100%;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text);
+        font: inherit;
+        padding: 12px 13px;
+        outline: none;
+      }
+      select option {
+        background: #070a0f;
+        color: var(--text);
+      }
+      textarea {
+        min-height: 96px;
+        resize: vertical;
+      }
+      .form-note {
+        margin-top: 16px;
+        border: 1px solid rgba(251, 191, 36, 0.22);
+        border-radius: 18px;
+        background: rgba(251, 191, 36, 0.1);
+        color: #fde68a;
+        padding: 14px;
+        line-height: 1.6;
+      }
+      .form-status {
+        display: none;
+        margin-top: 14px;
+        border-radius: 16px;
+        padding: 13px 14px;
+        line-height: 1.5;
+      }
+      .form-status.ok {
+        display: block;
+        border: 1px solid rgba(52, 211, 153, 0.22);
+        background: rgba(52, 211, 153, 0.1);
+        color: #bbf7d0;
+      }
+      .form-status.err {
+        display: block;
+        border: 1px solid rgba(248, 113, 113, 0.22);
+        background: rgba(248, 113, 113, 0.1);
+        color: #fecaca;
+      }
       .image-card h3 {
         margin: 0 0 16px;
         font-size: 24px;
@@ -150,6 +225,8 @@
       }
       @media (max-width: 900px) {
         .grid { grid-template-columns: 1fr; }
+        .tester-form .intro { grid-template-columns: 1fr; }
+        .form-grid { grid-template-columns: 1fr; }
         h1 { font-size: 34px; }
         h2 { font-size: 27px; }
       }
@@ -197,6 +274,56 @@
             <a class="btn secondary" href="https://apps.apple.com/app/testflight/id899247664" target="_blank" rel="noreferrer">Zainstaluj TestFlight</a>
           </div>
         </article>
+      </section>
+
+      <section class="card tester-form">
+        <div class="chip ios">Zgloszenie do testow</div>
+        <div class="intro">
+          <div>
+            <h2>Chcesz testowac Ghostel?</h2>
+            <p>
+              Wyslij zgloszenie i podaj adres e-mail, na ktorym masz konto Google Play
+              albo iCloud. Ten adres jest potrzebny, zeby dodac Cie do odpowiedniej grupy
+              testerow Android lub iOS.
+            </p>
+            <div class="form-note">
+              Android: podaj e-mail konta Google Play. iOS: podaj e-mail Apple ID/iCloud
+              uzywany w TestFlight.
+            </div>
+          </div>
+
+          <form id="tester-request-form">
+            <div class="form-grid">
+              <div class="field">
+                <label for="tester-name">Imie / nazwa testera</label>
+                <input id="tester-name" name="name" minlength="2" required placeholder="Np. Patryk" />
+              </div>
+              <div class="field">
+                <label for="tester-platform">Platforma</label>
+                <select id="tester-platform" name="platform" required>
+                  <option value="android">Android / Google Play</option>
+                  <option value="ios">iOS / iCloud / TestFlight</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="tester-email">E-mail Google Play / iCloud</label>
+                <input id="tester-email" name="store_email" type="email" required placeholder="konto@gmail.com" />
+              </div>
+              <div class="field">
+                <label for="tester-device">Model telefonu</label>
+                <input id="tester-device" name="device_model" maxlength="120" placeholder="Np. iPhone 14 / Samsung S23" />
+              </div>
+              <div class="field full">
+                <label for="tester-note">Dodatkowa informacja</label>
+                <textarea id="tester-note" name="note" placeholder="Opcjonalnie: co chcesz testowac albo jaki masz problem z instalacja."></textarea>
+              </div>
+            </div>
+            <div id="tester-form-status" class="form-status"></div>
+            <div class="actions">
+              <button id="tester-submit" class="btn primary" type="submit">Wyslij zgloszenie testera</button>
+            </div>
+          </form>
+        </div>
       </section>
 
       <section class="image-card">
@@ -349,5 +476,72 @@
         </svg>
       </section>
     </div>
+    <script>
+      (function () {
+        var startedAt = Date.now();
+        var form = document.getElementById("tester-request-form");
+        var statusEl = document.getElementById("tester-form-status");
+        var submit = document.getElementById("tester-submit");
+        var platform = document.getElementById("tester-platform");
+        var email = document.getElementById("tester-email");
+        platform.addEventListener("change", function () {
+          email.placeholder = platform.value === "ios" ? "appleid@icloud.com" : "konto@gmail.com";
+        });
+        form.addEventListener("submit", async function (event) {
+          event.preventDefault();
+          statusEl.className = "form-status";
+          statusEl.textContent = "";
+          submit.disabled = true;
+          submit.textContent = "Wysylanie...";
+
+          var data = new FormData(form);
+          var testerPlatform = String(data.get("platform") || "android");
+          var platformLabel = testerPlatform === "ios" ? "iOS / TestFlight" : "Android / Google Play";
+          var storeEmail = String(data.get("store_email") || "").trim();
+          var deviceModel = String(data.get("device_model") || "").trim();
+          var note = String(data.get("note") || "").trim();
+          var message = [
+            "Tester chce dolaczyc do testow Ghostel na platformie: " + platformLabel + ".",
+            "Email sklepu: " + storeEmail + ".",
+            "Model telefonu: " + (deviceModel || "nie podano") + ".",
+            note ? "Dodatkowe informacje: " + note : "Dodatkowe informacje: brak."
+          ].join("\n");
+
+          try {
+            var response = await fetch("https://panel-api.ghostel.app/api/contact", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              credentials: "include",
+              body: JSON.stringify({
+                name: String(data.get("name") || "").trim(),
+                email: storeEmail,
+                subject: "Tester access request - " + platformLabel,
+                category: "tester",
+                message: message,
+                app_platform: testerPlatform,
+                app_version: "1.4.27",
+                tester_platform: testerPlatform,
+                store_email: storeEmail,
+                device_model: deviceModel,
+                submitted_after_ms: Date.now() - startedAt
+              })
+            });
+            var body = await response.json().catch(function () { return {}; });
+            if (!response.ok) {
+              throw new Error(body.detail || "Nie udalo sie wyslac zgloszenia.");
+            }
+            form.reset();
+            statusEl.className = "form-status ok";
+            statusEl.textContent = "Zgloszenie wyslane. Numer: " + (body.ticket_id || "nowe") + ".";
+          } catch (error) {
+            statusEl.className = "form-status err";
+            statusEl.textContent = error.message || "Nie udalo sie wyslac zgloszenia.";
+          } finally {
+            submit.disabled = false;
+            submit.textContent = "Wyslij zgloszenie testera";
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

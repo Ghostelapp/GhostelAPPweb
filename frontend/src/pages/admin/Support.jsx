@@ -35,6 +35,7 @@ const categoryOptions = [
   { value: "billing", label: "Billing" },
   { value: "security", label: "Security" },
   { value: "feedback", label: "Feedback" },
+  { value: "tester", label: "Tester access" },
   { value: "other", label: "Other" },
 ];
 
@@ -148,6 +149,7 @@ export default function Support() {
     { label: "Open", value: summary.open || 0 },
     { label: "Resolved", value: summary.resolved || 0 },
     { label: "High", value: (summary.high || 0) + (summary.urgent || 0) },
+    { label: "Testers", value: summary.tester || 0 },
   ];
 
   return (
@@ -187,7 +189,7 @@ export default function Support() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-5">
+      <div className="grid gap-3 md:grid-cols-6">
         {statCards.map((card) => (
           <div key={card.label} className="glass rounded-2xl p-4">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">{card.label}</div>
@@ -203,7 +205,7 @@ export default function Support() {
             <Input
               value={filters.q}
               onChange={(e) => setFilters({ ...filters, q: e.target.value })}
-              placeholder="Search id, email, subject, message"
+              placeholder="Search id, email, store email, device, subject"
               className="border-white/10 bg-white/5 pl-9 text-white"
             />
           </div>
@@ -269,6 +271,11 @@ export default function Support() {
                 <div className="flex flex-wrap items-center gap-2">
                   <Pill type="status" value={item.status} />
                   <span className="text-[11px] text-zinc-500">{item.email}</span>
+                  {item.category === "tester" && (
+                    <span className="rounded-full border border-blue-400/20 bg-blue-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-blue-300">
+                      {item.tester_platform || item.app_platform || "tester"}
+                    </span>
+                  )}
                   <span className="text-[11px] text-zinc-600">{formatDate(item.created_at)}</span>
                 </div>
               </button>
@@ -313,7 +320,25 @@ export default function Support() {
                 </div>
                 <div className="rounded-xl bg-white/[0.03] p-4">
                   <div className="text-xs uppercase tracking-wider text-zinc-500">Platform</div>
-                  <div className="mt-1 text-white">{selected.app_platform || "unknown"} {selected.app_version ? `v${selected.app_version}` : ""}</div>
+                  <div className="mt-1 text-white">
+                    {selected.tester_platform || selected.app_platform || "unknown"} {selected.app_version ? `v${selected.app_version}` : ""}
+                  </div>
+                </div>
+                {selected.category === "tester" && (
+                  <>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="text-xs uppercase tracking-wider text-zinc-500">Google Play / iCloud email</div>
+                      <div className="mt-1 break-all text-white">{selected.store_email || selected.email}</div>
+                    </div>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="text-xs uppercase tracking-wider text-zinc-500">Device model</div>
+                      <div className="mt-1 text-white">{selected.device_model || "-"}</div>
+                    </div>
+                  </>
+                )}
+                <div className="rounded-xl bg-white/[0.03] p-4">
+                  <div className="text-xs uppercase tracking-wider text-zinc-500">Source</div>
+                  <div className="mt-1 text-white">{selected.source || "website"}</div>
                 </div>
                 <div className="rounded-xl bg-white/[0.03] p-4">
                   <div className="text-xs uppercase tracking-wider text-zinc-500">Created</div>
