@@ -6,6 +6,17 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
+    date: "2026-06-23",
+    title: "Mobile TURN call routing",
+    items: [
+      "Forced native Android and iOS voice calls through TURN relay when available.",
+      "Added recovery when ICE remains in checking instead of waiting indefinitely.",
+      "Kept Web calls on the default direct-or-relay policy.",
+      "Published Android build 27 and iOS build 23 as version 1.4.27.",
+    ],
+  },
+  {
+    version: "1.4.26",
     date: "2026-06-22",
     title: "Cross-platform call acceptance",
     items: [

@@ -36,7 +36,7 @@ export default function TesterAccess() {
                 <Download className="h-4 w-4" />
                 Android APK
               </div>
-              <h2 className="font-display text-3xl font-bold">Android 1.4.26 (26)</h2>
+              <h2 className="font-display text-3xl font-bold">Android 1.4.27 (27)</h2>
               <p className="mt-3 text-zinc-400">
                 Pobierz plik APK, zezwól na instalację z tego źródła i uruchom aplikację.
               </p>
@@ -62,7 +62,7 @@ export default function TesterAccess() {
                 <Apple className="h-4 w-4" />
                 iPhone / TestFlight
               </div>
-              <h2 className="font-display text-3xl font-bold">iOS 1.4.26 (22)</h2>
+              <h2 className="font-display text-3xl font-bold">iOS 1.4.27 (23)</h2>
               <p className="mt-3 text-zinc-400">
                 Na iOS testy odbywają się przez TestFlight. Najpierw zainstaluj TestFlight,
                 potem otwórz zaproszenie do testów albo publiczny link TestFlight od zespołu Ghostel.
