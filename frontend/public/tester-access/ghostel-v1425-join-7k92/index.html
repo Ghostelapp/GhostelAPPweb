@@ -3,9 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="robots" content="noindex, nofollow, noarchive, nosnippet" />
+    <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#070a0f" />
-    <title>Ghostel testers | Private access</title>
+    <title>Ghostel testers | Public testing program</title>
     <style>
       :root {
         color-scheme: dark;
@@ -16,6 +16,7 @@
         --muted: #94a3b8;
         --cyan: #22d3ee;
         --green: #34d399;
+        --amber: #f59e0b;
       }
       * { box-sizing: border-box; }
       body {
@@ -94,6 +95,11 @@
         border: 1px solid rgba(96, 165, 250, 0.24);
         background: rgba(96, 165, 250, 0.1);
       }
+      .chip.reward {
+        color: #fde68a;
+        border: 1px solid rgba(245, 158, 11, 0.28);
+        background: rgba(245, 158, 11, 0.12);
+      }
       h2 {
         margin: 16px 0 10px;
         font-size: 31px;
@@ -140,6 +146,9 @@
       .tester-form {
         margin-bottom: 24px;
         padding: 24px;
+      }
+      .reward-card {
+        margin-bottom: 24px;
       }
       .tester-form .intro {
         display: grid;
@@ -235,11 +244,24 @@
   <body>
     <div class="wrap">
       <section class="hero">
-        <div class="eyebrow">Private tester access</div>
-        <h1>Ghostel - instrukcja do testów</h1>
+        <div class="eyebrow">Publiczny program testów</div>
+        <h1>Ghostel - testy Android i iOS</h1>
         <p class="lead">
-          Ta strona jest przeznaczona tylko dla osób, które dostały bezpośredni link.
-          Zawiera aktualne instrukcje instalacji i testowania Ghostel na Androidzie i iPhonie.
+          Dołącz do publicznych testów Ghostel, instaluj aktualne buildy testowe,
+          zgłaszaj realne błędy i pomóż ustabilizować połączenia, powiadomienia oraz instalację.
+        </p>
+      </section>
+
+      <section class="card reward-card">
+        <div class="chip reward">Nagrody BTC</div>
+        <h2>Nagrody w Bitcoinie dla najlepszych zgłaszających błędy</h2>
+        <p>
+          Testerzy z największą liczbą potwierdzonych i wartościowych zgłoszeń błędów
+          mogą otrzymać nagrody w BTC. Liczą się zgłoszenia z jasnymi krokami odtworzenia,
+          zrzutami ekranu lub logami oraz realnym wpływem na testy Android/iOS.
+        </p>
+        <p class="note">
+          Duplikaty, słabe zgłoszenia i spam nie są liczone.
         </p>
       </section>
 
@@ -277,25 +299,25 @@
       </section>
 
       <section class="card tester-form">
-        <div class="chip ios">Zgloszenie do testow</div>
+        <div class="chip ios">Zgłoszenie do testów</div>
         <div class="intro">
           <div>
-            <h2>Chcesz testowac Ghostel?</h2>
+            <h2>Chcesz testować Ghostel?</h2>
             <p>
-              Wyslij zgloszenie i podaj adres e-mail, na ktorym masz konto Google Play
-              albo iCloud. Ten adres jest potrzebny, zeby dodac Cie do odpowiedniej grupy
-              testerow Android lub iOS.
+              Wyślij zgłoszenie i podaj adres e-mail, na którym masz konto Google Play
+              albo iCloud. Ten adres jest potrzebny, żeby dodać Cię do odpowiedniej grupy
+              testerów Android lub iOS.
             </p>
             <div class="form-note">
               Android: podaj e-mail konta Google Play. iOS: podaj e-mail Apple ID/iCloud
-              uzywany w TestFlight.
+              używany w TestFlight.
             </div>
           </div>
 
           <form id="tester-request-form">
             <div class="form-grid">
               <div class="field">
-                <label for="tester-name">Imie / nazwa testera</label>
+                <label for="tester-name">Imię / nazwa testera</label>
                 <input id="tester-name" name="name" minlength="2" required placeholder="Np. Patryk" />
               </div>
               <div class="field">
@@ -315,12 +337,12 @@
               </div>
               <div class="field full">
                 <label for="tester-note">Dodatkowa informacja</label>
-                <textarea id="tester-note" name="note" placeholder="Opcjonalnie: co chcesz testowac albo jaki masz problem z instalacja."></textarea>
+                <textarea id="tester-note" name="note" placeholder="Opcjonalnie: co chcesz testować albo jaki masz problem z instalacją."></textarea>
               </div>
             </div>
             <div id="tester-form-status" class="form-status"></div>
             <div class="actions">
-              <button id="tester-submit" class="btn primary" type="submit">Wyslij zgloszenie testera</button>
+              <button id="tester-submit" class="btn primary" type="submit">Wyślij zgłoszenie testera</button>
             </div>
           </form>
         </div>
@@ -492,7 +514,7 @@
           statusEl.className = "form-status";
           statusEl.textContent = "";
           submit.disabled = true;
-          submit.textContent = "Wysylanie...";
+          submit.textContent = "Wysyłanie...";
 
           var data = new FormData(form);
           var testerPlatform = String(data.get("platform") || "android");
@@ -501,7 +523,7 @@
           var deviceModel = String(data.get("device_model") || "").trim();
           var note = String(data.get("note") || "").trim();
           var message = [
-            "Tester chce dolaczyc do testow Ghostel na platformie: " + platformLabel + ".",
+            "Tester chce dołączyć do testów Ghostel na platformie: " + platformLabel + ".",
             "Email sklepu: " + storeEmail + ".",
             "Model telefonu: " + (deviceModel || "nie podano") + ".",
             note ? "Dodatkowe informacje: " + note : "Dodatkowe informacje: brak."
@@ -528,17 +550,17 @@
             });
             var body = await response.json().catch(function () { return {}; });
             if (!response.ok) {
-              throw new Error(body.detail || "Nie udalo sie wyslac zgloszenia.");
+              throw new Error(body.detail || "Nie udało się wysłać zgłoszenia.");
             }
             form.reset();
             statusEl.className = "form-status ok";
-            statusEl.textContent = "Zgloszenie wyslane. Numer: " + (body.ticket_id || "nowe") + ".";
+            statusEl.textContent = "Zgłoszenie wysłane. Numer: " + (body.ticket_id || "nowe") + ".";
           } catch (error) {
             statusEl.className = "form-status err";
-            statusEl.textContent = error.message || "Nie udalo sie wyslac zgloszenia.";
+            statusEl.textContent = error.message || "Nie udało się wysłać zgłoszenia.";
           } finally {
             submit.disabled = false;
-            submit.textContent = "Wyslij zgloszenie testera";
+            submit.textContent = "Wyślij zgłoszenie testera";
           }
         });
       })();

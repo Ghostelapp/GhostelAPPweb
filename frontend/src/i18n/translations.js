@@ -35,6 +35,7 @@ export const translations = {
       why: "Bezpieczeństwo",
       comparison: "Porównanie",
       how: "Jak działa",
+      testers: "Testy",
       download: "Pobierz",
       privacy: "Prywatność",
       faq: "FAQ",
@@ -287,6 +288,7 @@ export const translations = {
       why: "Security",
       comparison: "Comparison",
       how: "How it works",
+      testers: "Testing",
       download: "Download",
       privacy: "Privacy",
       faq: "FAQ",
@@ -543,6 +545,7 @@ translations.de = {
     why: "Sicherheit",
     comparison: "Vergleich",
     how: "So funktioniert es",
+    testers: "Tests",
     download: "Download",
     privacy: "Datenschutz",
     faq: "FAQ",
@@ -730,7 +733,7 @@ translations.es = {
   },
   nav: {
     features: "Funciones", why: "Seguridad", comparison: "Comparación",
-    how: "Cómo funciona", download: "Descargar", privacy: "Privacidad",
+    how: "Cómo funciona", testers: "Pruebas", download: "Descargar", privacy: "Privacidad",
     faq: "Preguntas frecuentes", deleteAccount: "Eliminar cuenta",
   },
   hero: {
@@ -838,7 +841,7 @@ translations.fr = {
   },
   nav: {
     features: "Fonctionnalités", why: "Sécurité", comparison: "Comparaison",
-    how: "Fonctionnement", download: "Télécharger", privacy: "Confidentialité",
+    how: "Fonctionnement", testers: "Tests", download: "Télécharger", privacy: "Confidentialité",
     faq: "FAQ", deleteAccount: "Supprimer le compte",
   },
   hero: {

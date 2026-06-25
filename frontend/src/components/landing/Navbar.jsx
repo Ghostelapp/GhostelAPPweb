@@ -28,6 +28,7 @@ export default function Navbar() {
     { section: "features", label: t("nav.features") },
     { section: "why", label: t("nav.why") },
     { section: "comparison", label: t("nav.comparison") },
+    { href: "/testers", label: t("nav.testers") },
     { section: "download", label: t("nav.download") },
     { section: "faq", label: t("nav.faq") },
   ];

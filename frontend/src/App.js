@@ -72,10 +72,10 @@ const seo = {
     path: "/updates",
   },
   testers: {
-    title: "Ghostel testers | Private access",
-    description: "Private Ghostel tester instructions for Android and iPhone.",
-    path: "/tester-access/ghostel-v1425-join-7k92",
-    robots: "noindex, nofollow, noarchive, nosnippet",
+    title: "Ghostel public testing program | Android and iOS",
+    description:
+      "Join Ghostel public testing on Android and iOS, report bugs and compete for BTC rewards for verified reports.",
+    path: "/testers",
   },
   noindex: {
     title: "ghostel.app",
@@ -138,7 +138,8 @@ function App() {
               <Route path="/contact" element={<Page meta={seo.contact}><Contact /></Page>} />
               <Route path="/status" element={<Page meta={seo.status}><Status /></Page>} />
               <Route path="/updates" element={<Page meta={seo.updates}><Changelog /></Page>} />
-              <Route path="/tester-access/ghostel-v1425-join-7k92" element={<Page meta={seo.testers}><TesterAccess /></Page>} />
+              <Route path="/testers" element={<Page meta={seo.testers}><TesterAccess /></Page>} />
+              <Route path="/tester-access/ghostel-v1425-join-7k92" element={<Navigate to="/testers" replace />} />
               <Route path="/login" element={<Page meta={seo.noindex}><Login /></Page>} />
               <Route path="/register" element={<Page meta={seo.noindex}><Register /></Page>} />
               <Route path="/account" element={<Page meta={seo.noindex}><Account /></Page>} />
