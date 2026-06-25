@@ -126,13 +126,14 @@ class ContactSupportIn(BaseModel):
     name: str = Field(min_length=2, max_length=120)
     email: EmailStr
     subject: str = Field(min_length=4, max_length=160)
-    category: Literal["account", "technical", "billing", "security", "feedback", "tester", "other"] = "other"
+    category: Literal["account", "technical", "billing", "security", "feedback", "tester", "bug", "other"] = "other"
     message: str = Field(min_length=20, max_length=5000)
     app_platform: Optional[Literal["ios", "android", "web", "desktop", "unknown"]] = "unknown"
     app_version: Optional[str] = Field(default="", max_length=40)
     tester_platform: Optional[Literal["android", "ios"]] = None
     store_email: Optional[EmailStr] = None
     device_model: Optional[str] = Field(default="", max_length=120)
+    public_reporter_name: Optional[str] = Field(default="", max_length=80)
     website: Optional[str] = Field(default="", max_length=120)
     submitted_after_ms: Optional[int] = Field(default=0, ge=0, le=600000)
 
@@ -142,6 +143,9 @@ class SupportTicketUpdateIn(BaseModel):
     priority: Optional[Literal["low", "normal", "high", "urgent"]] = None
     assigned_to: Optional[str] = Field(default=None, max_length=120)
     admin_note: Optional[str] = Field(default=None, max_length=4000)
+    bug_status: Optional[Literal["pending", "accepted", "rejected"]] = None
+    bug_points: Optional[int] = Field(default=None, ge=0, le=100)
+    public_reporter_name: Optional[str] = Field(default=None, max_length=80)
 
 
 # ----- helpers -----
@@ -329,7 +333,7 @@ def _support_priority(category: str, subject: str, message: str) -> str:
     high_terms = ("logowanie", "login", "platnosc", "payment", "crash", "nie dziala", "call", "polaczen")
     if category == "security" or any(term in text for term in urgent_terms):
         return "high"
-    if category == "tester":
+    if category in {"tester", "bug"}:
         return "normal"
     if any(term in text for term in high_terms):
         return "normal"
@@ -340,6 +344,22 @@ def _support_public_doc(doc: dict) -> dict:
     doc.pop("_id", None)
     doc.pop("ip_hash", None)
     return doc
+
+
+def _leaderboard_prize(rank: int) -> str:
+    if rank == 1:
+        return "$100 BTC"
+    if rank == 2:
+        return "$50 BTC"
+    if rank == 3:
+        return "$25 BTC"
+    return ""
+
+
+def _safe_public_reporter_name(value: str, fallback: str) -> str:
+    name = (value or fallback or "Tester").strip()
+    name = re.sub(r"\s+", " ", name)
+    return name[:80] or "Tester"
 
 
 async def _check_status_service(client: httpx.AsyncClient, service: dict) -> dict:
@@ -592,9 +612,12 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
         "tester_platform": payload.tester_platform or None,
         "store_email": str(payload.store_email or email).lower().strip(),
         "device_model": (payload.device_model or "").strip(),
+        "public_reporter_name": _safe_public_reporter_name(payload.public_reporter_name or payload.name, payload.name),
+        "bug_status": "pending" if payload.category == "bug" else None,
+        "bug_points": 0,
         "status": "new",
         "priority": priority,
-        "source": "tester_access" if payload.category == "tester" else "website",
+        "source": "tester_access" if payload.category in {"tester", "bug"} else "website",
         "assigned_to": "",
         "admin_note": "",
         "history": [
@@ -618,6 +641,56 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
 @api.get("/status")
 async def public_status():
     return await _public_service_status()
+
+
+@api.get("/tester-leaderboard")
+async def public_tester_leaderboard():
+    tickets = await db.support_tickets.find(
+        {"category": "bug", "bug_status": "accepted"},
+        {
+            "_id": 0,
+            "email": 1,
+            "name": 1,
+            "public_reporter_name": 1,
+            "bug_points": 1,
+            "created_at": 1,
+        },
+    ).to_list(5000)
+
+    grouped: dict[str, dict] = {}
+    for ticket in tickets:
+        key = (ticket.get("email") or ticket.get("public_reporter_name") or ticket.get("name") or "tester").lower()
+        current = grouped.setdefault(
+            key,
+            {
+                "name": _safe_public_reporter_name(ticket.get("public_reporter_name"), ticket.get("name")),
+                "accepted_reports": 0,
+                "points": 0,
+                "last_report_at": ticket.get("created_at"),
+            },
+        )
+        current["accepted_reports"] += 1
+        current["points"] += int(ticket.get("bug_points") or 1)
+        if ticket.get("created_at") and (not current.get("last_report_at") or ticket["created_at"] > current["last_report_at"]):
+            current["last_report_at"] = ticket["created_at"]
+        if ticket.get("public_reporter_name"):
+            current["name"] = _safe_public_reporter_name(ticket.get("public_reporter_name"), current["name"])
+
+    items = sorted(
+        grouped.values(),
+        key=lambda item: (-item["points"], -item["accepted_reports"], item.get("last_report_at") or ""),
+    )[:10]
+    for index, item in enumerate(items, start=1):
+        item["rank"] = index
+        item["prize"] = _leaderboard_prize(index)
+    return {
+        "items": items,
+        "prizes": [
+            {"rank": 1, "amount": "$100", "asset": "BTC"},
+            {"rank": 2, "amount": "$50", "asset": "BTC"},
+            {"rank": 3, "amount": "$25", "asset": "BTC"},
+        ],
+    }
 
 
 # ----- Auth -----
@@ -1135,6 +1208,9 @@ async def list_support_tickets(
         "urgent": await db.support_tickets.count_documents({"priority": "urgent"}),
         "high": await db.support_tickets.count_documents({"priority": "high"}),
         "tester": await db.support_tickets.count_documents({"category": "tester"}),
+        "bug": await db.support_tickets.count_documents({"category": "bug"}),
+        "bug_pending": await db.support_tickets.count_documents({"category": "bug", "bug_status": "pending"}),
+        "bug_accepted": await db.support_tickets.count_documents({"category": "bug", "bug_status": "accepted"}),
     }
     return {"items": tickets, "summary": summary}
 
@@ -1162,6 +1238,10 @@ async def update_support_ticket(ticket_id: str, payload: SupportTicketUpdateIn, 
     update = {k: v for k, v in incoming.items() if v is not None}
     if not update:
         raise HTTPException(status_code=400, detail="No changes provided")
+    if "public_reporter_name" in update:
+        update["public_reporter_name"] = _safe_public_reporter_name(update["public_reporter_name"], current.get("name"))
+    if ("bug_status" in update or "bug_points" in update) and current.get("category") != "bug":
+        raise HTTPException(status_code=400, detail="Bug ranking can be changed only for bug tickets.")
 
     now_iso = datetime.now(timezone.utc).isoformat()
     update["updated_at"] = now_iso
@@ -1224,15 +1304,18 @@ async def export_csv(kind: str, request: Request):
         for r in reports:
             writer.writerow([r.get("id"), r.get("type"), r.get("target"), r.get("reporter"), r.get("reason"), r.get("status"), r.get("created_at")])
     elif kind == "support":
-        writer.writerow(["public_id", "name", "email", "store_email", "category", "tester_platform", "device_model", "app_platform", "app_version", "subject", "status", "priority", "assigned_to", "source", "created_at", "updated_at"])
+        writer.writerow(["public_id", "name", "public_reporter_name", "email", "store_email", "category", "bug_status", "bug_points", "tester_platform", "device_model", "app_platform", "app_version", "subject", "status", "priority", "assigned_to", "source", "created_at", "updated_at"])
         tickets = await db.support_tickets.find({}, {"_id": 0, "ip_hash": 0, "message": 0, "history": 0}).sort("created_at", -1).to_list(5000)
         for t in tickets:
             writer.writerow([
                 t.get("public_id"),
                 t.get("name"),
+                t.get("public_reporter_name"),
                 t.get("email"),
                 t.get("store_email"),
                 t.get("category"),
+                t.get("bug_status"),
+                t.get("bug_points"),
                 t.get("tester_platform"),
                 t.get("device_model"),
                 t.get("app_platform"),
@@ -1329,6 +1412,9 @@ async def on_startup():
     await db.support_tickets.create_index("status")
     await db.support_tickets.create_index("priority")
     await db.support_tickets.create_index("category")
+    await db.support_tickets.create_index("bug_status")
+    await db.support_tickets.create_index("bug_points")
+    await db.support_tickets.create_index("public_reporter_name")
     await db.support_tickets.create_index("store_email")
     await db.support_tickets.create_index("source")
     await db.support_tickets.create_index("created_at")

@@ -1,14 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Apple,
   Bitcoin,
   Bug,
   CheckCircle2,
+  Crown,
   Download,
   ExternalLink,
+  Medal,
   Send,
   ShieldCheck,
   Smartphone,
+  Trophy,
 } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
@@ -44,6 +47,23 @@ const copy = {
       "The testers with the most verified and useful bug reports may receive rewards in Bitcoin. Duplicate, low-quality or abusive reports do not count.",
     rewardRules:
       "Reward eligibility is based on confirmed reports with clear steps, screenshots or logs, and real impact on Android/iOS testing.",
+    leaderboardTitle: "Bug reporters leaderboard",
+    leaderboardDesc: "Top 10 accepted bug reporters. Admin-approved reports count toward the ranking.",
+    leaderboardEmpty: "No accepted bug reports yet.",
+    reports: "reports",
+    points: "points",
+    prize1: "1st place: $100 in BTC",
+    prize2: "2nd place: $50 in BTC",
+    prize3: "3rd place: $25 in BTC",
+    bugFormEyebrow: "Report a bug",
+    bugFormTitle: "Contact us about a bug",
+    bugFormDesc: "Use this form for bugs found during Android or iOS testing. Reports appear in the admin panel and count in the leaderboard only after approval.",
+    bugSubject: "Bug title",
+    bugSubjectPlaceholder: "Example: Call stays connecting after unlock",
+    bugDetails: "Bug details",
+    bugDetailsPlaceholder: "Describe steps to reproduce, expected result, actual result, screenshots/logs if available.",
+    bugSubmit: "Send bug report",
+    bugSuccess: "Bug report sent. Ticket:",
     formEyebrow: "Tester signup",
     formTitle: "Want to test Ghostel?",
     formDesc:
@@ -85,6 +105,23 @@ const copy = {
       "Testerzy z największą liczbą potwierdzonych i wartościowych zgłoszeń błędów mogą otrzymać nagrody w Bitcoinie. Duplikaty, słabe lub spamowe zgłoszenia nie są liczone.",
     rewardRules:
       "Liczą się potwierdzone zgłoszenia z jasnymi krokami odtworzenia, zrzutami ekranu lub logami oraz realnym wpływem na testy Android/iOS.",
+    leaderboardTitle: "Lista zgłaszających błędy",
+    leaderboardDesc: "TOP 10 zaakceptowanych zgłaszających. Do rankingu liczą się tylko zgłoszenia zatwierdzone w panelu admina.",
+    leaderboardEmpty: "Nie ma jeszcze zaakceptowanych zgłoszeń błędów.",
+    reports: "zgłoszenia",
+    points: "punkty",
+    prize1: "1 miejsce: 100$ w BTC",
+    prize2: "2 miejsce: 50$ w BTC",
+    prize3: "3 miejsce: 25$ w BTC",
+    bugFormEyebrow: "Zgłoś błąd",
+    bugFormTitle: "Kontakt w sprawie błędów",
+    bugFormDesc: "Użyj tego formularza do błędów znalezionych podczas testów Androida lub iOS. Zgłoszenia pojawią się w panelu admina i trafią do rankingu dopiero po akceptacji.",
+    bugSubject: "Tytuł błędu",
+    bugSubjectPlaceholder: "Np. Po odblokowaniu ekran zostaje na connecting",
+    bugDetails: "Opis błędu",
+    bugDetailsPlaceholder: "Opisz kroki odtworzenia, oczekiwany efekt, faktyczny efekt, zrzuty ekranu albo logi, jeśli je masz.",
+    bugSubmit: "Wyślij zgłoszenie błędu",
+    bugSuccess: "Zgłoszenie błędu wysłane. Numer:",
     formEyebrow: "Zgłoszenie testera",
     formTitle: "Chcesz testować Ghostel?",
     formDesc:
@@ -240,12 +277,34 @@ export default function TesterAccess() {
     device_model: "",
     note: "",
   });
+  const [bugForm, setBugForm] = useState({
+    name: "",
+    platform: "android",
+    email: "",
+    device_model: "",
+    subject: "",
+    details: "",
+  });
+  const [leaderboard, setLeaderboard] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [submittingBug, setSubmittingBug] = useState(false);
   const [submitState, setSubmitState] = useState(null);
+  const [bugSubmitState, setBugSubmitState] = useState(null);
+
+  useEffect(() => {
+    api.get("/tester-leaderboard")
+      .then((response) => setLeaderboard(response.data?.items || []))
+      .catch(() => setLeaderboard([]));
+  }, []);
 
   const updateForm = (key, value) => {
     setForm((current) => ({ ...current, [key]: value }));
     setSubmitState(null);
+  };
+
+  const updateBugForm = (key, value) => {
+    setBugForm((current) => ({ ...current, [key]: value }));
+    setBugSubmitState(null);
   };
 
   const submitTesterRequest = async (event) => {
@@ -283,6 +342,44 @@ export default function TesterAccess() {
       setSubmitState({ type: "error", text: formatApiError(error) });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const submitBugReport = async (event) => {
+    event.preventDefault();
+    setSubmittingBug(true);
+    setBugSubmitState(null);
+    try {
+      const platformLabel = bugForm.platform === "ios" ? "iOS / TestFlight" : "Android / Google Play";
+      const message = [
+        `Bug report from Ghostel tester on: ${platformLabel}.`,
+        `Device model: ${bugForm.device_model || "not provided"}.`,
+        "",
+        bugForm.details,
+      ].join("\n");
+      const response = await api.post("/contact", {
+        name: bugForm.name,
+        email: bugForm.email,
+        subject: bugForm.subject,
+        category: "bug",
+        message,
+        app_platform: bugForm.platform,
+        app_version: TESTER_APP_VERSION,
+        tester_platform: bugForm.platform,
+        store_email: bugForm.email,
+        device_model: bugForm.device_model,
+        public_reporter_name: bugForm.name,
+        submitted_after_ms: Date.now() - startedAt,
+      });
+      setBugForm({ name: "", platform: "android", email: "", device_model: "", subject: "", details: "" });
+      setBugSubmitState({
+        type: "success",
+        text: `${t.bugSuccess || copy.en.bugSuccess} ${response.data?.ticket_id || "new"}.`,
+      });
+    } catch (error) {
+      setBugSubmitState({ type: "error", text: formatApiError(error) });
+    } finally {
+      setSubmittingBug(false);
     }
   };
 
@@ -358,6 +455,160 @@ export default function TesterAccess() {
               <div className="mt-5 rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm leading-6 text-amber-100">
                 {t.formNote}
               </div>
+            </div>
+          </section>
+
+          <section className="mb-8 glass rounded-3xl p-6">
+            <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-300">
+                  <Trophy className="h-4 w-4" />
+                  TOP 10
+                </div>
+                <h2 className="font-display text-3xl font-bold">{t.leaderboardTitle || copy.en.leaderboardTitle}</h2>
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-400">{t.leaderboardDesc || copy.en.leaderboardDesc}</p>
+              </div>
+              <div className="grid gap-2 text-sm sm:grid-cols-3">
+                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-amber-100">{t.prize1 || copy.en.prize1}</div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-zinc-200">{t.prize2 || copy.en.prize2}</div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-zinc-200">{t.prize3 || copy.en.prize3}</div>
+              </div>
+            </div>
+
+            <div className="overflow-hidden rounded-2xl border border-white/10">
+              {leaderboard.length > 0 ? (
+                leaderboard.map((item) => (
+                  <div key={`${item.rank}-${item.name}`} className="grid gap-3 border-b border-white/10 bg-white/[0.03] p-4 last:border-b-0 sm:grid-cols-[70px_1fr_auto_auto] sm:items-center">
+                    <div className="flex items-center gap-2 font-display text-2xl font-black text-white">
+                      {item.rank <= 3 ? <Crown className="h-5 w-5 text-amber-300" /> : <Medal className="h-5 w-5 text-zinc-500" />}
+                      #{item.rank}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white">{item.name}</div>
+                      <div className="text-xs text-zinc-500">
+                        {item.accepted_reports} {t.reports || copy.en.reports}
+                      </div>
+                    </div>
+                    <div className="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-cyan-300">
+                      {item.points} {t.points || copy.en.points}
+                    </div>
+                    <div className="text-sm font-semibold text-amber-200">{item.prize}</div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 text-center text-sm text-zinc-500">{t.leaderboardEmpty || copy.en.leaderboardEmpty}</div>
+              )}
+            </div>
+          </section>
+
+          <section className="mb-8 glass rounded-3xl p-6">
+            <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.2em] text-amber-300">
+              <Bug className="h-4 w-4" />
+              {t.bugFormEyebrow || copy.en.bugFormEyebrow}
+            </div>
+            <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+              <div>
+                <h2 className="font-display text-3xl font-bold">{t.bugFormTitle || copy.en.bugFormTitle}</h2>
+                <p className="mt-3 text-sm leading-6 text-zinc-400">{t.bugFormDesc || copy.en.bugFormDesc}</p>
+              </div>
+
+              <form onSubmit={submitBugReport} className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.name}</Label>
+                    <Input
+                      required
+                      minLength={2}
+                      value={bugForm.name}
+                      onChange={(e) => updateBugForm("name", e.target.value)}
+                      className="mt-2 border-white/10 bg-white/5 text-white"
+                      placeholder={t.namePlaceholder}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.storeEmail}</Label>
+                    <Input
+                      required
+                      type="email"
+                      value={bugForm.email}
+                      onChange={(e) => updateBugForm("email", e.target.value)}
+                      className="mt-2 border-white/10 bg-white/5 text-white"
+                      placeholder="account@gmail.com"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.platform}</Label>
+                    <select
+                      value={bugForm.platform}
+                      onChange={(e) => updateBugForm("platform", e.target.value)}
+                      className="mt-2 h-10 w-full rounded-md border border-white/10 bg-white/5 px-3 text-sm text-white outline-none"
+                    >
+                      <option className="bg-zinc-950" value="android">Android / Google Play</option>
+                      <option className="bg-zinc-950" value="ios">iOS / iCloud / TestFlight</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.deviceModel}</Label>
+                    <Input
+                      value={bugForm.device_model}
+                      onChange={(e) => updateBugForm("device_model", e.target.value)}
+                      className="mt-2 border-white/10 bg-white/5 text-white"
+                      placeholder={t.devicePlaceholder}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.bugSubject || copy.en.bugSubject}</Label>
+                  <Input
+                    required
+                    minLength={4}
+                    value={bugForm.subject}
+                    onChange={(e) => updateBugForm("subject", e.target.value)}
+                    className="mt-2 border-white/10 bg-white/5 text-white"
+                    placeholder={t.bugSubjectPlaceholder || copy.en.bugSubjectPlaceholder}
+                  />
+                </div>
+
+                <div>
+                  <Label className="text-xs uppercase tracking-wider text-zinc-400">{t.bugDetails || copy.en.bugDetails}</Label>
+                  <Textarea
+                    required
+                    minLength={20}
+                    value={bugForm.details}
+                    onChange={(e) => updateBugForm("details", e.target.value)}
+                    className="mt-2 min-h-[130px] border-white/10 bg-white/5 text-white"
+                    placeholder={t.bugDetailsPlaceholder || copy.en.bugDetailsPlaceholder}
+                  />
+                </div>
+
+                {bugSubmitState && (
+                  <div
+                    className={`rounded-2xl border p-4 text-sm ${
+                      bugSubmitState.type === "success"
+                        ? "border-emerald-400/20 bg-emerald-400/10 text-emerald-200"
+                        : "border-red-400/20 bg-red-400/10 text-red-200"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      {bugSubmitState.type === "success" && <CheckCircle2 className="h-4 w-4" />}
+                      {bugSubmitState.text}
+                    </div>
+                  </div>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={submittingBug}
+                  className="h-11 w-full rounded-xl bg-gradient-to-r from-amber-300 to-cyan-400 font-semibold text-zinc-950 hover:opacity-95"
+                >
+                  <Bug className="h-4 w-4" />
+                  {submittingBug ? t.submitting : (t.bugSubmit || copy.en.bugSubmit)}
+                </Button>
+              </form>
             </div>
           </section>
 

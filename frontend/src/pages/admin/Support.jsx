@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Download, Inbox, LifeBuoy, RefreshCcw, Save, Search } from "lucide-react";
+import { Bug, Download, Inbox, LifeBuoy, RefreshCcw, Save, Search, Trophy } from "lucide-react";
 import api, { downloadExport, formatApiError } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,14 @@ const categoryOptions = [
   { value: "security", label: "Security" },
   { value: "feedback", label: "Feedback" },
   { value: "tester", label: "Tester access" },
+  { value: "bug", label: "Bug report" },
   { value: "other", label: "Other" },
+];
+
+const bugStatusOptions = [
+  { value: "pending", label: "Pending review" },
+  { value: "accepted", label: "Accepted to ranking" },
+  { value: "rejected", label: "Rejected" },
 ];
 
 function pillClass(type, value) {
@@ -82,6 +89,9 @@ export default function Support() {
     priority: "normal",
     assigned_to: "",
     admin_note: "",
+    bug_status: "pending",
+    bug_points: 1,
+    public_reporter_name: "",
   });
 
   const selected = useMemo(
@@ -121,6 +131,9 @@ export default function Support() {
       priority: selected.priority || "normal",
       assigned_to: selected.assigned_to || "",
       admin_note: selected.admin_note || "",
+      bug_status: selected.bug_status || "pending",
+      bug_points: selected.bug_points ?? 1,
+      public_reporter_name: selected.public_reporter_name || selected.name || "",
     });
   }, [selected]);
 
@@ -133,7 +146,13 @@ export default function Support() {
     if (!selected) return;
     setSaving(true);
     try {
-      const response = await api.patch(`/admin/support/${selected.id}`, draft);
+      const payload = { ...draft };
+      if (selected.category !== "bug") {
+        delete payload.bug_status;
+        delete payload.bug_points;
+        delete payload.public_reporter_name;
+      }
+      const response = await api.patch(`/admin/support/${selected.id}`, payload);
       setItems((current) => current.map((item) => (item.id === selected.id ? response.data : item)));
       toast.success("Support ticket updated");
     } catch (error) {
@@ -150,6 +169,7 @@ export default function Support() {
     { label: "Resolved", value: summary.resolved || 0 },
     { label: "High", value: (summary.high || 0) + (summary.urgent || 0) },
     { label: "Testers", value: summary.tester || 0 },
+    { label: "Bugs accepted", value: summary.bug_accepted || 0 },
   ];
 
   return (
@@ -189,7 +209,7 @@ export default function Support() {
         </div>
       </div>
 
-      <div className="grid gap-3 md:grid-cols-6">
+      <div className="grid gap-3 md:grid-cols-7">
         {statCards.map((card) => (
           <div key={card.label} className="glass rounded-2xl p-4">
             <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500">{card.label}</div>
@@ -276,6 +296,11 @@ export default function Support() {
                       {item.tester_platform || item.app_platform || "tester"}
                     </span>
                   )}
+                  {item.category === "bug" && (
+                    <span className="rounded-full border border-amber-400/20 bg-amber-400/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-[0.12em] text-amber-300">
+                      bug: {item.bug_status || "pending"}
+                    </span>
+                  )}
                   <span className="text-[11px] text-zinc-600">{formatDate(item.created_at)}</span>
                 </div>
               </button>
@@ -336,6 +361,32 @@ export default function Support() {
                     </div>
                   </>
                 )}
+                {selected.category === "bug" && (
+                  <>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-500">
+                        <Bug className="h-3.5 w-3.5" />
+                        Bug ranking status
+                      </div>
+                      <div className="mt-1 text-white">{selected.bug_status || "pending"}</div>
+                    </div>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="flex items-center gap-2 text-xs uppercase tracking-wider text-zinc-500">
+                        <Trophy className="h-3.5 w-3.5" />
+                        Ranking points
+                      </div>
+                      <div className="mt-1 text-white">{selected.bug_points ?? 0}</div>
+                    </div>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="text-xs uppercase tracking-wider text-zinc-500">Public ranking name</div>
+                      <div className="mt-1 text-white">{selected.public_reporter_name || selected.name}</div>
+                    </div>
+                    <div className="rounded-xl bg-white/[0.03] p-4">
+                      <div className="text-xs uppercase tracking-wider text-zinc-500">Reporter email</div>
+                      <div className="mt-1 break-all text-white">{selected.email}</div>
+                    </div>
+                  </>
+                )}
                 <div className="rounded-xl bg-white/[0.03] p-4">
                   <div className="text-xs uppercase tracking-wider text-zinc-500">Source</div>
                   <div className="mt-1 text-white">{selected.source || "website"}</div>
@@ -374,6 +425,50 @@ export default function Support() {
                   </Select>
                 </div>
               </div>
+
+              {selected.category === "bug" && (
+                <div className="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4">
+                  <div className="mb-4 flex items-center gap-2 text-amber-200">
+                    <Trophy className="h-4 w-4" />
+                    <span className="text-xs font-bold uppercase tracking-[0.16em]">Bug leaderboard approval</span>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-3">
+                    <div>
+                      <Label className="text-xs uppercase tracking-wider text-amber-100/80">Ranking status</Label>
+                      <Select value={draft.bug_status} onValueChange={(value) => setDraft({ ...draft, bug_status: value })}>
+                        <SelectTrigger className="mt-2 border-amber-300/20 bg-zinc-950/40 text-white">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="glass-strong border-white/10 text-white">
+                          {bugStatusOptions.map((item) => <SelectItem key={item.value} value={item.value}>{item.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-xs uppercase tracking-wider text-amber-100/80">Points</Label>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="100"
+                        value={draft.bug_points}
+                        onChange={(e) => setDraft({ ...draft, bug_points: Number(e.target.value) })}
+                        className="mt-2 border-amber-300/20 bg-zinc-950/40 text-white"
+                      />
+                    </div>
+                    <div>
+                      <Label className="text-xs uppercase tracking-wider text-amber-100/80">Public name</Label>
+                      <Input
+                        value={draft.public_reporter_name}
+                        onChange={(e) => setDraft({ ...draft, public_reporter_name: e.target.value })}
+                        className="mt-2 border-amber-300/20 bg-zinc-950/40 text-white"
+                      />
+                    </div>
+                  </div>
+                  <p className="mt-3 text-xs leading-5 text-amber-100/80">
+                    Set status to Accepted to count this report on the public TOP 10 list. Use points to reward useful reports with logs, screenshots, or clear reproduction steps.
+                  </p>
+                </div>
+              )}
 
               <div>
                 <Label className="text-xs uppercase tracking-wider text-zinc-400">Assigned to</Label>
