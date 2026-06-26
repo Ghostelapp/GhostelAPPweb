@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-06-26",
-    title: "Call accept stability and duplicate push cleanup",
+    title: "Lock-screen call stability",
     items: [
-      "Prevented the accepting iOS device from ending its own CallKit session after receiving accepted call-control.",
-      "Skipped accepted call-control pushes to the exact session that answered the call.",
-      "Compacted duplicate push targets per device and token type to reduce double incoming-call alerts.",
-      "Published Android build 29 and iOS build 25 as version 1.4.29.",
+      "Kept the Android full-screen incoming-call UI visible while the phone is being unlocked.",
+      "Prevented the Android privacy overlay from covering the incoming-call screen during lock-screen transitions.",
+      "Deferred transient iOS CallKit end events during passcode unlock so active incoming calls are restored instead of rejected.",
+      "Published Android build 30 and iOS build 26 as version 1.4.30.",
     ],
   },
   {
