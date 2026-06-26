@@ -6,13 +6,13 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-06-23",
-    title: "Mobile TURN call routing",
+    date: "2026-06-26",
+    title: "Cross-device call control and louder audio",
     items: [
-      "Forced native Android and iOS voice calls through TURN relay when available.",
-      "Added recovery when ICE remains in checking instead of waiting indefinitely.",
-      "Kept Web calls on the default direct-or-relay policy.",
-      "Published Android build 27 and iOS build 23 as version 1.4.27.",
+      "Added silent call-control push so other devices stop ringing after a call is accepted or ended.",
+      "Kept Android full-screen call notifications in sync even when the app is locked or backgrounded.",
+      "Started mobile voice calls on speaker by default for louder conversation audio.",
+      "Published Android build 28 and iOS build 24 as version 1.4.28.",
     ],
   },
   {
