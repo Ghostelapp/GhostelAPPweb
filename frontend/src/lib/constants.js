@@ -4,7 +4,7 @@ export const GHOSTEL_APK_URL =
   process.env.REACT_APP_GHOSTEL_APK_URL ||
   "https://api.ghostel.app/app-release.apk";
 
-export const GHOSTEL_ANDROID_VERSION = "1.4.28";
+export const GHOSTEL_ANDROID_VERSION = "1.4.29";
 
 export const GHOSTEL_WEB_APP_URL =
   process.env.REACT_APP_GHOSTEL_WEB_APP_URL || "https://app.ghostel.app";

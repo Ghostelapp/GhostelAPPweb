@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-06-26",
-    title: "Cross-device call control and louder audio",
+    title: "Call accept stability and duplicate push cleanup",
     items: [
-      "Added silent call-control push so other devices stop ringing after a call is accepted or ended.",
-      "Kept Android full-screen call notifications in sync even when the app is locked or backgrounded.",
-      "Started mobile voice calls on speaker by default for louder conversation audio.",
-      "Published Android build 28 and iOS build 24 as version 1.4.28.",
+      "Prevented the accepting iOS device from ending its own CallKit session after receiving accepted call-control.",
+      "Skipped accepted call-control pushes to the exact session that answered the call.",
+      "Compacted duplicate push targets per device and token type to reduce double incoming-call alerts.",
+      "Published Android build 29 and iOS build 25 as version 1.4.29.",
     ],
   },
   {
