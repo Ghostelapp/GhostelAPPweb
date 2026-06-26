@@ -436,12 +436,22 @@ async def _public_service_status() -> dict:
 
 async def _website_analytics() -> dict:
     now = datetime.now(timezone.utc)
-    today = now.strftime("%Y-%m-%d")
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
     active_since = now - timedelta(minutes=5)
     thirty_days_ago = now - timedelta(days=29)
 
     total_pageviews = await db.website_pageviews.count_documents({})
-    pageviews_today = await db.website_pageviews.count_documents({"created_at": {"$gte": today}})
+    pageviews_today = await db.website_pageviews.count_documents(
+        {
+            "$or": [
+                {"created_dt": {"$gte": today_start}},
+                {
+                    "created_dt": {"$exists": False},
+                    "created_at": {"$gte": today_start.isoformat()},
+                },
+            ]
+        }
+    )
     total_visitors = len(await db.website_sessions.distinct("visitor_id"))
     active_now = len(
         await db.website_sessions.distinct("visitor_id", {"last_seen_at": {"$gte": active_since}})
@@ -825,38 +835,130 @@ def _ghostel_user_to_public(u: dict) -> dict:
     }
 
 
-def _build_charts(users: list):
-    """Build 14-day activity/registration charts from real user list."""
+def _parse_chart_datetime(value):
+    if not value:
+        return None
+    if isinstance(value, datetime):
+        return value if value.tzinfo else value.replace(tzinfo=timezone.utc)
+    if isinstance(value, str):
+        try:
+            parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+            return parsed if parsed.tzinfo else parsed.replace(tzinfo=timezone.utc)
+        except Exception:
+            return None
+    return None
+
+
+def _chart_days(days_count: int = 14):
     now = datetime.now(timezone.utc)
     days = []
-    for d in range(13, -1, -1):
+    for d in range(days_count - 1, -1, -1):
         day = now - timedelta(days=d)
         start = day.replace(hour=0, minute=0, second=0, microsecond=0)
         end = start + timedelta(days=1)
-        days.append((day.strftime("%d.%m"), start, end))
+        days.append((day.strftime("%d.%m"), start.strftime("%Y-%m-%d"), start, end))
+    return days
 
-    def parse(dt_str):
-        if not dt_str:
-            return None
-        try:
-            return datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-        except Exception:
-            return None
 
-    regs_by_day = {label: 0 for label, _, _ in days}
-    active_by_day = {label: 0 for label, _, _ in days}
-    for u in users:
-        ca = parse(u.get("created_at"))
-        ls = parse(u.get("last_seen") or u.get("last_active"))
-        for label, start, end in days:
-            if ca and start <= ca < end:
-                regs_by_day[label] += 1
-            if ls and start <= ls < end:
-                active_by_day[label] += 1
+def _empty_chart(value_key: str, days_count: int = 14) -> list[dict]:
+    return [{"day": label, value_key: 0} for label, _, _, _ in _chart_days(days_count)]
 
-    registrations_chart = [{"day": l, "count": regs_by_day[l]} for l, _, _ in days]
-    activity_chart = [{"day": l, "active": active_by_day[l]} for l, _, _ in days]
+
+def _bucket_chart(rows: list[dict], field: str, value_key: str = "count", days_count: int = 14) -> list[dict]:
+    days = _chart_days(days_count)
+    counts_by_day = {key: 0 for _, key, _, _ in days}
+    for row in rows:
+        dt = _parse_chart_datetime(row.get(field))
+        if not dt:
+            continue
+        for _, key, start, end in days:
+            if start <= dt < end:
+                counts_by_day[key] += 1
+                break
+    return [{"day": label, value_key: counts_by_day[key]} for label, key, _, _ in days]
+
+
+async def _collection_date_chart(collection, field: str, value_key: str = "count", days_count: int = 14) -> list[dict]:
+    days = _chart_days(days_count)
+    start_dt = days[0][2]
+    try:
+        rows = await collection.aggregate(
+            [
+                {
+                    "$project": {
+                        "_chart_dt": {
+                            "$cond": [
+                                {"$eq": [{"$type": f"${field}"}, "date"]},
+                                f"${field}",
+                                {
+                                    "$dateFromString": {
+                                        "dateString": f"${field}",
+                                        "onError": None,
+                                        "onNull": None,
+                                    }
+                                },
+                            ]
+                        }
+                    }
+                },
+                {"$match": {"_chart_dt": {"$gte": start_dt}}},
+                {
+                    "$group": {
+                        "_id": {
+                            "$dateToString": {
+                                "format": "%Y-%m-%d",
+                                "date": "$_chart_dt",
+                                "timezone": "UTC",
+                            }
+                        },
+                        "count": {"$sum": 1},
+                    }
+                },
+            ]
+        ).to_list(days_count + 5)
+        counts_by_key = {row["_id"]: row["count"] for row in rows if row.get("_id")}
+        return [{"day": label, value_key: counts_by_key.get(key, 0)} for label, key, _, _ in days]
+    except Exception as exc:
+        logger.warning(f"chart aggregation fallback for {collection.name}.{field}: {exc}")
+        rows = await collection.find({}, {"_id": 0, field: 1}).to_list(50000)
+        return _bucket_chart(rows, field, value_key, days_count)
+
+
+def _build_charts(users: list):
+    """Build 14-day activity/registration charts from real user timestamps."""
+    registrations_chart = _bucket_chart(users, "created_at", "count")
+    activity_rows = [
+        {"last_active": u.get("last_seen") or u.get("last_active")}
+        for u in users
+    ]
+    activity_chart = _bucket_chart(activity_rows, "last_active", "active")
     return activity_chart, registrations_chart
+
+
+def _normalize_dashboard_chart(raw_chart, value_key: str):
+    if not isinstance(raw_chart, list):
+        return None
+    normalized = []
+    for row in raw_chart[-14:]:
+        if not isinstance(row, dict):
+            return None
+        day = row.get("day")
+        if not day:
+            return None
+        value = row.get(value_key)
+        if value is None and value_key != "count":
+            value = row.get("count")
+        if value is None and value_key != "active":
+            value = row.get("active")
+        try:
+            value = int(value or 0)
+        except (TypeError, ValueError):
+            value = 0
+        normalized.append({"day": str(day), value_key: value})
+    if len(normalized) != 14:
+        return None
+    return normalized
+
 
 
 @api.get("/admin/dashboard")
@@ -876,14 +978,19 @@ async def admin_dashboard(request: Request):
 
     if source == "ghostel":
         public_users = [_ghostel_user_to_public(u) for u in users]
-        activity_chart, registrations_chart = _build_charts(users)
-        # messages chart synthesized — ghostel.app exposes only total, not per-day
-        total_msgs = stats.get("messages", 0)
-        per_day_baseline = max(1, total_msgs // 14)
-        messages_chart = [
-            {"day": d["day"], "count": per_day_baseline + (i * 3 % 7)}
-            for i, d in enumerate(registrations_chart)
-        ]
+        fallback_activity_chart, fallback_registrations_chart = _build_charts(users)
+        activity_chart = (
+            _normalize_dashboard_chart(stats.get("activity_chart"), "active")
+            or fallback_activity_chart
+        )
+        registrations_chart = (
+            _normalize_dashboard_chart(stats.get("registrations_chart"), "count")
+            or fallback_registrations_chart
+        )
+        messages_chart = (
+            _normalize_dashboard_chart(stats.get("messages_chart"), "count")
+            or _empty_chart("count")
+        )
         recent_activity = sorted(
             public_users, key=lambda u: u.get("last_active") or "", reverse=True
         )[:5]
@@ -914,13 +1021,9 @@ async def admin_dashboard(request: Request):
     total_messages = await db.messages.count_documents({})
     total_groups = await db.groups.count_documents({})
     pending_reports = await db.reports.count_documents({"status": "pending"})
-    activity, registrations, messages_chart = [], [], []
-    for d in range(13, -1, -1):
-        day = now - timedelta(days=d)
-        day_str = day.strftime("%d.%m")
-        activity.append({"day": day_str, "active": 20})
-        registrations.append({"day": day_str, "count": 0})
-        messages_chart.append({"day": day_str, "count": 50 + d * 7})
+    activity = await _collection_date_chart(db.users, "last_active", "active")
+    registrations = await _collection_date_chart(db.users, "created_at", "count")
+    messages_chart = await _collection_date_chart(db.messages, "created_at", "count")
     recent_users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
     return {
         "source": source,

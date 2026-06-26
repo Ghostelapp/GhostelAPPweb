@@ -122,6 +122,14 @@ class TestDashboard:
         assert isinstance(d["activity_chart"], list) and len(d["activity_chart"]) == 14
         assert isinstance(d["registrations_chart"], list) and len(d["registrations_chart"]) == 14
         assert isinstance(d["messages_chart"], list) and len(d["messages_chart"]) == 14
+        for chart_key, value_key in (
+            ("activity_chart", "active"),
+            ("registrations_chart", "count"),
+            ("messages_chart", "count"),
+        ):
+            for row in d[chart_key]:
+                assert isinstance(row.get("day"), str) and row["day"]
+                assert isinstance(row.get(value_key), int)
         for key in ("total_pageviews", "pageviews_today", "total_visitors", "active_now", "daily", "countries"):
             assert key in d["website_analytics"]
 
