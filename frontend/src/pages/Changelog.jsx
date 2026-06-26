@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-06-26",
-    title: "Lock-screen call stability",
+    title: "Production call state sync",
     items: [
-      "Kept the Android full-screen incoming-call UI visible while the phone is being unlocked.",
-      "Prevented the Android privacy overlay from covering the incoming-call screen during lock-screen transitions.",
-      "Deferred transient iOS CallKit end events during passcode unlock so active incoming calls are restored instead of rejected.",
-      "Published Android build 30 and iOS build 26 as version 1.4.30.",
+      "Added authoritative /calls/active and /calls/:id/status sync for app resume and phone unlock.",
+      "Persisted a minimal local call state so incoming calls can be restored after process or lock-screen transitions.",
+      "Started Android foreground call service for incoming calls and declared phoneCall foreground service support.",
+      "Published Android build 31 and iOS build 27 as version 1.4.31.",
     ],
   },
   {
