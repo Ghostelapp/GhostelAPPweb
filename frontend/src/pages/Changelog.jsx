@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-06-26",
-    title: "Production call state sync",
+    title: "Unlock call UI recovery",
     items: [
-      "Added authoritative /calls/active and /calls/:id/status sync for app resume and phone unlock.",
-      "Persisted a minimal local call state so incoming calls can be restored after process or lock-screen transitions.",
-      "Started Android foreground call service for incoming calls and declared phoneCall foreground service support.",
-      "Published Android build 31 and iOS build 27 as version 1.4.31.",
+      "Added hard /calls/active sync after app resume, phone unlock and Android Activity.onResume.",
+      "Centralized mobile call restore state so ringing calls are not lost when lock-screen UI transitions.",
+      "Restores incoming call UI or active call screen from backend state before relying on WebSocket reconnect.",
+      "Published Android build 32 and iOS build 28 as version 1.4.32.",
     ],
   },
   {

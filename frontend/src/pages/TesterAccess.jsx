@@ -24,7 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 const ANDROID_APK_URL = "https://api.ghostel.app/app-release.apk";
 const TESTFLIGHT_APP_URL = "https://apps.apple.com/app/testflight/id899247664";
-const TESTER_APP_VERSION = "1.4.31";
+const TESTER_APP_VERSION = "1.4.32";
 
 const copy = {
   en: {
@@ -32,12 +32,12 @@ const copy = {
     title: "Test Ghostel on Android and iOS",
     intro:
       "Join public Ghostel testing, install current test builds, report real bugs and help stabilize calls, notifications and installation flows.",
-    androidTitle: "Android 1.4.31 (31)",
+    androidTitle: "Android 1.4.32 (32)",
     androidDesc: "Download the APK, allow installation from this source and open the app.",
     androidNote:
       'If Android shows "App not installed", remove the older Ghostel build from the phone and try again.',
     apkButton: "Download APK",
-    iosTitle: "iOS 1.4.31 (27)",
+    iosTitle: "iOS 1.4.32 (28)",
     iosDesc:
       "iOS testing uses TestFlight. Install TestFlight first, then open the invitation or the public TestFlight link from the Ghostel team.",
     iosNote: "An Expo build page is not an installation link for iPhone testers.",
@@ -90,12 +90,12 @@ const copy = {
     title: "Testuj Ghostel na Androidzie i iOS",
     intro:
       "Dołącz do publicznych testów Ghostel, instaluj aktualne buildy testowe, zgłaszaj realne błędy i pomóż ustabilizować połączenia, powiadomienia oraz instalację.",
-    androidTitle: "Android 1.4.31 (31)",
+    androidTitle: "Android 1.4.32 (32)",
     androidDesc: "Pobierz plik APK, zezwól na instalację z tego źródła i uruchom aplikację.",
     androidNote:
       'Jeśli Android pokaże komunikat "Aplikacja nie została zainstalowana", usuń starszą wersję Ghostel z telefonu i spróbuj ponownie.',
     apkButton: "Pobierz APK",
-    iosTitle: "iOS 1.4.31 (27)",
+    iosTitle: "iOS 1.4.32 (28)",
     iosDesc:
       "Na iOS testy odbywają się przez TestFlight. Najpierw zainstaluj TestFlight, potem otwórz zaproszenie albo publiczny link TestFlight od zespołu Ghostel.",
     iosNote: "Sama strona builda w Expo nie jest linkiem instalacyjnym dla testera iPhone.",
@@ -148,11 +148,11 @@ const copy = {
     title: "Teste Ghostel auf Android und iOS",
     intro:
       "Nimm am öffentlichen Ghostel-Test teil, installiere aktuelle Test-Builds, melde echte Fehler und hilf, Anrufe, Benachrichtigungen und Installation zu stabilisieren.",
-    androidTitle: "Android 1.4.31 (31)",
+    androidTitle: "Android 1.4.32 (32)",
     androidDesc: "Lade die APK herunter, erlaube die Installation aus dieser Quelle und öffne die App.",
     androidNote: 'Wenn Android "App nicht installiert" meldet, entferne die ältere Ghostel-Version und versuche es erneut.',
     apkButton: "APK herunterladen",
-    iosTitle: "iOS 1.4.31 (27)",
+    iosTitle: "iOS 1.4.32 (28)",
     iosDesc:
       "iOS-Tests laufen über TestFlight. Installiere zuerst TestFlight und öffne danach die Einladung oder den öffentlichen TestFlight-Link vom Ghostel-Team.",
     iosNote: "Eine Expo-Build-Seite ist kein Installationslink für iPhone-Tester.",
@@ -188,11 +188,11 @@ const copy = {
     title: "Prueba Ghostel en Android e iOS",
     intro:
       "Únete a las pruebas públicas de Ghostel, instala builds actuales, reporta errores reales y ayuda a estabilizar llamadas, notificaciones e instalación.",
-    androidTitle: "Android 1.4.31 (31)",
+    androidTitle: "Android 1.4.32 (32)",
     androidDesc: "Descarga el APK, permite la instalación desde esta fuente y abre la aplicación.",
     androidNote: 'Si Android muestra "Aplicación no instalada", elimina la versión anterior de Ghostel e inténtalo de nuevo.',
     apkButton: "Descargar APK",
-    iosTitle: "iOS 1.4.31 (27)",
+    iosTitle: "iOS 1.4.32 (28)",
     iosDesc:
       "Las pruebas en iOS se hacen con TestFlight. Instala TestFlight primero y luego abre la invitación o el enlace público de TestFlight del equipo Ghostel.",
     iosNote: "Una página de build de Expo no es un enlace de instalación para testers de iPhone.",
@@ -228,12 +228,12 @@ const copy = {
     title: "Testez Ghostel sur Android et iOS",
     intro:
       "Rejoignez les tests publics de Ghostel, installez les builds de test, signalez les vrais bugs et aidez à stabiliser les appels, les notifications et l'installation.",
-    androidTitle: "Android 1.4.31 (31)",
+    androidTitle: "Android 1.4.32 (32)",
     androidDesc: "Téléchargez l'APK, autorisez l'installation depuis cette source et ouvrez l'application.",
     androidNote:
       'Si Android affiche "Application non installée", supprimez l’ancienne version de Ghostel du téléphone puis réessayez.',
     apkButton: "Télécharger l'APK",
-    iosTitle: "iOS 1.4.31 (27)",
+    iosTitle: "iOS 1.4.32 (28)",
     iosDesc:
       "Les tests iOS passent par TestFlight. Installez d'abord TestFlight, puis ouvrez l'invitation ou le lien public TestFlight de l'équipe Ghostel.",
     iosNote: "Une page de build Expo n'est pas un lien d'installation pour les testeurs iPhone.",
