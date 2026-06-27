@@ -6,13 +6,13 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-06-26",
-    title: "Unlock call UI recovery",
+    date: "2026-06-27",
+    title: "Call recovery and release version sync",
     items: [
-      "Added hard /calls/active sync after app resume, phone unlock and Android Activity.onResume.",
-      "Centralized mobile call restore state so ringing calls are not lost when lock-screen UI transitions.",
-      "Restores incoming call UI or active call screen from backend state before relying on WebSocket reconnect.",
-      "Published Android build 32 and iOS build 28 as version 1.4.32.",
+      "Rebuilt call state recovery for Android and iOS lock-screen transitions.",
+      "Kept incoming and active call state synchronized after app resume, unlock and WebSocket reconnect.",
+      "Updated the public Android APK endpoint and website release labels to the current release.",
+      "Published Android build 33 and iOS build 29 as version 1.4.33.",
     ],
   },
   {
