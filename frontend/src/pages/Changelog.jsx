@@ -7,12 +7,13 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-06-27",
-    title: "Call recovery and release version sync",
+    title: "Call push delivery and release sync",
     items: [
-      "Rebuilt call state recovery for Android and iOS lock-screen transitions.",
-      "Kept incoming and active call state synchronized after app resume, unlock and WebSocket reconnect.",
+      "Fixed iOS VoIP, FCM and Expo push token registration so one transport no longer removes the others.",
+      "Scoped call push fallbacks per device instead of per user to keep Android and iOS call notifications synchronized.",
+      "Marked native iOS CallKit answers as locally accepted before call-control cleanup runs.",
       "Updated the public Android APK endpoint and website release labels to the current release.",
-      "Published Android build 33 and iOS build 29 as version 1.4.33.",
+      "Published Android build 34 and iOS build 30 as version 1.4.34.",
     ],
   },
   {
