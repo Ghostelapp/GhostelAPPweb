@@ -117,14 +117,50 @@ export default function Dashboard() {
     { icon: ShieldAlert, label: t("admin.pendingReports"), value: data.stats.pending_reports, accent: "amber" },
   ];
   const analytics = data.website_analytics;
+  const sourceMeta =
+    data.source === "ghostel"
+      ? {
+          label: "Ghostel app API",
+          tone: "text-emerald-300 border-emerald-400/30 bg-emerald-400/10",
+          detail: "User, message and push stats are loaded from the mobile app backend.",
+        }
+      : {
+          label: "Local website fallback",
+          tone: "text-amber-300 border-amber-400/30 bg-amber-400/10",
+          detail:
+            "The panel could not read the mobile app backend, so these app stats come from the website database only.",
+        };
 
   return (
     <div data-testid="admin-dashboard" className="space-y-8">
       <div>
-        <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
-          {t("admin.dashboard")}
-        </h1>
-        <p className="text-sm text-zinc-400">Real-time overview of your ghostel.app community.</p>
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h1 className="font-display text-4xl font-black tracking-tighter text-white mb-1">
+              {t("admin.dashboard")}
+            </h1>
+            <p className="text-sm text-zinc-400">Real-time overview of your ghostel.app community.</p>
+          </div>
+          <div
+            data-testid="dashboard-data-source"
+            className={`rounded-2xl border px-4 py-3 text-sm ${sourceMeta.tone}`}
+          >
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">
+              Data source
+            </div>
+            <div className="mt-1 font-display text-base font-bold text-white">
+              {sourceMeta.label}
+            </div>
+            <div className="mt-1 max-w-sm text-xs leading-5 text-zinc-300">
+              {sourceMeta.detail}
+            </div>
+            {data.source_error ? (
+              <div className="mt-2 max-w-sm text-[11px] leading-5 text-zinc-400">
+                Reason: {String(data.source_error).slice(0, 180)}
+              </div>
+            ) : null}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">

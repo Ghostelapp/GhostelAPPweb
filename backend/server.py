@@ -968,12 +968,14 @@ async def admin_dashboard(request: Request):
     stats = None
     users = []
     source = "local"
+    source_error = ""
     if ghostel_client.is_configured:
         try:
             stats = await ghostel_client.stats()
             users = await ghostel_client.users()
             source = "ghostel"
         except Exception as e:
+            source_error = str(e)[:240]
             logger.warning(f"ghostel.app API unreachable, falling back to local: {e}")
 
     if source == "ghostel":
@@ -1005,6 +1007,7 @@ async def admin_dashboard(request: Request):
         }
         return {
             "source": source,
+            "source_error": source_error,
             "stats": out_stats,
             "activity_chart": activity_chart,
             "registrations_chart": registrations_chart,
@@ -1027,6 +1030,7 @@ async def admin_dashboard(request: Request):
     recent_users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("created_at", -1).limit(5).to_list(5)
     return {
         "source": source,
+        "source_error": source_error,
         "stats": {
             "total_users": total_users,
             "active_users": active_users,
