@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { LifeBuoy, MessageCircle, Send, X } from "lucide-react";
 import { toast } from "sonner";
@@ -68,8 +68,23 @@ export default function FloatingSupport() {
     message: "",
     website: "",
   });
+  const isAdmin = location.pathname.startsWith("/admin");
 
-  if (location.pathname.startsWith("/admin")) return null;
+  useEffect(() => {
+    if (isAdmin && open) {
+      setOpen(false);
+    }
+  }, [isAdmin, open]);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent("ghostel:support-widget", {
+        detail: { open: open && !isAdmin },
+      })
+    );
+  }, [isAdmin, open]);
+
+  if (isAdmin) return null;
 
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
 
