@@ -3,6 +3,12 @@ import { ArrowUp } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useLang } from "@/context/LanguageContext";
 
+function forceWindowScrollTop(options = {}) {
+  window.scrollTo({ top: 0, left: 0, ...options });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
 export default function ScrollToTop() {
   const { t } = useLang();
   const location = useLocation();
@@ -30,7 +36,7 @@ export default function ScrollToTop() {
         }
       }
 
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      forceWindowScrollTop({ behavior: "auto" });
     }, 80);
 
     return () => window.clearTimeout(timeoutId);
@@ -50,7 +56,7 @@ export default function ScrollToTop() {
       data-testid="scroll-to-top"
       aria-label={t("common.backToTop")}
       title={t("common.backToTop")}
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => forceWindowScrollTop({ behavior: "smooth" })}
       className="fixed bottom-24 right-5 z-[59] grid h-12 w-12 place-items-center rounded-full border border-cyan-400/30 bg-[#0b1016]/90 text-cyan-300 shadow-2xl backdrop-blur-xl transition hover:-translate-y-1 hover:bg-cyan-400 hover:text-zinc-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 sm:bottom-28"
     >
       <ArrowUp className="h-5 w-5" />

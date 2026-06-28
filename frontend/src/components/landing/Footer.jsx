@@ -16,13 +16,52 @@ export default function Footer() {
       href: "https://www.linkedin.com/in/ghostel-app-2bb5a9415/",
     },
   ];
+  const scheduleInternalScroll = (targetId) => {
+    const scroll = () => {
+      if (targetId) {
+        const target = document.getElementById(targetId);
+        if (target) {
+          target.scrollIntoView({ behavior: "auto", block: "start" });
+          return;
+        }
+      }
+
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    };
+
+    window.requestAnimationFrame(scroll);
+    window.setTimeout(scroll, 80);
+    window.setTimeout(scroll, 200);
+  };
+
+  const handleInternalClick = (event, targetId) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.altKey ||
+      event.ctrlKey ||
+      event.shiftKey
+    ) {
+      return;
+    }
+
+    scheduleInternalScroll(targetId);
+  };
 
   return (
     <footer data-testid="footer-section" className="relative border-t divider-soft pt-16 pb-10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid md:grid-cols-4 gap-10 mb-12">
           <div className="md:col-span-2">
-            <Link to="/" aria-label="ghostel.app - homepage" className="flex items-center gap-2.5 mb-4 w-fit">
+            <Link
+              to="/"
+              aria-label="ghostel.app - homepage"
+              className="flex items-center gap-2.5 mb-4 w-fit"
+              onClick={(event) => handleInternalClick(event)}
+            >
               <div className="w-9 h-9 rounded-full bg-cyan-400/10 border border-cyan-400/30 grid place-items-center text-cyan-400">
                 <ShieldCheck className="w-5 h-5" />
               </div>
@@ -53,11 +92,11 @@ export default function Footer() {
               <BrandMark className="text-xs" />
             </div>
             <ul className="space-y-3 text-sm">
-              <li><a href="#features" data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</a></li>
-              <li><Link to="/contact" data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</Link></li>
-              <li><Link to="/testers" data-testid="footer-link-testers" className="text-zinc-400 hover:text-cyan-400">{t("nav.testers")}</Link></li>
-              <li><Link to="/status" data-testid="footer-link-status" className="text-zinc-400 hover:text-cyan-400">Status</Link></li>
-              <li><Link to="/updates" data-testid="footer-link-updates" className="text-zinc-400 hover:text-cyan-400">Updates</Link></li>
+              <li><Link to="/#features" onClick={(event) => handleInternalClick(event, "features")} data-testid="footer-link-about" className="text-zinc-400 hover:text-cyan-400">{t("footer.about")}</Link></li>
+              <li><Link to="/contact" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-contact" className="text-zinc-400 hover:text-cyan-400">{t("footer.contact")}</Link></li>
+              <li><Link to="/testers" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-testers" className="text-zinc-400 hover:text-cyan-400">{t("nav.testers")}</Link></li>
+              <li><Link to="/status" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-status" className="text-zinc-400 hover:text-cyan-400">Status</Link></li>
+              <li><Link to="/updates" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-updates" className="text-zinc-400 hover:text-cyan-400">Updates</Link></li>
               <li><a href={apkUrl} data-testid="footer-link-download" className="text-zinc-400 hover:text-cyan-400">{t("footer.download")} Android{version ? ` v${version}` : ""}</a></li>
             </ul>
           </div>
@@ -67,9 +106,9 @@ export default function Footer() {
               Legal
             </div>
             <ul className="space-y-3 text-sm">
-              <li><Link to="/terms" data-testid="footer-link-terms" className="text-zinc-400 hover:text-cyan-400">{t("footer.terms")}</Link></li>
-              <li><Link to="/privacy" data-testid="footer-link-privacy" className="text-zinc-400 hover:text-cyan-400">{t("footer.privacy")}</Link></li>
-              <li><Link to="/delete-account" data-testid="footer-link-delete-account" className="text-zinc-400 hover:text-cyan-400">{t("nav.deleteAccount")}</Link></li>
+              <li><Link to="/terms" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-terms" className="text-zinc-400 hover:text-cyan-400">{t("footer.terms")}</Link></li>
+              <li><Link to="/privacy" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-privacy" className="text-zinc-400 hover:text-cyan-400">{t("footer.privacy")}</Link></li>
+              <li><Link to="/delete-account" onClick={(event) => handleInternalClick(event)} data-testid="footer-link-delete-account" className="text-zinc-400 hover:text-cyan-400">{t("nav.deleteAccount")}</Link></li>
             </ul>
           </div>
         </div>
