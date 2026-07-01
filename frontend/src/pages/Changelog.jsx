@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-07-01",
-    title: "Caller status and call push sync",
+    title: "iOS CallKit lifecycle and call push cleanup",
     items: [
-      "Synced caller UI with authoritative backend call status so accepted calls no longer remain stuck on Calling.",
-      "Restored caller display names in native incoming-call push payloads.",
-      "Suppressed duplicate iOS fallback push notifications when VoIP PushKit succeeds.",
-      "Published Android build 38 and iOS build 34 as version 1.4.38.",
+      "Fixed iOS lock-screen accept and decline cleanup so old calls do not return after app resume.",
+      "Added terminal call-state cache and stale VoIP push filtering for ended, declined and cancelled calls.",
+      "Added direct APNs VoIP call-control cleanup for iOS when FCM call-control delivery is unavailable.",
+      "Published Android build 39 and iOS build 35 as version 1.4.39.",
     ],
   },
   {
