@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-07-01",
-    title: "CallKit resume and release sync",
+    title: "Caller status and call push sync",
     items: [
-      "Fixed the iOS CallKit answer handoff so a lock-screen answer restores the active WebRTC call screen.",
-      "Changed call resume navigation to replace duplicate call screens instead of stacking them.",
-      "Updated public Android APK endpoint headers and website release labels to 1.4.37.",
-      "Published Android build 37 and iOS build 33 as version 1.4.37.",
+      "Synced caller UI with authoritative backend call status so accepted calls no longer remain stuck on Calling.",
+      "Restored caller display names in native incoming-call push payloads.",
+      "Suppressed duplicate iOS fallback push notifications when VoIP PushKit succeeds.",
+      "Published Android build 38 and iOS build 34 as version 1.4.38.",
     ],
   },
   {
