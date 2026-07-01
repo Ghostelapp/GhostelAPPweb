@@ -22,11 +22,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const ANDROID_APK_URL = "https://api.ghostel.app/app-release.apk?v=1.4.36";
+const ANDROID_APK_URL = "https://api.ghostel.app/app-release.apk?v=1.4.37";
 const TESTFLIGHT_APP_URL = "https://apps.apple.com/app/testflight/id899247664";
-const TESTER_APP_VERSION = "1.4.36";
-const TESTER_ANDROID_BUILD = "36";
-const TESTER_IOS_BUILD = "32";
+const TESTER_APP_VERSION = "1.4.37";
+const TESTER_ANDROID_BUILD = "37";
+const TESTER_IOS_BUILD = "33";
 const TESTER_ANDROID_TITLE = `Android ${TESTER_APP_VERSION} (${TESTER_ANDROID_BUILD})`;
 const TESTER_IOS_TITLE = `iOS ${TESTER_APP_VERSION} (${TESTER_IOS_BUILD})`;
 

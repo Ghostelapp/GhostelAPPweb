@@ -6,14 +6,13 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-06-27",
-    title: "Call push delivery and release sync",
+    date: "2026-07-01",
+    title: "CallKit resume and release sync",
     items: [
-      "Fixed iOS VoIP, FCM and Expo push token registration so one transport no longer removes the others.",
-      "Scoped call push fallbacks per device instead of per user to keep Android and iOS call notifications synchronized.",
-      "Marked native iOS CallKit answers as locally accepted before call-control cleanup runs.",
-      "Updated the public Android APK endpoint and website release labels to the current release.",
-      "Published Android build 34 and iOS build 30 as version 1.4.34.",
+      "Fixed the iOS CallKit answer handoff so a lock-screen answer restores the active WebRTC call screen.",
+      "Changed call resume navigation to replace duplicate call screens instead of stacking them.",
+      "Updated public Android APK endpoint headers and website release labels to 1.4.37.",
+      "Published Android build 37 and iOS build 33 as version 1.4.37.",
     ],
   },
   {
