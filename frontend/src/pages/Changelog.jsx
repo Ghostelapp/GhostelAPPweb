@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-07-01",
-    title: "iOS CallKit lifecycle and call push cleanup",
+    title: "Accepted call-control regression fix",
     items: [
-      "Fixed iOS lock-screen accept and decline cleanup so old calls do not return after app resume.",
-      "Added terminal call-state cache and stale VoIP push filtering for ended, declined and cancelled calls.",
-      "Added direct APNs VoIP call-control cleanup for iOS when FCM call-control delivery is unavailable.",
-      "Published Android build 39 and iOS build 35 as version 1.4.39.",
+      "Stopped accepted call-control payloads from clearing the locally accepted iOS call state.",
+      "Kept accepted and connecting calls active in backend resume and timeout checks.",
+      "Added diagnostics for CallKit answer/end actions around lock-screen accepts.",
+      "Published Android build 40 and iOS build 36 as version 1.4.40.",
     ],
   },
   {
