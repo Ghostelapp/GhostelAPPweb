@@ -7,12 +7,12 @@ const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
     date: "2026-07-01",
-    title: "Accepted call-control regression fix",
+    title: "iOS CallKit lock-screen accept recovery",
     items: [
-      "Stopped accepted call-control payloads from clearing the locally accepted iOS call state.",
-      "Kept accepted and connecting calls active in backend resume and timeout checks.",
-      "Added diagnostics for CallKit answer/end actions around lock-screen accepts.",
-      "Published Android build 40 and iOS build 36 as version 1.4.40.",
+      "Recovered missed iOS CallKit answer events from audio-session activation on lock-screen accepts.",
+      "Handled delayed CallKit event replay from didLoadWithEvents and initial native events.",
+      "Kept caller-side polling aware of accepted calls while waiting for WebRTC readiness.",
+      "Published Android build 41 and iOS build 37 as version 1.4.41.",
     ],
   },
   {
