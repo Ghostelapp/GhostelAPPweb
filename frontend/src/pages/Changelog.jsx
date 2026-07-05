@@ -6,13 +6,13 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
-    date: "2026-07-01",
-    title: "iOS CallKit lock-screen accept recovery",
+    date: "2026-07-05",
+    title: "Accepted-call signaling recovery",
     items: [
-      "Recovered missed iOS CallKit answer events from audio-session activation on lock-screen accepts.",
-      "Handled delayed CallKit event replay from didLoadWithEvents and initial native events.",
-      "Kept caller-side polling aware of accepted calls while waiting for WebRTC readiness.",
-      "Published Android build 42 and iOS build 38 as version 1.4.42.",
+      "Recovered caller-side WebRTC offer negotiation after iOS and Android accepted-call events.",
+      "Prevented no-answer timeout from ending calls after the callee already accepted.",
+      "Kept iOS call-control cleanup on VoIP PushKit and Android call-control cleanup on FCM to reduce duplicate call notifications.",
+      "Published Android build 43 and iOS build 39 as version 1.4.43.",
     ],
   },
   {
