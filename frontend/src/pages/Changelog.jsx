@@ -12,7 +12,7 @@ const updates = [
       "Recovered missed iOS CallKit answer events from audio-session activation on lock-screen accepts.",
       "Handled delayed CallKit event replay from didLoadWithEvents and initial native events.",
       "Kept caller-side polling aware of accepted calls while waiting for WebRTC readiness.",
-      "Published Android build 41 and iOS build 37 as version 1.4.41.",
+      "Published Android build 42 and iOS build 38 as version 1.4.42.",
     ],
   },
   {
