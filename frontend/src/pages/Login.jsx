@@ -135,6 +135,12 @@ export default function Login() {
           </Button>
         </form>
 
+        <div className="mt-4 text-center">
+          <Link to="/forgot-password" className="text-xs text-zinc-500 hover:text-cyan-400">
+            {t("login.forgotPassword")}
+          </Link>
+        </div>
+
         <div className="mt-6 pt-5 border-t divider-soft text-xs text-zinc-500 text-center">
           {t("login.adminHint")}
         </div>

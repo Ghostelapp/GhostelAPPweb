@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import ForgotPassword from "@/pages/ForgotPassword";
 import Account from "@/pages/Account";
 import Privacy from "@/pages/Privacy";
 import DeleteAccount from "@/pages/DeleteAccount";
@@ -142,6 +143,7 @@ function App() {
               <Route path="/tester-access/ghostel-v1425-join-7k92" element={<Navigate to="/testers" replace />} />
               <Route path="/login" element={<Page meta={seo.noindex}><Login /></Page>} />
               <Route path="/register" element={<Page meta={seo.noindex}><Register /></Page>} />
+              <Route path="/forgot-password" element={<Page meta={seo.noindex}><ForgotPassword /></Page>} />
               <Route path="/account" element={<Page meta={seo.noindex}><Account /></Page>} />
               <Route
                 path="/admin"
