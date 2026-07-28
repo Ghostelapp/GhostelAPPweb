@@ -12,7 +12,7 @@ const updates = [
       "Recovered caller-side WebRTC offer negotiation after iOS and Android accepted-call events.",
       "Prevented no-answer timeout from ending calls after the callee already accepted.",
       "Kept iOS call-control cleanup on VoIP PushKit and Android call-control cleanup on FCM to reduce duplicate call notifications.",
-      "Published Android build 43 and iOS build 39 as version 1.4.43.",
+      "Published Android build 44 and iOS build 42 as version 1.4.44.",
     ],
   },
   {
