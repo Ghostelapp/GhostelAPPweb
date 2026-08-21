@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@/index.css";
 import App from "@/App";
 import { clearLegacyBrowserCaches } from "@/utils/clearLegacyBrowserCaches";
+import { installWebsiteErrorLogging } from "@/utils/errorLogging";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -15,6 +16,7 @@ const queryClient = new QueryClient({
 });
 
 void clearLegacyBrowserCaches();
+installWebsiteErrorLogging();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

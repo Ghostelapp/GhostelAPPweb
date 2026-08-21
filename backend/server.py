@@ -17,7 +17,7 @@ import asyncio
 import time
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Literal
+from typing import Any, Optional, List, Literal
 
 from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -146,6 +146,22 @@ class SupportTicketUpdateIn(BaseModel):
     bug_status: Optional[Literal["pending", "accepted", "rejected"]] = None
     bug_points: Optional[int] = Field(default=None, ge=0, le=100)
     public_reporter_name: Optional[str] = Field(default=None, max_length=80)
+
+
+class ErrorLogIn(BaseModel):
+    source: Literal["app", "website", "backend"] = "website"
+    platform: Literal["ios", "android", "web", "desktop", "server", "unknown"] = "unknown"
+    level: Literal["error", "warning", "info"] = "error"
+    message: str = Field(min_length=1, max_length=1200)
+    stack: Optional[str] = Field(default="", max_length=6000)
+    route: Optional[str] = Field(default="", max_length=300)
+    screen: Optional[str] = Field(default="", max_length=120)
+    app_version: Optional[str] = Field(default="", max_length=40)
+    build_number: Optional[str] = Field(default="", max_length=40)
+    device_model: Optional[str] = Field(default="", max_length=120)
+    os_version: Optional[str] = Field(default="", max_length=80)
+    fingerprint: Optional[str] = Field(default="", max_length=120)
+    context: Optional[dict[str, Any]] = Field(default_factory=dict)
 
 
 # ----- helpers -----
@@ -341,6 +357,71 @@ def _support_priority(category: str, subject: str, message: str) -> str:
 
 
 def _support_public_doc(doc: dict) -> dict:
+    doc.pop("_id", None)
+    doc.pop("ip_hash", None)
+    return doc
+
+
+_SENSITIVE_LOG_KEY = re.compile(
+    r"(authorization|cookie|token|password|passwd|secret|private|key|jwt|bearer|"
+    r"sdp|candidate|ice|audio|voice|message_text|plaintext|ciphertext|nonce|iv|"
+    r"refresh|session|credential)",
+    re.IGNORECASE,
+)
+_JWT_RE = re.compile(r"\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b")
+_BEARER_RE = re.compile(r"Bearer\s+[A-Za-z0-9._~+/=-]{20,}", re.IGNORECASE)
+_QUERY_SECRET_RE = re.compile(
+    r"((?:[?&]|\b)(?:token|code|secret|key|password|session|jwt|auth)=)[^&\s]+",
+    re.IGNORECASE,
+)
+_LONG_SECRET_RE = re.compile(r"\b[A-Za-z0-9_:/+=.-]{120,}\b")
+
+
+def _clean_error_text(value: Any, *, max_len: int = 1200) -> str:
+    text = str(value or "")
+    text = _JWT_RE.sub("[redacted-jwt]", text)
+    text = _BEARER_RE.sub("Bearer [redacted]", text)
+    text = _QUERY_SECRET_RE.sub(r"\1[redacted]", text)
+    text = _LONG_SECRET_RE.sub("[redacted-long-value]", text)
+    return text[:max_len]
+
+
+def _sanitize_error_context(value: Any, *, depth: int = 0) -> Any:
+    if depth > 4:
+        return "[truncated]"
+    if value is None or isinstance(value, (bool, int, float)):
+        return value
+    if isinstance(value, str):
+        return _clean_error_text(value, max_len=1000)
+    if isinstance(value, list):
+        return [_sanitize_error_context(item, depth=depth + 1) for item in value[:20]]
+    if isinstance(value, dict):
+        out: dict[str, Any] = {}
+        for raw_key, raw_value in list(value.items())[:50]:
+            key = str(raw_key)[:80]
+            if _SENSITIVE_LOG_KEY.search(key):
+                out[key] = "[redacted]"
+            else:
+                out[key] = _sanitize_error_context(raw_value, depth=depth + 1)
+        return out
+    return _clean_error_text(value, max_len=500)
+
+
+def _error_fingerprint(payload: ErrorLogIn, message: str, stack: str) -> str:
+    base = payload.fingerprint or "|".join(
+        [
+            payload.source,
+            payload.platform,
+            payload.level,
+            message[:240],
+            (payload.route or payload.screen or "")[:120],
+            stack.splitlines()[0][:240] if stack else "",
+        ]
+    )
+    return hashlib.sha256(base.encode("utf-8", errors="ignore")).hexdigest()[:32]
+
+
+def _public_error_log_doc(doc: dict) -> dict:
     doc.pop("_id", None)
     doc.pop("ip_hash", None)
     return doc
@@ -590,6 +671,49 @@ async def website_event(payload: WebsiteEventIn, request: Request):
             }
         )
     return Response(status_code=204)
+
+
+@api.post("/error-logs", status_code=202)
+@api.post("/logs/error", status_code=202)
+async def create_error_log(payload: ErrorLogIn, request: Request):
+    ip = _client_ip(request)
+    await _enforce_rate_limit("error-log-ip", ip, limit=60, window_seconds=60)
+
+    message = _clean_error_text(payload.message, max_len=1200).strip()
+    if not message:
+        raise HTTPException(status_code=400, detail="Error message is required")
+    stack = _clean_error_text(payload.stack or "", max_len=6000)
+    fingerprint = _error_fingerprint(payload, message, stack)
+    await _enforce_rate_limit(
+        "error-log-fingerprint",
+        f"{ip}:{fingerprint}",
+        limit=20,
+        window_seconds=60,
+    )
+
+    now = datetime.now(timezone.utc)
+    doc = {
+        "id": str(uuid.uuid4()),
+        "source": payload.source,
+        "platform": payload.platform,
+        "level": payload.level,
+        "message": message,
+        "stack": stack,
+        "route": _clean_error_text(payload.route or "", max_len=300),
+        "screen": _clean_error_text(payload.screen or "", max_len=120),
+        "app_version": _clean_error_text(payload.app_version or "", max_len=40),
+        "build_number": _clean_error_text(payload.build_number or "", max_len=40),
+        "device_model": _clean_error_text(payload.device_model or "", max_len=120),
+        "os_version": _clean_error_text(payload.os_version or "", max_len=80),
+        "fingerprint": fingerprint,
+        "context": _sanitize_error_context(payload.context or {}),
+        "user_agent": request.headers.get("user-agent", "")[:500],
+        "ip_hash": hashlib.sha256(ip.encode("utf-8")).hexdigest(),
+        "created_dt": now,
+        "created_at": now.isoformat(),
+    }
+    await db.error_logs.insert_one(doc)
+    return {"ok": True, "id": doc["id"], "fingerprint": fingerprint}
 
 
 # ----- Contact support -----
@@ -1381,6 +1505,71 @@ async def update_support_ticket(ticket_id: str, payload: SupportTicketUpdateIn, 
     return ticket
 
 
+# ----- Admin: Error logs -----
+@api.get("/admin/error-logs")
+async def list_error_logs(
+    request: Request,
+    source: Optional[Literal["app", "website", "backend", "all"]] = Query(default="all"),
+    level: Optional[Literal["error", "warning", "info", "all"]] = Query(default="all"),
+    platform: Optional[Literal["ios", "android", "web", "desktop", "server", "unknown", "all"]] = Query(default="all"),
+    q: Optional[str] = Query(default=None, max_length=160),
+    limit: int = Query(default=50, ge=1, le=200),
+    offset: int = Query(default=0, ge=0, le=10000),
+):
+    await require_admin(request, db)
+    query: dict[str, Any] = {}
+    if source and source != "all":
+        query["source"] = source
+    if level and level != "all":
+        query["level"] = level
+    if platform and platform != "all":
+        query["platform"] = platform
+    if q:
+        needle = q.strip()
+        if needle:
+            pattern = re.escape(needle)
+            query["$or"] = [
+                {"message": {"$regex": pattern, "$options": "i"}},
+                {"route": {"$regex": pattern, "$options": "i"}},
+                {"screen": {"$regex": pattern, "$options": "i"}},
+                {"app_version": {"$regex": pattern, "$options": "i"}},
+                {"fingerprint": {"$regex": pattern, "$options": "i"}},
+            ]
+
+    now = datetime.now(timezone.utc)
+    last_24h = now - timedelta(hours=24)
+    items = await db.error_logs.find(query, {"_id": 0, "ip_hash": 0}).sort("created_dt", -1).skip(offset).limit(limit).to_list(limit)
+    total = await db.error_logs.count_documents(query)
+
+    async def count(extra: dict[str, Any]) -> int:
+        return await db.error_logs.count_documents({**query, **extra})
+
+    fingerprint_rows = await db.error_logs.aggregate(
+        [
+            {"$match": query},
+            {"$group": {"_id": "$fingerprint", "count": {"$sum": 1}, "message": {"$first": "$message"}, "last_seen": {"$max": "$created_dt"}}},
+            {"$sort": {"count": -1, "last_seen": -1}},
+            {"$limit": 10},
+            {"$project": {"_id": 0, "fingerprint": "$_id", "count": 1, "message": 1, "last_seen": 1}},
+        ]
+    ).to_list(10)
+    for row in fingerprint_rows:
+        if isinstance(row.get("last_seen"), datetime):
+            row["last_seen"] = row["last_seen"].isoformat()
+
+    summary = {
+        "total": total,
+        "errors": await count({"level": "error"}),
+        "warnings": await count({"level": "warning"}),
+        "app": await count({"source": "app"}),
+        "website": await count({"source": "website"}),
+        "backend": await count({"source": "backend"}),
+        "last_24h": await count({"created_dt": {"$gte": last_24h}}),
+        "top_fingerprints": fingerprint_rows,
+    }
+    return {"items": [_public_error_log_doc(item) for item in items], "summary": summary, "total": total}
+
+
 # ----- Admin: Reports / CSV export -----
 @api.get("/admin/export/{kind}")
 async def export_csv(kind: str, request: Request):
@@ -1434,6 +1623,23 @@ async def export_csv(kind: str, request: Request):
                 t.get("source"),
                 t.get("created_at"),
                 t.get("updated_at"),
+            ])
+    elif kind == "error-logs":
+        writer.writerow(["id", "source", "platform", "level", "app_version", "build_number", "route", "screen", "fingerprint", "message", "created_at"])
+        logs = await db.error_logs.find({}, {"_id": 0, "ip_hash": 0, "stack": 0, "context": 0, "user_agent": 0}).sort("created_dt", -1).to_list(5000)
+        for item in logs:
+            writer.writerow([
+                item.get("id"),
+                item.get("source"),
+                item.get("platform"),
+                item.get("level"),
+                item.get("app_version"),
+                item.get("build_number"),
+                item.get("route"),
+                item.get("screen"),
+                item.get("fingerprint"),
+                item.get("message"),
+                item.get("created_at"),
             ])
     elif kind == "activity":
         writer.writerow(["user_id", "name", "email", "last_active"])
@@ -1490,7 +1696,7 @@ async def security_headers(request: Request, call_next):
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
     response.headers["Cross-Origin-Resource-Policy"] = "same-site"
-    if request.url.path.startswith(("/api/auth", "/api/admin", "/api/contact")):
+    if request.url.path.startswith(("/api/auth", "/api/admin", "/api/contact", "/api/error-logs", "/api/logs/error")):
         response.headers["Cache-Control"] = "no-store"
     return response
 
@@ -1525,6 +1731,12 @@ async def on_startup():
     await db.support_tickets.create_index("store_email")
     await db.support_tickets.create_index("source")
     await db.support_tickets.create_index("created_at")
+    await db.error_logs.create_index("id", unique=True)
+    await db.error_logs.create_index("created_dt")
+    await db.error_logs.create_index("source")
+    await db.error_logs.create_index("level")
+    await db.error_logs.create_index("platform")
+    await db.error_logs.create_index("fingerprint")
     await db.status_incidents.create_index("updated_at")
     await db.status_incidents.create_index("public")
     # seed admin

@@ -169,6 +169,42 @@ class TestWebsiteAnalytics:
         assert r.status_code == 422
 
 
+class TestErrorLogs:
+    def test_public_error_log_creates_admin_entry(self, admin_token):
+        marker = uuid.uuid4().hex[:8]
+        payload = {
+            "source": "website",
+            "platform": "web",
+            "level": "error",
+            "message": f"Automated UI error {marker} token=secret-value",
+            "route": "/test",
+            "context": {
+                "token": "must-not-be-visible",
+                "safe": "visible",
+            },
+        }
+        created = requests.post(f"{API}/error-logs", json=payload)
+        assert created.status_code == 202, created.text
+
+        listed = requests.get(
+            f"{API}/admin/error-logs",
+            params={"q": marker},
+            headers=admin_headers(admin_token),
+        )
+        assert listed.status_code == 200, listed.text
+        data = listed.json()
+        assert data["total"] >= 1
+        item = data["items"][0]
+        assert item["source"] == "website"
+        assert item["context"]["token"] == "[redacted]"
+        assert "secret-value" not in item["message"]
+        assert "ip_hash" not in item
+
+    def test_error_logs_requires_admin(self):
+        r = requests.get(f"{API}/admin/error-logs")
+        assert r.status_code == 401
+
+
 # ---- Admin: Users ----
 class TestAdminUsers:
     def test_list_users(self, admin_token):
@@ -376,7 +412,7 @@ class TestSettings:
 
 # ---- Admin: CSV export ----
 class TestCSVExport:
-    @pytest.mark.parametrize("kind", ["users", "groups", "reports", "activity", "support"])
+    @pytest.mark.parametrize("kind", ["users", "groups", "reports", "activity", "support", "error-logs"])
     def test_export_with_bearer(self, admin_token, kind):
         r = requests.get(f"{API}/admin/export/{kind}", headers=admin_headers(admin_token))
         assert r.status_code == 200, r.text

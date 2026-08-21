@@ -22,6 +22,7 @@ import Groups from "@/pages/admin/Groups";
 import Moderation from "@/pages/admin/Moderation";
 import Notifications from "@/pages/admin/Notifications";
 import Support from "@/pages/admin/Support";
+import ErrorLogs from "@/pages/admin/ErrorLogs";
 import Roles from "@/pages/admin/Roles";
 import Settings from "@/pages/admin/Settings";
 import Reports from "@/pages/admin/Reports";
@@ -161,6 +162,7 @@ function App() {
                 <Route path="moderation" element={<Moderation />} />
                 <Route path="notifications" element={<Notifications />} />
                 <Route path="support" element={<Support />} />
+                <Route path="error-logs" element={<ErrorLogs />} />
                 <Route path="roles" element={<Roles />} />
                 <Route path="settings" element={<Settings />} />
                 <Route path="reports" element={<Reports />} />
