@@ -1,6 +1,6 @@
 import { downloadExport, formatApiError } from "@/lib/api";
 import { useLang } from "@/context/LanguageContext";
-import { Download, Activity, UserPlus, Flag, UsersRound, LifeBuoy, AlertTriangle } from "lucide-react";
+import { Download, Activity, UserPlus, Flag, UsersRound, LifeBuoy, AlertTriangle, Rocket, Radio } from "lucide-react";
 import { toast } from "sonner";
 
 const reports = [
@@ -10,6 +10,8 @@ const reports = [
   { kind: "groups", icon: UsersRound, title: "Statystyki grup", desc: "Lista grup z liczbą członków.", color: "cyan" },
   { kind: "support", icon: LifeBuoy, title: "Support", desc: "Zgłoszenia z formularza kontaktowego.", color: "purple" },
   { kind: "error-logs", icon: AlertTriangle, title: "Error logs", desc: "Sanitized app, website and backend error logs.", color: "amber" },
+  { kind: "releases", icon: Rocket, title: "Release Center", desc: "Historia wersji, buildów i linków pobierania.", color: "cyan" },
+  { kind: "status-incidents", icon: Radio, title: "Status incidents", desc: "Publiczna historia incydentów status page.", color: "amber" },
 ];
 
 export default function Reports() {

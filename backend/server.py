@@ -110,6 +110,54 @@ class SettingsIn(BaseModel):
     max_file_size_mb: Optional[int] = None
 
 
+class ReleaseCreateIn(BaseModel):
+    platform: Literal["android", "ios", "website", "backend", "desktop"]
+    version: str = Field(min_length=1, max_length=40)
+    build_number: Optional[str] = Field(default="", max_length=40)
+    title: Optional[str] = Field(default="", max_length=140)
+    status: Literal["draft", "testing", "published", "rollback"] = "draft"
+    download_url: Optional[str] = Field(default="", max_length=500)
+    release_url: Optional[str] = Field(default="", max_length=500)
+    commit_sha: Optional[str] = Field(default="", max_length=80)
+    notes: Optional[str] = Field(default="", max_length=4000)
+    current: bool = False
+    public: bool = True
+    published_at: Optional[str] = Field(default=None, max_length=80)
+
+
+class ReleaseUpdateIn(BaseModel):
+    platform: Optional[Literal["android", "ios", "website", "backend", "desktop"]] = None
+    version: Optional[str] = Field(default=None, min_length=1, max_length=40)
+    build_number: Optional[str] = Field(default=None, max_length=40)
+    title: Optional[str] = Field(default=None, max_length=140)
+    status: Optional[Literal["draft", "testing", "published", "rollback"]] = None
+    download_url: Optional[str] = Field(default=None, max_length=500)
+    release_url: Optional[str] = Field(default=None, max_length=500)
+    commit_sha: Optional[str] = Field(default=None, max_length=80)
+    notes: Optional[str] = Field(default=None, max_length=4000)
+    current: Optional[bool] = None
+    public: Optional[bool] = None
+    published_at: Optional[str] = Field(default=None, max_length=80)
+
+
+class StatusIncidentCreateIn(BaseModel):
+    service: Literal["general", "website", "mobile_api", "panel_api", "push", "calls", "turn", "apk"] = "general"
+    title: str = Field(min_length=1, max_length=140)
+    message: Optional[str] = Field(default="", max_length=2000)
+    status: Literal["investigating", "identified", "monitoring", "resolved"] = "investigating"
+    impact: Literal["none", "minor", "major", "critical"] = "minor"
+    public: bool = True
+
+
+class StatusIncidentUpdateIn(BaseModel):
+    service: Optional[Literal["general", "website", "mobile_api", "panel_api", "push", "calls", "turn", "apk"]] = None
+    title: Optional[str] = Field(default=None, min_length=1, max_length=140)
+    message: Optional[str] = Field(default=None, max_length=2000)
+    status: Optional[Literal["investigating", "identified", "monitoring", "resolved"]] = None
+    impact: Optional[Literal["none", "minor", "major", "critical"]] = None
+    public: Optional[bool] = None
+
+
 class WebsiteEventIn(BaseModel):
     event: Literal["pageview", "heartbeat"] = "pageview"
     visitor_id: str = Field(min_length=8, max_length=80, pattern=r"^[A-Za-z0-9_-]+$")
@@ -515,6 +563,171 @@ async def _public_service_status() -> dict:
     }
 
 
+_ADMIN_OPERATIONS_HEADER_ALLOWLIST = (
+    "content-length",
+    "content-type",
+    "content-disposition",
+    "cache-control",
+    "etag",
+    "last-modified",
+    "x-ghostel-android-version",
+)
+
+
+def _env_public_url(name: str, default: str) -> str:
+    value = (os.environ.get(name) or default).strip()
+    return value or default
+
+
+def _safe_response_headers(response: httpx.Response) -> dict:
+    headers = {}
+    for key in _ADMIN_OPERATIONS_HEADER_ALLOWLIST:
+        value = response.headers.get(key)
+        if value:
+            headers[key] = _clean_error_text(value, max_len=240)
+    return headers
+
+
+async def _admin_operations_check(client: httpx.AsyncClient, service: dict) -> dict:
+    started = time.perf_counter()
+    method = service.get("method", "GET")
+    try:
+        response = await client.request(
+            method,
+            service["url"],
+            headers={"user-agent": "ghostel-admin-operations/1.0"},
+        )
+        latency_ms = round((time.perf_counter() - started) * 1000)
+        return {
+            "key": service["key"],
+            "name": service["name"],
+            "url": _clean_error_text(service["url"], max_len=300),
+            "method": method,
+            "ok": response.status_code < 400,
+            "status": response.status_code,
+            "latency_ms": latency_ms,
+            "headers": _safe_response_headers(response),
+        }
+    except Exception as exc:
+        latency_ms = round((time.perf_counter() - started) * 1000)
+        return {
+            "key": service["key"],
+            "name": service["name"],
+            "url": _clean_error_text(service["url"], max_len=300),
+            "method": method,
+            "ok": False,
+            "status": "error",
+            "latency_ms": latency_ms,
+            "headers": {},
+            "error": _clean_error_text(str(exc), max_len=240),
+        }
+
+
+async def _admin_asset_manifest(client: httpx.AsyncClient, website_url: str) -> dict:
+    manifest_url = f"{website_url.rstrip('/')}/asset-manifest.json"
+    try:
+        response = await client.get(
+            manifest_url,
+            headers={"user-agent": "ghostel-admin-operations/1.0"},
+        )
+        latency_ms = round(response.elapsed.total_seconds() * 1000)
+        response.raise_for_status()
+        data = response.json()
+        files = data.get("files") if isinstance(data, dict) else {}
+        entrypoints = data.get("entrypoints") if isinstance(data, dict) else []
+        if not isinstance(files, dict):
+            files = {}
+        if not isinstance(entrypoints, list):
+            entrypoints = []
+        return {
+            "ok": True,
+            "url": manifest_url,
+            "status": response.status_code,
+            "latency_ms": latency_ms,
+            "main_js": _clean_error_text(files.get("main.js", ""), max_len=300),
+            "main_css": _clean_error_text(files.get("main.css", ""), max_len=300),
+            "entrypoints": [_clean_error_text(item, max_len=300) for item in entrypoints[:12]],
+        }
+    except Exception as exc:
+        return {
+            "ok": False,
+            "url": manifest_url,
+            "status": "error",
+            "latency_ms": None,
+            "main_js": "",
+            "main_css": "",
+            "entrypoints": [],
+            "error": _clean_error_text(str(exc), max_len=240),
+        }
+
+
+def _safe_admin_url(value: Optional[str]) -> str:
+    raw = (value or "").strip()
+    if not raw:
+        return ""
+    parsed = urlparse(raw)
+    if parsed.scheme not in {"https", "http"} or not parsed.netloc:
+        raise HTTPException(status_code=400, detail="URL must start with http:// or https://")
+    return _clean_error_text(raw, max_len=500)
+
+
+def _release_public_doc(doc: dict) -> dict:
+    doc = dict(doc or {})
+    doc.pop("_id", None)
+    return doc
+
+
+def _default_public_releases() -> dict:
+    android_url = _env_public_url("GHOSTEL_APK_URL", "https://api.ghostel.app/app-release.apk?v=1.4.54")
+    android_version = (os.environ.get("GHOSTEL_ANDROID_VERSION") or "").strip()
+    if not android_version:
+        for part in urlparse(android_url).query.split("&"):
+            key, _, value = part.partition("=")
+            if key == "v" and value:
+                android_version = value[:40]
+                break
+    android_version = android_version or "1.4.54"
+    now_iso = datetime.now(timezone.utc).isoformat()
+    return {
+        "android": {
+            "id": "default-android",
+            "platform": "android",
+            "version": android_version,
+            "build_number": android_version.split(".")[-1],
+            "title": f"Android {android_version}",
+            "status": "published",
+            "download_url": android_url,
+            "release_url": _env_public_url(
+                "GHOSTEL_RELEASE_API_URL",
+                "https://api.github.com/repos/Ghostelapp/app-Gostel/releases/latest",
+            ),
+            "commit_sha": "",
+            "notes": "Default production Android download configured on the website.",
+            "current": True,
+            "public": True,
+            "published_at": now_iso,
+            "created_at": now_iso,
+            "updated_at": now_iso,
+            "source": "default",
+        }
+    }
+
+
+async def _current_public_releases() -> dict:
+    rows = await db.release_records.find(
+        {"public": {"$ne": False}, "current": True, "status": "published"},
+        {"_id": 0},
+    ).sort("published_at", -1).to_list(100)
+    releases = _default_public_releases()
+    for row in rows:
+        platform = row.get("platform")
+        if platform:
+            item = _release_public_doc(row)
+            item["source"] = item.get("source") or "release_center"
+            releases[platform] = item
+    return releases
+
+
 async def _website_analytics() -> dict:
     now = datetime.now(timezone.utc)
     today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
@@ -775,6 +988,14 @@ async def create_support_ticket(payload: ContactSupportIn, request: Request):
 @api.get("/status")
 async def public_status():
     return await _public_service_status()
+
+
+@api.get("/releases/current")
+async def public_current_releases():
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "releases": await _current_public_releases(),
+    }
 
 
 @api.get("/tester-leaderboard")
@@ -1083,6 +1304,117 @@ def _normalize_dashboard_chart(raw_chart, value_key: str):
         return None
     return normalized
 
+
+
+@api.get("/admin/operations")
+async def admin_operations(request: Request):
+    await require_admin(request, db)
+
+    now = datetime.now(timezone.utc)
+    last_24h = now - timedelta(hours=24)
+    current_releases = await _current_public_releases()
+    android_release = current_releases.get("android", {})
+    website_url = _env_public_url("PUBLIC_WEBSITE_URL", "https://ghostel.app")
+    mobile_api_url = _env_public_url("GHOSTEL_MOBILE_API_URL", "https://api.ghostel.app/api/")
+    panel_api_url = _env_public_url("PANEL_API_URL", "https://panel-api.ghostel.app/api/")
+    apk_url = (android_release.get("download_url") or os.environ.get("GHOSTEL_APK_URL") or "https://api.ghostel.app/app-release.apk?v=1.4.54").strip()
+    release_api_url = _env_public_url(
+        "GHOSTEL_RELEASE_API_URL",
+        android_release.get("release_url") or "https://api.github.com/repos/Ghostelapp/app-Gostel/releases/latest",
+    )
+
+    services = [
+        {"key": "website", "name": "ghostel.app website", "url": website_url, "method": "HEAD"},
+        {"key": "mobile_api", "name": "Mobile app API", "url": mobile_api_url, "method": "GET"},
+        {"key": "panel_api", "name": "Website panel API", "url": panel_api_url, "method": "GET"},
+        {"key": "android_apk", "name": "Android APK download", "url": apk_url, "method": "HEAD"},
+        {"key": "github_release", "name": "GitHub latest release API", "url": release_api_url, "method": "GET"},
+    ]
+
+    async with httpx.AsyncClient(timeout=7.0, follow_redirects=True) as http_client:
+        service_checks, asset_manifest = await asyncio.gather(
+            asyncio.gather(*[_admin_operations_check(http_client, service) for service in services]),
+            _admin_asset_manifest(http_client, website_url),
+        )
+
+    apk_check = next((row for row in service_checks if row["key"] == "android_apk"), {})
+    apk_headers = apk_check.get("headers") or {}
+    apk_query_version = ""
+    for part in urlparse(apk_url).query.split("&"):
+        key, _, value = part.partition("=")
+        if key == "v":
+            apk_query_version = value[:40]
+            break
+
+    active_now = len(
+        await db.website_sessions.distinct(
+            "visitor_id",
+            {"last_seen_at": {"$gte": now - timedelta(minutes=5)}},
+        )
+    )
+    counts = {
+        "support_open": await db.support_tickets.count_documents({"status": {"$in": ["new", "open", "waiting"]}}),
+        "support_urgent": await db.support_tickets.count_documents({"priority": "urgent", "status": {"$nin": ["resolved", "closed"]}}),
+        "support_unassigned": await db.support_tickets.count_documents(
+            {
+                "status": {"$in": ["new", "open", "waiting"]},
+                "$or": [{"assigned_to": ""}, {"assigned_to": None}, {"assigned_to": {"$exists": False}}],
+            }
+        ),
+        "bug_pending": await db.support_tickets.count_documents({"category": "bug", "bug_status": "pending"}),
+        "bug_accepted": await db.support_tickets.count_documents({"category": "bug", "bug_status": "accepted"}),
+        "errors_24h": await db.error_logs.count_documents(
+            {
+                "$or": [
+                    {"created_dt": {"$gte": last_24h}},
+                    {"created_dt": {"$exists": False}, "created_at": {"$gte": last_24h.isoformat()}},
+                ]
+            }
+        ),
+        "website_active_now": active_now,
+    }
+
+    healthy_services = sum(1 for row in service_checks if row.get("ok"))
+    return {
+        "generated_at": now.isoformat(),
+        "summary": {
+            "healthy_services": healthy_services,
+            "total_services": len(service_checks),
+            "overall_status": "operational"
+            if healthy_services == len(service_checks)
+            else "degraded"
+            if healthy_services
+            else "outage",
+        },
+        "services": service_checks,
+        "builds": {
+            "android": {
+                "apk_url": _clean_error_text(apk_url, max_len=300),
+                "release_center_version": android_release.get("version", ""),
+                "release_center_build": android_release.get("build_number", ""),
+                "query_version": apk_query_version,
+                "header_version": apk_headers.get("x-ghostel-android-version", ""),
+                "content_length": apk_headers.get("content-length", ""),
+                "content_type": apk_headers.get("content-type", ""),
+                "content_disposition": apk_headers.get("content-disposition", ""),
+                "cache_control": apk_headers.get("cache-control", ""),
+                "last_modified": apk_headers.get("last-modified", ""),
+            },
+            "website": asset_manifest,
+        },
+        "counts": counts,
+        "configuration": {
+            "ghostel_public_api_configured": ghostel_client.has_public_api,
+            "ghostel_admin_bridge_configured": ghostel_client.is_configured,
+            "secure_cookies_enabled": _cookie_secure(),
+            "frontend_url": _clean_error_text(os.environ.get("FRONTEND_URL", ""), max_len=300),
+            "public_website_url": _clean_error_text(website_url, max_len=300),
+            "mobile_api_url": _clean_error_text(mobile_api_url, max_len=300),
+            "panel_api_url": _clean_error_text(panel_api_url, max_len=300),
+            "release_api_url": _clean_error_text(release_api_url, max_len=300),
+            "error_log_redaction_enabled": True,
+        },
+    }
 
 
 @api.get("/admin/dashboard")
@@ -1399,6 +1731,179 @@ async def update_settings(payload: SettingsIn, request: Request):
     return s
 
 
+# ----- Admin: Release Center -----
+@api.get("/admin/releases")
+async def list_releases(request: Request):
+    await require_admin(request, db)
+    items = await db.release_records.find({}, {"_id": 0}).sort("updated_at", -1).to_list(500)
+    return {
+        "items": items,
+        "current": await _current_public_releases(),
+    }
+
+
+@api.post("/admin/releases")
+async def create_release(payload: ReleaseCreateIn, request: Request):
+    admin = await require_admin(request, db)
+    now_iso = datetime.now(timezone.utc).isoformat()
+    data = payload.model_dump()
+    data["platform"] = data["platform"].lower()
+    data["version"] = _clean_error_text(data["version"].strip(), max_len=40)
+    data["build_number"] = _clean_error_text((data.get("build_number") or "").strip(), max_len=40)
+    data["title"] = _clean_error_text((data.get("title") or "").strip(), max_len=140) or f"{data['platform']} {data['version']}"
+    data["notes"] = _clean_error_text((data.get("notes") or "").strip(), max_len=4000)
+    data["commit_sha"] = _clean_error_text((data.get("commit_sha") or "").strip(), max_len=80)
+    data["download_url"] = _safe_admin_url(data.get("download_url"))
+    data["release_url"] = _safe_admin_url(data.get("release_url"))
+    data["published_at"] = _clean_error_text(data.get("published_at") or "", max_len=80)
+    if data["current"]:
+        data["status"] = "published"
+        data["public"] = True
+        data["published_at"] = data["published_at"] or now_iso
+        await db.release_records.update_many(
+            {"platform": data["platform"]},
+            {"$set": {"current": False, "updated_at": now_iso}},
+        )
+
+    doc = {
+        "id": str(uuid.uuid4()),
+        **data,
+        "created_by": admin.get("email") or admin.get("id") or "admin",
+        "created_at": now_iso,
+        "updated_at": now_iso,
+        "source": "release_center",
+    }
+    await db.release_records.insert_one(doc)
+    return _release_public_doc(doc)
+
+
+@api.patch("/admin/releases/{release_id}")
+async def update_release(release_id: str, payload: ReleaseUpdateIn, request: Request):
+    admin = await require_admin(request, db)
+    current = await db.release_records.find_one({"id": release_id})
+    if not current:
+        raise HTTPException(status_code=404, detail="Release not found")
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    update = payload.model_dump(exclude_unset=True)
+    if not update:
+        return _release_public_doc(current)
+
+    for key in ("version", "build_number", "title", "notes", "commit_sha", "published_at"):
+        if key in update and update[key] is not None:
+            max_len = 4000 if key == "notes" else 140 if key == "title" else 80
+            if key == "version":
+                max_len = 40
+            update[key] = _clean_error_text(str(update[key]).strip(), max_len=max_len)
+    for key in ("download_url", "release_url"):
+        if key in update and update[key] is not None:
+            update[key] = _safe_admin_url(update[key])
+    if update.get("platform"):
+        update["platform"] = update["platform"].lower()
+
+    platform = update.get("platform") or current.get("platform")
+    if update.get("current") is True:
+        update["status"] = "published"
+        update["public"] = True
+        update["published_at"] = update.get("published_at") or current.get("published_at") or now_iso
+        await db.release_records.update_many(
+            {"platform": platform, "id": {"$ne": release_id}},
+            {"$set": {"current": False, "updated_at": now_iso}},
+        )
+
+    update["updated_by"] = admin.get("email") or admin.get("id") or "admin"
+    update["updated_at"] = now_iso
+    doc = await db.release_records.find_one_and_update(
+        {"id": release_id},
+        {"$set": update},
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0},
+    )
+    return doc
+
+
+@api.delete("/admin/releases/{release_id}")
+async def delete_release(release_id: str, request: Request):
+    await require_admin(request, db)
+    result = await db.release_records.delete_one({"id": release_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Release not found")
+    return {"ok": True}
+
+
+# ----- Admin: Public status manager -----
+@api.get("/admin/status-incidents")
+async def list_status_incidents(request: Request):
+    await require_admin(request, db)
+    items = await db.status_incidents.find({}, {"_id": 0}).sort("updated_at", -1).to_list(500)
+    return {"items": items}
+
+
+@api.post("/admin/status-incidents")
+async def create_status_incident(payload: StatusIncidentCreateIn, request: Request):
+    admin = await require_admin(request, db)
+    now_iso = datetime.now(timezone.utc).isoformat()
+    resolved_at = now_iso if payload.status == "resolved" else None
+    doc = {
+        "id": str(uuid.uuid4()),
+        "service": payload.service,
+        "title": _clean_error_text(payload.title.strip(), max_len=140),
+        "message": _clean_error_text((payload.message or "").strip(), max_len=2000),
+        "status": payload.status,
+        "impact": payload.impact,
+        "public": payload.public,
+        "created_by": admin.get("email") or admin.get("id") or "admin",
+        "created_at": now_iso,
+        "updated_at": now_iso,
+        "resolved_at": resolved_at,
+    }
+    await db.status_incidents.insert_one(doc)
+    doc.pop("_id", None)
+    return doc
+
+
+@api.patch("/admin/status-incidents/{incident_id}")
+async def update_status_incident(incident_id: str, payload: StatusIncidentUpdateIn, request: Request):
+    admin = await require_admin(request, db)
+    current = await db.status_incidents.find_one({"id": incident_id})
+    if not current:
+        raise HTTPException(status_code=404, detail="Incident not found")
+
+    update = payload.model_dump(exclude_unset=True)
+    if not update:
+        current.pop("_id", None)
+        return current
+    if "title" in update and update["title"] is not None:
+        update["title"] = _clean_error_text(update["title"].strip(), max_len=140)
+    if "message" in update and update["message"] is not None:
+        update["message"] = _clean_error_text(update["message"].strip(), max_len=2000)
+
+    now_iso = datetime.now(timezone.utc).isoformat()
+    if update.get("status") == "resolved":
+        update["resolved_at"] = current.get("resolved_at") or now_iso
+    elif update.get("status") in {"investigating", "identified", "monitoring"}:
+        update["resolved_at"] = None
+    update["updated_by"] = admin.get("email") or admin.get("id") or "admin"
+    update["updated_at"] = now_iso
+
+    doc = await db.status_incidents.find_one_and_update(
+        {"id": incident_id},
+        {"$set": update},
+        return_document=ReturnDocument.AFTER,
+        projection={"_id": 0},
+    )
+    return doc
+
+
+@api.delete("/admin/status-incidents/{incident_id}")
+async def delete_status_incident(incident_id: str, request: Request):
+    await require_admin(request, db)
+    result = await db.status_incidents.delete_one({"id": incident_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return {"ok": True}
+
+
 # ----- Admin: Contact support -----
 @api.get("/admin/support")
 async def list_support_tickets(
@@ -1641,6 +2146,39 @@ async def export_csv(kind: str, request: Request):
                 item.get("message"),
                 item.get("created_at"),
             ])
+    elif kind == "releases":
+        writer.writerow(["id", "platform", "version", "build_number", "status", "current", "public", "download_url", "release_url", "commit_sha", "published_at", "updated_at"])
+        releases = await db.release_records.find({}, {"_id": 0, "notes": 0}).sort("updated_at", -1).to_list(5000)
+        for item in releases:
+            writer.writerow([
+                item.get("id"),
+                item.get("platform"),
+                item.get("version"),
+                item.get("build_number"),
+                item.get("status"),
+                item.get("current"),
+                item.get("public"),
+                item.get("download_url"),
+                item.get("release_url"),
+                item.get("commit_sha"),
+                item.get("published_at"),
+                item.get("updated_at"),
+            ])
+    elif kind == "status-incidents":
+        writer.writerow(["id", "service", "title", "status", "impact", "public", "created_at", "updated_at", "resolved_at"])
+        incidents = await db.status_incidents.find({}, {"_id": 0, "message": 0}).sort("updated_at", -1).to_list(5000)
+        for item in incidents:
+            writer.writerow([
+                item.get("id"),
+                item.get("service"),
+                item.get("title"),
+                item.get("status"),
+                item.get("impact"),
+                item.get("public"),
+                item.get("created_at"),
+                item.get("updated_at"),
+                item.get("resolved_at"),
+            ])
     elif kind == "activity":
         writer.writerow(["user_id", "name", "email", "last_active"])
         users = await db.users.find({}, {"_id": 0, "password_hash": 0}).sort("last_active", -1).to_list(2000)
@@ -1737,8 +2275,16 @@ async def on_startup():
     await db.error_logs.create_index("level")
     await db.error_logs.create_index("platform")
     await db.error_logs.create_index("fingerprint")
+    await db.release_records.create_index("id", unique=True)
+    await db.release_records.create_index("platform")
+    await db.release_records.create_index("current")
+    await db.release_records.create_index("status")
+    await db.release_records.create_index("updated_at")
+    await db.status_incidents.create_index("id", unique=True)
     await db.status_incidents.create_index("updated_at")
     await db.status_incidents.create_index("public")
+    await db.status_incidents.create_index("service")
+    await db.status_incidents.create_index("status")
     # seed admin
     admin_email = os.environ.get("ADMIN_EMAIL", "admin@ghostel.app").lower()
     admin_password = os.environ.get("ADMIN_PASSWORD")

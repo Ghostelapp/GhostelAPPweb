@@ -17,18 +17,20 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import { useLang } from "@/context/LanguageContext";
 import api, { formatApiError } from "@/lib/api";
+import { GHOSTEL_ANDROID_BUILD, GHOSTEL_ANDROID_VERSION, GHOSTEL_APK_URL } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
-const ANDROID_APK_URL = "https://api.ghostel.app/app-release.apk?v=1.4.53";
+const ANDROID_APK_URL = GHOSTEL_APK_URL;
 const TESTFLIGHT_APP_URL = "https://apps.apple.com/app/testflight/id899247664";
-const TESTER_APP_VERSION = "1.4.53";
-const TESTER_ANDROID_BUILD = "53";
+const TESTER_APP_VERSION = GHOSTEL_ANDROID_VERSION;
+const TESTER_ANDROID_BUILD = GHOSTEL_ANDROID_BUILD;
+const TESTER_IOS_VERSION = "1.4.53";
 const TESTER_IOS_BUILD = "53";
 const TESTER_ANDROID_TITLE = `Android ${TESTER_APP_VERSION} (${TESTER_ANDROID_BUILD})`;
-const TESTER_IOS_TITLE = `iOS ${TESTER_APP_VERSION} (${TESTER_IOS_BUILD})`;
+const TESTER_IOS_TITLE = `iOS ${TESTER_IOS_VERSION} (${TESTER_IOS_BUILD})`;
 
 const copy = {
   en: {
@@ -317,6 +319,7 @@ export default function TesterAccess() {
     setSubmitState(null);
     try {
       const platformLabel = form.platform === "ios" ? "iOS / TestFlight" : "Android / Google Play";
+      const appVersion = form.platform === "ios" ? TESTER_IOS_VERSION : TESTER_APP_VERSION;
       const message = [
         `Tester wants to join Ghostel testing on: ${platformLabel}.`,
         `Store email: ${form.store_email}.`,
@@ -331,7 +334,7 @@ export default function TesterAccess() {
         category: "tester",
         message,
         app_platform: form.platform,
-        app_version: TESTER_APP_VERSION,
+        app_version: appVersion,
         tester_platform: form.platform,
         store_email: form.store_email,
         device_model: form.device_model,
@@ -355,6 +358,7 @@ export default function TesterAccess() {
     setBugSubmitState(null);
     try {
       const platformLabel = bugForm.platform === "ios" ? "iOS / TestFlight" : "Android / Google Play";
+      const appVersion = bugForm.platform === "ios" ? TESTER_IOS_VERSION : TESTER_APP_VERSION;
       const message = [
         `Bug report from Ghostel tester on: ${platformLabel}.`,
         `Device model: ${bugForm.device_model || "not provided"}.`,
@@ -368,7 +372,7 @@ export default function TesterAccess() {
         category: "bug",
         message,
         app_platform: bugForm.platform,
-        app_version: TESTER_APP_VERSION,
+        app_version: appVersion,
         tester_platform: bugForm.platform,
         store_email: bugForm.email,
         device_model: bugForm.device_model,

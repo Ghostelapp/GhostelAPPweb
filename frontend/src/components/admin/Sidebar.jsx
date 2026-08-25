@@ -7,6 +7,9 @@ import {
   Bell,
   LifeBuoy,
   AlertTriangle,
+  Activity,
+  Rocket,
+  Radio,
   KeyRound,
   Settings,
   FileBarChart2,
@@ -22,6 +25,9 @@ export default function Sidebar() {
 
   const items = [
     { to: "/admin", icon: LayoutDashboard, label: t("admin.dashboard"), end: true, testid: "sidebar-dashboard" },
+    { to: "/admin/operations", icon: Activity, label: "Operations", testid: "sidebar-operations" },
+    { to: "/admin/releases", icon: Rocket, label: "Release Center", testid: "sidebar-releases" },
+    { to: "/admin/status-manager", icon: Radio, label: "Status Manager", testid: "sidebar-status-manager" },
     { to: "/admin/users", icon: Users, label: t("admin.users"), testid: "sidebar-users" },
     { to: "/admin/groups", icon: UsersRound, label: t("admin.groups"), testid: "sidebar-groups" },
     { to: "/admin/moderation", icon: Shield, label: t("admin.moderation"), testid: "sidebar-moderation" },
