@@ -17,6 +17,9 @@ import Changelog from "@/pages/Changelog";
 import TesterAccess from "@/pages/TesterAccess";
 import AdminLayout from "@/pages/AdminLayout";
 import Dashboard from "@/pages/admin/Dashboard";
+import Operations from "@/pages/admin/Operations";
+import ReleaseCenter from "@/pages/admin/ReleaseCenter";
+import StatusManager from "@/pages/admin/StatusManager";
 import Users from "@/pages/admin/Users";
 import Groups from "@/pages/admin/Groups";
 import Moderation from "@/pages/admin/Moderation";
@@ -157,6 +160,9 @@ function App() {
                 }
               >
                 <Route index element={<Dashboard />} />
+                <Route path="operations" element={<Operations />} />
+                <Route path="releases" element={<ReleaseCenter />} />
+                <Route path="status-manager" element={<StatusManager />} />
                 <Route path="users" element={<Users />} />
                 <Route path="groups" element={<Groups />} />
                 <Route path="moderation" element={<Moderation />} />
