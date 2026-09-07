@@ -6,6 +6,27 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
+    date: "2026-09-07",
+    title: "Android and iOS release 1.4.55",
+    items: [
+      "Published Android build 62 as version 1.4.55 for tester APK downloads.",
+      "Submitted iOS build 67 as version 1.4.55 to App Store Connect/TestFlight processing.",
+      "Fixed backend import errors that broke login and media uploads.",
+      "Updated ghostel.app download links and SEO metadata.",
+    ],
+  },
+  {
+    version: "1.4.54",
+    date: "2026-08-26",
+    title: "Fresh Android and iOS test builds",
+    items: [
+      "Published Android build 58 as version 1.4.54 for tester APK downloads.",
+      "Submitted iOS build 61 as version 1.4.54 to App Store Connect/TestFlight processing.",
+      "Updated ghostel.app tester links and release metadata so mobile browsers do not reuse the stale APK link.",
+    ],
+  },
+  {
+    version: GHOSTEL_ANDROID_VERSION,
     date: "2026-07-05",
     title: "Accepted-call signaling recovery",
     items: [

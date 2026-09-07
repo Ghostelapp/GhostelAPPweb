@@ -9,7 +9,7 @@ const brands = [
     name: "ghostel.app",
     Logo: () => (
       <div className="relative grid h-12 w-12 place-items-center overflow-hidden rounded-2xl border border-cyan-300/40 bg-cyan-300/15 p-1.5 shadow-lg shadow-cyan-950/40">
-        <img src="/ghostel-logo.png" alt="" className="h-full w-full object-contain" />
+        <img src="/ghostel-logo.png" alt="ghostel.app logo" className="h-full w-full object-contain" />
         <span className="absolute -right-1 -top-1 h-3 w-3 rounded-full bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.8)]" />
       </div>
     ),
@@ -19,7 +19,7 @@ const brands = [
     name: "Telegram",
     Logo: () => (
       <div className="grid h-12 w-12 place-items-center rounded-2xl border border-sky-300/30 bg-sky-400/15 p-3">
-        <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="" className="h-full w-full object-contain" />
+        <img src="https://cdn.simpleicons.org/telegram/26A5E4" alt="Telegram logo" className="h-full w-full object-contain" />
       </div>
     ),
   },
@@ -28,7 +28,7 @@ const brands = [
     name: "Messenger",
     Logo: () => (
       <div className="grid h-12 w-12 place-items-center rounded-2xl border border-blue-300/30 bg-gradient-to-br from-blue-500/25 to-fuchsia-500/20 p-3">
-        <img src="https://cdn.simpleicons.org/messenger/00B2FF" alt="" className="h-full w-full object-contain" />
+        <img src="https://cdn.simpleicons.org/messenger/00B2FF" alt="Messenger logo" className="h-full w-full object-contain" />
       </div>
     ),
   },
@@ -37,7 +37,7 @@ const brands = [
     name: "WhatsApp",
     Logo: () => (
       <div className="grid h-12 w-12 place-items-center rounded-2xl border border-emerald-300/30 bg-emerald-400/15 p-3">
-        <img src="https://cdn.simpleicons.org/whatsapp/25D366" alt="" className="h-full w-full object-contain" />
+        <img src="https://cdn.simpleicons.org/whatsapp/25D366" alt="WhatsApp logo" className="h-full w-full object-contain" />
       </div>
     ),
   },
