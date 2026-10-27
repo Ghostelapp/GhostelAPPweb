@@ -17,7 +17,7 @@ import asyncio
 import time
 from urllib.parse import urlparse
 from datetime import datetime, timezone, timedelta
-from typing import Any, Optional, List, Literal
+from typing import Any, Dict, Optional, List, Literal
 
 from fastapi import FastAPI, APIRouter, Request, Response, HTTPException, Depends, Query
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -87,12 +87,39 @@ class GroupUpdateIn(BaseModel):
 
 
 class NotificationIn(BaseModel):
-    title: str
-    body: str
-    icon: Optional[str] = "bell"
-    link: Optional[str] = ""
-    target_type: str = "all"  # all | group | user
-    target_id: Optional[str] = None
+    title: str = Field(min_length=1, max_length=120)
+    body: str = Field(min_length=1, max_length=2000)
+    translations: Dict[str, dict] = Field(default_factory=dict)
+    severity: Literal["info", "warning", "critical"] = "info"
+    presentation: Literal["banner", "modal", "inbox"] = "banner"
+    target_platform: Literal["all", "android", "ios", "web"] = "all"
+    target_user_ids: List[str] = Field(default_factory=list, max_length=1000)
+    min_version: Optional[str] = Field(default=None, max_length=32)
+    max_version: Optional[str] = Field(default=None, max_length=32)
+    starts_at: Optional[datetime] = None
+    ends_at: Optional[datetime] = None
+    action_label: Optional[str] = Field(default=None, max_length=40)
+    action_url: Optional[str] = Field(default=None, max_length=500)
+    requires_acknowledgement: bool = False
+    send_push: bool = True
+
+
+class NotificationUpdateIn(BaseModel):
+    title: Optional[str] = Field(default=None, min_length=1, max_length=120)
+    body: Optional[str] = Field(default=None, min_length=1, max_length=2000)
+    translations: Optional[Dict[str, dict]] = None
+    severity: Optional[Literal["info", "warning", "critical"]] = None
+    presentation: Optional[Literal["banner", "modal", "inbox"]] = None
+    target_platform: Optional[Literal["all", "android", "ios", "web"]] = None
+    target_user_ids: Optional[List[str]] = Field(default=None, max_length=1000)
+    min_version: Optional[str] = Field(default=None, max_length=32)
+    max_version: Optional[str] = Field(default=None, max_length=32)
+    starts_at: Optional[datetime] = None
+    ends_at: Optional[datetime] = None
+    action_label: Optional[str] = Field(default=None, max_length=40)
+    action_url: Optional[str] = Field(default=None, max_length=500)
+    requires_acknowledgement: Optional[bool] = None
+    send_push: Optional[bool] = None
 
 
 class ReportActionIn(BaseModel):
@@ -678,22 +705,30 @@ def _release_public_doc(doc: dict) -> dict:
 
 
 def _default_public_releases() -> dict:
-    android_url = _env_public_url("GHOSTEL_APK_URL", "https://api.ghostel.app/app-release.apk?v=1.4.54")
+    android_url = _env_public_url("GHOSTEL_APK_URL", "https://api.ghostel.app/app-release.apk?v=1.4.55-b62")
     android_version = (os.environ.get("GHOSTEL_ANDROID_VERSION") or "").strip()
-    if not android_version:
-        for part in urlparse(android_url).query.split("&"):
-            key, _, value = part.partition("=")
-            if key == "v" and value:
-                android_version = value[:40]
-                break
-    android_version = android_version or "1.4.54"
+    android_build_number = (os.environ.get("GHOSTEL_ANDROID_BUILD_NUMBER") or "").strip()
+    for part in urlparse(android_url).query.split("&"):
+        key, _, value = part.partition("=")
+        if key != "v" or not value:
+            continue
+        version_value = value[:40]
+        version_part, separator, build_part = version_value.rpartition("-b")
+        if separator and build_part.isdigit():
+            android_version = android_version or version_part
+            android_build_number = android_build_number or build_part
+        else:
+            android_version = android_version or version_value
+        break
+    android_version = android_version or "1.4.55"
+    android_build_number = android_build_number or android_version.split(".")[-1]
     now_iso = datetime.now(timezone.utc).isoformat()
     return {
         "android": {
             "id": "default-android",
             "platform": "android",
             "version": android_version,
-            "build_number": android_version.split(".")[-1],
+            "build_number": android_build_number,
             "title": f"Android {android_version}",
             "status": "published",
             "download_url": android_url,
@@ -1317,7 +1352,7 @@ async def admin_operations(request: Request):
     website_url = _env_public_url("PUBLIC_WEBSITE_URL", "https://ghostel.app")
     mobile_api_url = _env_public_url("GHOSTEL_MOBILE_API_URL", "https://api.ghostel.app/api/")
     panel_api_url = _env_public_url("PANEL_API_URL", "https://panel-api.ghostel.app/api/")
-    apk_url = (android_release.get("download_url") or os.environ.get("GHOSTEL_APK_URL") or "https://api.ghostel.app/app-release.apk?v=1.4.54").strip()
+    apk_url = (android_release.get("download_url") or os.environ.get("GHOSTEL_APK_URL") or "https://api.ghostel.app/app-release.apk?v=1.4.55-b62").strip()
     release_api_url = _env_public_url(
         "GHOSTEL_RELEASE_API_URL",
         android_release.get("release_url") or "https://api.github.com/repos/Ghostelapp/app-Gostel/releases/latest",
@@ -1682,36 +1717,51 @@ async def report_action(report_id: str, payload: ReportActionIn, request: Reques
 @api.get("/admin/notifications")
 async def list_notifications(request: Request):
     await require_admin(request, db)
-    notifications = await db.notifications.find({}, {"_id": 0}).sort("created_at", -1).to_list(200)
-    return notifications
+    if not ghostel_client.is_configured:
+        raise HTTPException(status_code=503, detail="Most administracyjny API aplikacji nie jest skonfigurowany")
+    try:
+        return await ghostel_client.announcements()
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=exc.response.status_code, detail=_upstream_detail(exc))
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="API aplikacji jest chwilowo niedostępne")
 
 
 @api.post("/admin/notifications")
 async def send_notification(payload: NotificationIn, request: Request):
     await require_admin(request, db)
-    # determine recipients count
-    if payload.target_type == "all":
-        recipients = await db.users.count_documents({})
-    elif payload.target_type == "group":
-        g = await db.groups.find_one({"id": payload.target_id})
-        recipients = g.get("members_count", 0) if g else 0
-    else:
-        recipients = 1 if await db.users.find_one({"id": payload.target_id}) else 0
-    doc = {
-        "id": str(uuid.uuid4()),
-        "title": payload.title,
-        "body": payload.body,
-        "icon": payload.icon,
-        "link": payload.link,
-        "target_type": payload.target_type,
-        "target_id": payload.target_id,
-        "recipients": recipients,
-        "status": "sent",
-        "created_at": datetime.now(timezone.utc).isoformat(),
-    }
-    await db.notifications.insert_one(doc)
-    doc.pop("_id", None)
-    return doc
+    if not ghostel_client.is_configured:
+        raise HTTPException(status_code=503, detail="Most administracyjny API aplikacji nie jest skonfigurowany")
+    try:
+        return await ghostel_client.create_announcement(payload.model_dump(mode="json"))
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=exc.response.status_code, detail=_upstream_detail(exc))
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="API aplikacji jest chwilowo niedostępne")
+
+
+@api.patch("/admin/notifications/{announcement_id}")
+async def update_notification(announcement_id: str, payload: NotificationUpdateIn, request: Request):
+    await require_admin(request, db)
+    try:
+        return await ghostel_client.update_announcement(
+            announcement_id, payload.model_dump(exclude_unset=True, mode="json")
+        )
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=exc.response.status_code, detail=_upstream_detail(exc))
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="API aplikacji jest chwilowo niedostępne")
+
+
+@api.post("/admin/notifications/{announcement_id}/{action}")
+async def notification_action(announcement_id: str, action: Literal["publish", "unpublish", "archive"], request: Request):
+    await require_admin(request, db)
+    try:
+        return await ghostel_client.announcement_action(announcement_id, action)
+    except httpx.HTTPStatusError as exc:
+        raise HTTPException(status_code=exc.response.status_code, detail=_upstream_detail(exc))
+    except httpx.RequestError:
+        raise HTTPException(status_code=503, detail="API aplikacji jest chwilowo niedostępne")
 
 
 # ----- Admin: Settings -----
