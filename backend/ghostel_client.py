@@ -100,6 +100,29 @@ class GhostelClient:
             return []
         return r.json()
 
+    async def announcements(self) -> list:
+        r = await self._request("GET", "/admin/announcements")
+        r.raise_for_status()
+        return r.json()
+
+    async def create_announcement(self, payload: dict) -> dict:
+        r = await self._request("POST", "/admin/announcements", json=payload)
+        r.raise_for_status()
+        return r.json()
+
+    async def update_announcement(self, announcement_id: str, payload: dict) -> dict:
+        r = await self._request("PATCH", f"/admin/announcements/{announcement_id}", json=payload)
+        r.raise_for_status()
+        return r.json()
+
+    async def announcement_action(self, announcement_id: str, action: str) -> dict:
+        if action == "archive":
+            r = await self._request("DELETE", f"/admin/announcements/{announcement_id}")
+        else:
+            r = await self._request("POST", f"/admin/announcements/{announcement_id}/{action}")
+        r.raise_for_status()
+        return r.json()
+
 
 # singleton
 ghostel_client = GhostelClient()
