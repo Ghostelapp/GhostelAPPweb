@@ -8,6 +8,12 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const onAuthExpired = () => {
+      setToken(null);
+      setUser(false);
+      setLoading(false);
+    };
+    window.addEventListener("ghostel:auth-expired", onAuthExpired);
     api
       .get("/auth/me")
       .then((res) => setUser(res.data))
@@ -16,6 +22,8 @@ export function AuthProvider({ children }) {
         setUser(false);
       })
       .finally(() => setLoading(false));
+
+    return () => window.removeEventListener("ghostel:auth-expired", onAuthExpired);
   }, []);
 
   const login = async (email, password, totpCode = "") => {

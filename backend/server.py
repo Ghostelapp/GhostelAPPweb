@@ -268,9 +268,15 @@ def _cookie_secure() -> bool:
     return os.environ.get("FRONTEND_URL", "").lower().startswith("https://")
 
 
+def _set_access_cookie(response: Response, access: str):
+    secure = _cookie_secure()
+    access_minutes = max(5, int(os.environ.get("ACCESS_TOKEN_MINUTES", "60")))
+    response.set_cookie("access_token", access, httponly=True, secure=secure, samesite="strict", max_age=access_minutes * 60, path="/")
+
+
 def _set_cookies(response: Response, access: str, refresh: str):
     secure = _cookie_secure()
-    response.set_cookie("access_token", access, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 12, path="/")
+    _set_access_cookie(response, access)
     response.set_cookie("refresh_token", refresh, httponly=True, secure=secure, samesite="strict", max_age=60 * 60 * 24 * 7, path="/")
 
 
@@ -1096,9 +1102,7 @@ async def register(payload: RegisterIn, response: Response, request: Request):
     access = create_access_token(doc["id"], email, doc.get("role", "user"))
     refresh = create_refresh_token(doc["id"])
     _set_cookies(response, access, refresh)
-    out = _public_user(doc)
-    out["access_token"] = access
-    return out
+    return _public_user(doc)
 
 
 @api.post("/auth/login")
@@ -1140,9 +1144,33 @@ async def login(payload: LoginIn, response: Response, request: Request):
     refresh = create_refresh_token(user["id"])
     _set_cookies(response, access, refresh)
     await db.users.update_one({"id": user["id"]}, {"$set": {"last_active": datetime.now(timezone.utc).isoformat()}})
-    out = _public_user(user)
-    out["access_token"] = access
-    return out
+    return _public_user(user)
+
+
+@api.post("/auth/refresh")
+async def refresh_session(response: Response, request: Request):
+    await _enforce_rate_limit(
+        "auth-refresh-ip", _client_ip(request), limit=60, window_seconds=5 * 60
+    )
+    raw_token = request.cookies.get("refresh_token", "")
+    if not raw_token:
+        raise HTTPException(status_code=401, detail="Refresh session required")
+    try:
+        payload = decode_token(raw_token)
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid refresh session")
+    if payload.get("type") != "refresh":
+        raise HTTPException(status_code=401, detail="Invalid refresh session")
+    if payload.get("jti") and await db.revoked_tokens.find_one({"jti": payload["jti"]}, {"_id": 1}):
+        raise HTTPException(status_code=401, detail="Refresh session revoked")
+
+    user = await db.users.find_one({"id": payload.get("sub")})
+    if not user or user.get("status") == "blocked":
+        raise HTTPException(status_code=401, detail="Account unavailable")
+
+    access = create_access_token(user["id"], user.get("email", ""), user.get("role", "user"))
+    _set_access_cookie(response, access)
+    return {"ok": True, "user": _public_user(user)}
 
 
 @api.post("/auth/logout")
