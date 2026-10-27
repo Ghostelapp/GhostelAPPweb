@@ -33,13 +33,42 @@ export function setToken(token) {
 
 setToken(null);
 
+let refreshPromise = null;
+
+function notifyAuthExpired() {
+  window.dispatchEvent(new Event("ghostel:auth-expired"));
+}
+
 api.interceptors.response.use(
   (r) => r,
-  (err) => {
-    if (err?.response?.status === 401) {
+  async (err) => {
+    const request = err?.config;
+    if (err?.response?.status !== 401 || !request) return Promise.reject(err);
+
+    const path = String(request.url || "").split("?", 1)[0];
+    const authEndpoint = /\/auth\/(login|register|logout|refresh)$/.test(path);
+    if (authEndpoint) return Promise.reject(err);
+
+    if (request._authRetried) {
       setToken(null);
+      notifyAuthExpired();
+      return Promise.reject(err);
     }
-    return Promise.reject(err);
+
+    request._authRetried = true;
+    try {
+      if (!refreshPromise) {
+        refreshPromise = api.post("/auth/refresh").finally(() => {
+          refreshPromise = null;
+        });
+      }
+      await refreshPromise;
+      return api(request);
+    } catch {
+      setToken(null);
+      notifyAuthExpired();
+      return Promise.reject(err);
+    }
   }
 );
 

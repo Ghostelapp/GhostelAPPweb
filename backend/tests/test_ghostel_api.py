@@ -21,9 +21,10 @@ def admin_token():
     r = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
     assert r.status_code == 200, f"Admin login failed: {r.status_code} {r.text}"
     data = r.json()
-    assert "access_token" in data
+    assert "access_token" not in data
+    assert r.cookies.get("access_token")
     assert data["role"] == "admin"
-    return data["access_token"]
+    return r.cookies.get("access_token")
 
 
 @pytest.fixture(scope="session")
@@ -40,7 +41,8 @@ def user_token():
     r = requests.post(f"{API}/auth/login", json={"email": USER_EMAIL, "password": USER_PASSWORD})
     if r.status_code != 200:
         pytest.skip(f"User login failed: {r.status_code} {r.text}")
-    return r.json()["access_token"]
+    assert "access_token" not in r.json()
+    return r.cookies.get("access_token")
 
 
 def admin_headers(token):
@@ -62,7 +64,8 @@ class TestAuth:
         d = r.json()
         assert d["email"] == ADMIN_EMAIL
         assert d["role"] == "admin"
-        assert isinstance(d["access_token"], str) and len(d["access_token"]) > 10
+        assert "access_token" not in d
+        assert r.cookies.get("access_token")
 
     def test_login_wrong_password(self):
         r = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": "WrongPass!"})
@@ -79,11 +82,34 @@ class TestAuth:
         d = r.json()
         assert d["email"] == email.lower()
         assert d["role"] == "user"
-        assert "access_token" in d
+        assert "access_token" not in d
+        token = r.cookies.get("access_token")
+        assert token
         # verify token works
-        me = requests.get(f"{API}/auth/me", headers={"Authorization": f"Bearer {d['access_token']}"})
+        me = requests.get(f"{API}/auth/me", headers={"Authorization": f"Bearer {token}"})
         assert me.status_code == 200
         assert me.json()["email"] == email.lower()
+
+    def test_refresh_renews_access_cookie_without_returning_a_token(self):
+        if not ADMIN_PASSWORD:
+            pytest.skip("ADMIN_PASSWORD env var is required for auth tests")
+        login = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
+        assert login.status_code == 200, login.text
+        refresh_cookie = login.cookies.get("refresh_token")
+        assert refresh_cookie
+
+        refreshed = requests.post(f"{API}/auth/refresh", cookies={"refresh_token": refresh_cookie})
+        assert refreshed.status_code == 200, refreshed.text
+        assert "access_token" not in refreshed.json()
+        access_cookie = refreshed.cookies.get("access_token")
+        assert access_cookie
+
+        me = requests.get(f"{API}/auth/me", headers={"Authorization": f"Bearer {access_cookie}"})
+        assert me.status_code == 200
+        assert me.json()["role"] == "admin"
+
+    def test_refresh_requires_refresh_cookie(self):
+        assert requests.post(f"{API}/auth/refresh").status_code == 401
 
     def test_register_duplicate_email_rejected(self):
         r = requests.post(f"{API}/auth/register", json={"name": "Admin Dup", "email": ADMIN_EMAIL, "password": "Password123!"})
@@ -100,13 +126,18 @@ class TestAuth:
     def test_logout_revokes_bearer_token(self):
         if not ADMIN_PASSWORD:
             pytest.skip("ADMIN_PASSWORD env var is required for admin API tests")
-        login = requests.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
+        session = requests.Session()
+        login = session.post(f"{API}/auth/login", json={"email": ADMIN_EMAIL, "password": ADMIN_PASSWORD})
         assert login.status_code == 200, login.text
-        token = login.json()["access_token"]
-        logout = requests.post(f"{API}/auth/logout", headers={"Authorization": f"Bearer {token}"})
+        token = login.cookies.get("access_token")
+        refresh_token = login.cookies.get("refresh_token")
+        assert token and refresh_token
+        logout = session.post(f"{API}/auth/logout")
         assert logout.status_code == 200, logout.text
         me = requests.get(f"{API}/auth/me", headers={"Authorization": f"Bearer {token}"})
         assert me.status_code == 401
+        refresh = requests.post(f"{API}/auth/refresh", cookies={"refresh_token": refresh_token})
+        assert refresh.status_code == 401
 
 
 # ---- Admin: Dashboard ----

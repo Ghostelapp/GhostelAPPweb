@@ -8,7 +8,7 @@ Build a complete modern website + admin panel for ghostel.app, a real-time commu
 ## Architecture
 - **Backend**: FastAPI + Motor (MongoDB async) + JWT auth (Bearer token).
 - **Frontend**: React 19 + Tailwind + Shadcn UI + Framer Motion + Recharts + React Router.
-- **Auth**: Bearer JWT in `localStorage` (httpOnly cookies also set for fallback).
+- **Auth**: HttpOnly access and refresh cookies for the website; Bearer JWT remains accepted for API clients. Access tokens renew through `/api/auth/refresh` and are not returned in auth response bodies.
 
 ## User Personas
 - **Visitor** — lands on marketing page, reads features, signs up.
