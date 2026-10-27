@@ -711,7 +711,7 @@ def _release_public_doc(doc: dict) -> dict:
 
 
 def _default_public_releases() -> dict:
-    android_url = _env_public_url("GHOSTEL_APK_URL", "https://api.ghostel.app/app-release.apk?v=1.4.55-b62")
+    android_url = _env_public_url("GHOSTEL_APK_URL", "https://api.ghostel.app/app-release.apk?v=1.4.56-b63")
     android_version = (os.environ.get("GHOSTEL_ANDROID_VERSION") or "").strip()
     android_build_number = (os.environ.get("GHOSTEL_ANDROID_BUILD_NUMBER") or "").strip()
     for part in urlparse(android_url).query.split("&"):
@@ -726,7 +726,7 @@ def _default_public_releases() -> dict:
         else:
             android_version = android_version or version_value
         break
-    android_version = android_version or "1.4.55"
+    android_version = android_version or "1.4.56"
     android_build_number = android_build_number or android_version.split(".")[-1]
     now_iso = datetime.now(timezone.utc).isoformat()
     return {
@@ -1380,7 +1380,7 @@ async def admin_operations(request: Request):
     website_url = _env_public_url("PUBLIC_WEBSITE_URL", "https://ghostel.app")
     mobile_api_url = _env_public_url("GHOSTEL_MOBILE_API_URL", "https://api.ghostel.app/api/")
     panel_api_url = _env_public_url("PANEL_API_URL", "https://panel-api.ghostel.app/api/")
-    apk_url = (android_release.get("download_url") or os.environ.get("GHOSTEL_APK_URL") or "https://api.ghostel.app/app-release.apk?v=1.4.55-b62").strip()
+    apk_url = (android_release.get("download_url") or os.environ.get("GHOSTEL_APK_URL") or "https://api.ghostel.app/app-release.apk?v=1.4.56-b63").strip()
     release_api_url = _env_public_url(
         "GHOSTEL_RELEASE_API_URL",
         android_release.get("release_url") or "https://api.github.com/repos/Ghostelapp/app-Gostel/releases/latest",

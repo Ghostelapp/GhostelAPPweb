@@ -6,6 +6,17 @@ import { GHOSTEL_ANDROID_VERSION } from "@/lib/constants";
 const updates = [
   {
     version: GHOSTEL_ANDROID_VERSION,
+    date: "2026-10-27",
+    title: "Calls and account security update",
+    items: [
+      "Improved incoming-call recovery and call lifecycle handling across iOS and Android.",
+      "Strengthened website session renewal with HttpOnly cookies.",
+      "Published Android build 63 as version 1.4.56 and submitted iOS build 75 to TestFlight.",
+      "Updated public tester metadata and Android download versioning.",
+    ],
+  },
+  {
+    version: GHOSTEL_ANDROID_VERSION,
     date: "2026-09-07",
     title: "Android and iOS release 1.4.55",
     items: [
